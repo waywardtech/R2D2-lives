@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Mapping, Protocol
 
 
 class DroidDriver(Protocol):
@@ -12,13 +12,98 @@ class HardwareUnavailableError(RuntimeError):
     pass
 
 
-class Spherov2R2Driver:
-    """Phase 1 adapter seam; deliberately impossible to instantiate in P0."""
+class Spherov2Backend(Protocol):
+    """Narrow reviewed surface over the pinned third-party BLE library."""
 
-    def __init__(self) -> None:
+    library_version: str
+
+    def connect(self, configured_identity: str) -> None: ...
+    def disconnect(self) -> None: ...
+    def stop(self) -> None: ...
+    def identity(self) -> Mapping[str, str]: ...
+    def battery(self) -> Mapping[str, object]: ...
+    def exercise_stationary(self, capability: str) -> Mapping[str, object]: ...
+
+
+class UnavailableSpherov2Backend:
+    library_version = "unavailable"
+
+    def _raise(self) -> None:
         raise HardwareUnavailableError(
-            "Spherov2R2Driver is unavailable in Phase 0; simulation is mandatory"
+            "spherov2.py backend is not installed; simulation/replay is mandatory"
         )
+
+    def connect(self, configured_identity: str) -> None:
+        self._raise()
+
+    def disconnect(self) -> None:
+        self._raise()
+
+    def stop(self) -> None:
+        self._raise()
+
+    def identity(self) -> Mapping[str, str]:
+        self._raise()
+        return {}
+
+    def battery(self) -> Mapping[str, object]:
+        self._raise()
+        return {}
+
+    def exercise_stationary(self, capability: str) -> Mapping[str, object]:
+        self._raise()
+        return {}
+
+
+@dataclass
+class Spherov2R2Driver:
+    """Owned adapter for the pinned 0.12.1 baseline; no raw types escape."""
+
+    backend: Spherov2Backend = field(default_factory=UnavailableSpherov2Backend)
+    configured_identity: str = ""
+    connected: bool = False
+    stopped: bool = True
+
+    expected_library_version = "0.12.1"
+
+    def connect(self) -> None:
+        if not self.configured_identity:
+            raise ValueError("configured droid identity is required outside source control")
+        if isinstance(self.backend, UnavailableSpherov2Backend):
+            self.backend.connect(self.configured_identity)
+        if self.backend.library_version != self.expected_library_version:
+            raise RuntimeError(
+                f"expected spherov2.py {self.expected_library_version}, "
+                f"got {self.backend.library_version}"
+            )
+        try:
+            self.backend.connect(self.configured_identity)
+        except Exception:
+            try:
+                self.backend.stop()
+            except Exception:
+                pass
+            try:
+                self.backend.disconnect()
+            except Exception:
+                pass
+            self.connected = False
+            self.stopped = True
+            raise
+        self.connected = True
+        self.stopped = True
+
+    def safe_hold(self) -> None:
+        self.stopped = True
+        if self.connected:
+            self.backend.stop()
+
+    def disconnect(self) -> None:
+        if self.connected:
+            self.safe_hold()
+            self.backend.disconnect()
+        self.connected = False
+        self.stopped = True
 
 
 @dataclass

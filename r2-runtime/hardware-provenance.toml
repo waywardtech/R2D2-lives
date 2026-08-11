@@ -1,0 +1,35 @@
+[spherov2]
+expected_version = "0.12.1"
+license = "MIT"
+source_assessment = "specs/docs/11-supplied-source-assessment.md"
+source_url = "https://files.pythonhosted.org/packages/ea/11/a7e868c08e6b3a4a359b90007b96c197b203dff981fe5f8b7f700856e1aa/spherov2-0.12.1.tar.gz"
+source_sha256 = "087929a28164af78c8a258396593a51d45fc89af23e86c524d86d0a5d094908f"
+source_archive_verified = true
+inspected_date = "2026-08-11"
+status = "reviewed-adapter-surface"
+
+[bleak]
+selected_version = "0.21.1"
+source_sha256 = "ec4a1a2772fb315b992cbaa1153070c7e26968a52b0e2727035f443a1af5c18f"
+compatibility_basis = "Python 3.11 support and API surface used by spherov2 0.12.1"
+linux_requirements = ["dbus-fast>=1.83.0,<3", "typing-extensions>=4.7.0"]
+status = "locked-not-hardware-verified"
+
+[direct_dependencies]
+numpy = "1.26.4"
+transforms3d = "0.4.1"
+
+[target_pi_lock]
+file = "requirements-hardware-pi.lock"
+manifest = "hardware-wheelhouse.manifest.json"
+python = "CPython 3.11"
+platform = "manylinux2014_aarch64"
+artifact_count = 6
+hashes_verified = true
+target_import_verified = false
+resolved_date = "2026-08-11"
+
+[safety]
+default_backend = "simulation"
+real_hardware_automated_tests = false
+movement_authorized = false

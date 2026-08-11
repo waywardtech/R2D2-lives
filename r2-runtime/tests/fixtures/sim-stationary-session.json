@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "seed": 20260811,
+  "library_baseline": "0.12.1",
+  "evidence_category": "simulation",
+  "identity": {
+    "model": "R201-sim",
+    "system": "sim-system-1",
+    "firmware": "sim-fw-1"
+  },
+  "events": [
+    "connect",
+    "identity.system_info",
+    "battery.state_voltage",
+    "led.low_brightness",
+    "head.safe_range",
+    "audio.quiet_preview",
+    "telemetry.stationary",
+    "collision.configuration",
+    "stop",
+    "disconnect"
+  ],
+  "movement_performed": false,
+  "final_state": "safe_hold"
+}

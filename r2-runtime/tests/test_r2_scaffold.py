@@ -33,8 +33,10 @@ class R2ScaffoldTest(unittest.TestCase):
         self.assertEqual(driver.history, ["safe_hold"])
 
     def test_hardware_adapter_is_fail_closed_in_phase_zero(self) -> None:
-        with self.assertRaisesRegex(HardwareUnavailableError, "simulation is mandatory"):
-            Spherov2R2Driver()
+        driver = Spherov2R2Driver(configured_identity="configured-outside-source")
+        with self.assertRaisesRegex(HardwareUnavailableError, "simulation/replay is mandatory"):
+            driver.connect()
+        self.assertTrue(driver.stopped)
 
 
 if __name__ == "__main__":

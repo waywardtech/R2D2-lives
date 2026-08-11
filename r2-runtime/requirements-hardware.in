@@ -1,0 +1,5 @@
+# Direct hardware-profile pins. Resolve a platform lock on the target Pi before installation.
+spherov2==0.12.1
+bleak==0.21.1
+numpy==1.26.4
+transforms3d==0.4.1

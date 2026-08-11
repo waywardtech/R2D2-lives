@@ -59,6 +59,10 @@ def sim_smoke() -> None:
     _run([sys.executable, "integration-lab/sim_roundtrip.py"])
 
 
+def p1_sim() -> None:
+    _run([sys.executable, "integration-lab/p1_stationary_probe.py"])
+
+
 def test() -> None:
     check()
     contract()
@@ -72,6 +76,11 @@ def docs_check() -> None:
         ROOT / "STATUS.md",
         ROOT / "CHANGELOG.md",
         ROOT / "docs" / "phase-0-operator.md",
+        ROOT / "docs" / "phase-1-stationary-probe.md",
+        ROOT / "r2-runtime" / "hardware-provenance.toml",
+        ROOT / "r2-runtime" / "requirements-hardware-pi.lock",
+        ROOT / "r2-runtime" / "hardware-wheelhouse.manifest.json",
+        ROOT / "r2-runtime" / "THIRD_PARTY_NOTICES.md",
         ROOT / "traceability" / "evidence.csv",
         ROOT / "specs" / "traceability" / "requirements.csv",
     ]
@@ -83,6 +92,7 @@ def docs_check() -> None:
         if phrase not in status:
             raise SystemExit(f"STATUS.md missing required phrase: {phrase}")
     json.loads((ROOT / "protocol" / "schema" / "sap-common.schema.json").read_text(encoding="utf-8"))
+    _run([sys.executable, "scripts/verify_hardware_lock.py"])
     yaml_expectations = {
         "agent-api.openapi.yaml": ("openapi: 3.1.0", "paths:", "SAP-Version"),
         "spatial-provider-api.openapi.yaml": ("openapi: 3.1.0", "paths:", "sap-common.schema.json"),
@@ -100,6 +110,7 @@ TASKS = {
     "check": check,
     "contract": contract,
     "sim-smoke": sim_smoke,
+    "p1-sim": p1_sim,
     "test": test,
     "docs-check": docs_check,
 }

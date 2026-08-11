@@ -1,0 +1,134 @@
+from __future__ import annotations
+
+import hashlib
+from pathlib import Path
+import tempfile
+import unittest
+
+from r2_runtime.ble_owner import BleOwner, ConnectionState
+from r2_runtime.capability_probe import MOVEMENT_CAPABILITIES, StationaryCapabilityProbe
+from r2_runtime.drivers import (
+    HardwareUnavailableError,
+    Spherov2R2Driver,
+    UnavailableSpherov2Backend,
+)
+from r2_runtime.recording import read_verified_json, write_immutable_json
+from r2_runtime.sim_hardware import SimSpherov2Backend
+
+
+class CapabilityProbeTest(unittest.TestCase):
+    def make_probe(self) -> tuple[SimSpherov2Backend, Spherov2R2Driver, BleOwner, StationaryCapabilityProbe]:
+        backend = SimSpherov2Backend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        owner = BleOwner(driver)
+        return backend, driver, owner, StationaryCapabilityProbe(owner, driver)
+
+    def test_stationary_probe_records_capabilities_without_movement(self) -> None:
+        backend, driver, owner, probe = self.make_probe()
+        report = probe.run(generated_at="2030-01-01T00:00:00Z")
+        self.assertEqual(report.evidence_category, "simulation")
+        self.assertFalse(report.movement_performed)
+        self.assertEqual(report.final_state, "safe_hold")
+        self.assertTrue(owner.stopped)
+        self.assertEqual(owner.state, ConnectionState.OFFLINE)
+        for capability in MOVEMENT_CAPABILITIES:
+            self.assertEqual(report.capabilities[capability].status, "untested")
+        self.assertNotIn("D2-SIMULATED", str(report.to_dict()))
+        self.assertNotIn("drive.bounded", backend.calls)
+
+    def test_five_simulated_cycles_end_stopped(self) -> None:
+        for _ in range(5):
+            backend, _, owner, probe = self.make_probe()
+            probe.run(generated_at="2030-01-01T00:00:00Z")
+            self.assertTrue(owner.stopped)
+            self.assertEqual(backend.calls[-2:], ["stop", "disconnect"])
+
+    def test_link_loss_and_reconnect_do_not_resume(self) -> None:
+        backend, driver, owner, _ = self.make_probe()
+        owner.connect_for_stationary_probe()
+        driver.stopped = False  # injected unsafe/stale local state
+        owner.link_lost()
+        self.assertTrue(owner.stopped)
+        self.assertFalse(driver.connected)
+        owner.connect_for_stationary_probe()
+        self.assertTrue(owner.stopped)
+        self.assertTrue(backend.stopped)
+        owner.disconnect("test_complete")
+
+    def test_wrong_library_version_fails_closed(self) -> None:
+        backend = SimSpherov2Backend(library_version="0.12.0")
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        owner = BleOwner(driver)
+        with self.assertRaisesRegex(RuntimeError, "expected spherov2.py 0.12.1"):
+            owner.connect_for_stationary_probe()
+        self.assertTrue(owner.stopped)
+        self.assertEqual(owner.state, ConnectionState.OFFLINE)
+
+    def test_partial_connect_failure_attempts_stop_and_disconnect(self) -> None:
+        class PartialFailureBackend(SimSpherov2Backend):
+            def connect(self, configured_identity: str) -> None:
+                self.connected = True
+                self.calls.append("connect_partial")
+                raise OSError("injected handshake failure")
+
+        backend = PartialFailureBackend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        owner = BleOwner(driver)
+        with self.assertRaisesRegex(OSError, "handshake failure"):
+            owner.connect_for_stationary_probe()
+        self.assertEqual(backend.calls, ["connect_partial", "stop", "disconnect"])
+        self.assertTrue(owner.stopped)
+        self.assertFalse(driver.connected)
+        self.assertEqual(owner.state, ConnectionState.OFFLINE)
+
+    def test_unavailable_backend_has_no_implicit_hardware_fallback(self) -> None:
+        driver = Spherov2R2Driver(
+            backend=UnavailableSpherov2Backend(), configured_identity="configured-outside-source"
+        )
+        with self.assertRaisesRegex(HardwareUnavailableError, "simulation/replay is mandatory"):
+            driver.connect()
+        self.assertTrue(driver.stopped)
+
+    def test_immutable_record_and_hash_verified_replay(self) -> None:
+        _, _, _, probe = self.make_probe()
+        report = probe.run(generated_at="2030-01-01T00:00:00Z")
+        with tempfile.TemporaryDirectory() as raw_temp:
+            path = Path(raw_temp) / "report.json"
+            digest = write_immutable_json(path, report.to_dict())
+            replay = read_verified_json(path, digest)
+            self.assertEqual(replay["final_state"], "safe_hold")
+            with self.assertRaisesRegex(ValueError, "hash mismatch"):
+                read_verified_json(path, "0" * 64)
+            self.assertEqual(digest, hashlib.sha256(path.read_bytes()).hexdigest())
+
+    def test_canonical_replay_fixture_is_stationary_and_safe(self) -> None:
+        path = Path(__file__).parent / "fixtures" / "sim-stationary-session.json"
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        replay = read_verified_json(path, digest)
+        self.assertEqual(replay["seed"], 20260811)
+        self.assertFalse(replay["movement_performed"])
+        self.assertEqual(replay["events"][-2:], ["stop", "disconnect"])
+        self.assertEqual(replay["final_state"], "safe_hold")
+
+    def test_critical_hardware_battery_blocks_all_optional_actions(self) -> None:
+        class CriticalBatteryBackend(SimSpherov2Backend):
+            def battery(self) -> dict[str, object]:
+                self.calls.append("battery")
+                return {"state": "critical", "voltage_v": 3.1, "provenance": "test"}
+
+            def exercise_stationary(self, capability: str) -> dict[str, object]:
+                raise AssertionError(f"unsafe action attempted: {capability}")
+
+        backend = CriticalBatteryBackend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        report = StationaryCapabilityProbe(BleOwner(driver), driver).run(
+            generated_at="2030-01-01T00:00:00Z", evidence_category="HIL-stationary"
+        )
+        for capability, evidence in report.capabilities.items():
+            if capability not in {"identity.system_info", "battery.state_voltage"}:
+                self.assertEqual(evidence.status, "untested")
+        self.assertEqual(report.final_state, "safe_hold")
+
+
+if __name__ == "__main__":
+    unittest.main()

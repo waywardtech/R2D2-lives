@@ -1,4 +1,4 @@
-.PHONY: bootstrap check contract sim-smoke test docs-check
+.PHONY: bootstrap check contract sim-smoke p1-sim test docs-check hardware-lock-check hardware-import-check
 
 PYTHON ?= python3
 
@@ -14,9 +14,17 @@ contract:
 sim-smoke:
 	$(PYTHON) scripts/tasks.py sim-smoke
 
+p1-sim:
+	$(PYTHON) scripts/tasks.py p1-sim
+
 test:
 	$(PYTHON) scripts/tasks.py test
 
 docs-check:
 	$(PYTHON) scripts/tasks.py docs-check
 
+hardware-lock-check:
+	$(PYTHON) scripts/verify_hardware_lock.py
+
+hardware-import-check:
+	$(PYTHON) scripts/verify_hardware_imports.py

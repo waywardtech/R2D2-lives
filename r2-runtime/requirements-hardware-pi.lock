@@ -1,0 +1,9 @@
+# Target: CPython 3.11, Linux aarch64, manylinux2014-compatible Raspberry Pi OS.
+# Generated from requirements-hardware.in on 2026-08-11.
+# Install only after running scripts/verify_hardware_lock.py on the target Pi.
+bleak==0.21.1 --hash=sha256:ccec260a0f5ec02dd133d68b0351c0151b2ecf3ddd0bcabc4c04a1cdd7f33256
+dbus-fast==2.46.4 --hash=sha256:8b3abb2c8d63d6c09839dc504c0f62b179534d0f7d188081ad6e2740645a9759
+numpy==1.26.4 --hash=sha256:7ab55401287bfec946ced39700c053796e7cc0e3acbef09993a9ad2adba6ca6e
+spherov2==0.12.1 --hash=sha256:f182796b6b73225a1e6968c38243c56945ef6a5e953224e604aa8d1a83adb0fd
+transforms3d==0.4.1 --hash=sha256:aea08776c1c915c8b424418994202aced8e46301c375ce63423d14f1d0045aa7
+typing-extensions==4.16.0 --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8
