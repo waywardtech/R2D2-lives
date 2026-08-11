@@ -25,3 +25,4 @@ SAFE-003,P1,in_progress,automated,r2-runtime/tests/test_hil_preflight.py,"Author
 R2-002,P1,in_progress,automated,scripts/verify_hardware_lock.py,"Six CPython 3.11 Linux/aarch64 wheel hashes locked and verified; target-host import recorded separately"
 R2-002,P1,in_progress,target_host,docs/phase-1-stationary-probe.md,"All six locked versions imported with Python 3.11.2 on Debian 13/aarch64; BLE and R2 not accessed"
 SAFE-003,P1,in_progress,target_host,r2-runtime/hardware-provenance.toml,"Read-only Pi audit passed; controller remained powered off, non-pairable, and non-discovering"
+R2-001,P1,in_progress,HIL_discovery,docs/phase-1-stationary-probe.md,"Controller software block recovered and restored; bounded scans found no R2 advertisement; no connection or command"

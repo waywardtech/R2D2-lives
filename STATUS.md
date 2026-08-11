@@ -46,6 +46,8 @@ Evidence category: automated, contract, simulation. No HIL evidence.
   Python 3.11.2 on the Debian 13/aarch64 target host; BLE was not accessed.
 - Read-only Pi readiness audit passed for BlueZ, D-Bus, NTP, storage, and CPU
   thermal state; the Bluetooth controller remains powered off and undiscoverable.
+- First authorized stationary discovery attempt characterized the Pi's software
+  rfkill state but found no R2 advertisement; no connection or command occurred.
 
 ## Remaining gate items
 
@@ -70,6 +72,8 @@ Evidence category: automated, contract, simulation. No HIL evidence.
 - No physical capability, BLE behavior, acoustic accuracy, or real-room safety is verified.
 - Target-host dependency imports are verified, but the Pi defaults to Python
   3.13.5 and deployment must explicitly use 3.11. All actual firmware/BLE behavior remains unverified.
+- R2 did not advertise during bounded discovery while charging; operator action
+  is required to wake advertising without moving or unplugging the droid.
 
 ## Last verification
 
@@ -85,6 +89,7 @@ python scripts/tasks.py test -> pass after Phase 1 lock slice; 43 tests plus iso
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off
+stationary HIL discovery attempt 1 -> blocked; no R2 advertisement, no connection/command
 ```
 
 ## Hardware state
@@ -92,7 +97,7 @@ SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller 
 - Real R2 movement authorized for next run: no
 - Last known droid state: unknown/stopped (never assume active)
 - Capability profile: none/unverified
-- Hardware evidence category: target-host dependency import only; no R2 HIL
+- Hardware evidence category: target-host import plus HIL discovery; no R2 connection
 
 ## Exact next task
 

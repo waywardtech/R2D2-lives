@@ -19,6 +19,8 @@
   under Python 3.11.2 without BLE access.
 - Record a read-only Pi readiness audit with the Bluetooth controller left off;
   distinguish Pi CPU temperature from ambient and droid sensor evidence.
+- Characterize the first stationary-HIL discovery attempt: Pi rfkill recovery
+  succeeded, R2 did not advertise, and no droid connection or command occurred.
 
 ## 0.1.0 - 2026-08-11
 

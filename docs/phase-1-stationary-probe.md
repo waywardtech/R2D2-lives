@@ -43,6 +43,18 @@ Bluetooth controller was powered off, non-pairable, and non-discovering; it was
 not powered on or scanned. The measured 35.537 °C value is Pi CPU temperature
 only. It is not ambient temperature and is not a droid sensor reading.
 
+## Stationary HIL discovery attempt 1
+
+On 2026-08-11 the operator authorized R2 access while charging with a hard
+constraint against changing heading, direction, or location. The Pi controller
+was software-blocked; the existing `rfkill` utility safely unblocked it and the
+controller came up non-pairable and non-discovering. A 10-second R2-prefix scan
+and a 15-second name-filtered scan found no R2/Sphero advertisement. R2 was never
+connected or commanded. The controller was returned to its original powered-off,
+software-blocked state and all temporary files were removed. No device address
+is stored in repository evidence. Testing is blocked until R2 advertises while
+remaining on charge and stationary.
+
 ## Simulation
 
 Run `python scripts/tasks.py p1-sim` (or `make p1-sim`). Output includes seed
