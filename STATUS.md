@@ -44,6 +44,8 @@ Evidence category: automated, contract, simulation. No HIL evidence.
   hash lock and manifest; downloaded wheels verified without installation.
 - All six locked packages installed offline and imported successfully with
   Python 3.11.2 on the Debian 13/aarch64 target host; BLE was not accessed.
+- Read-only Pi readiness audit passed for BlueZ, D-Bus, NTP, storage, and CPU
+  thermal state; the Bluetooth controller remains powered off and undiscoverable.
 
 ## Remaining gate items
 
@@ -82,6 +84,7 @@ python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s so
 python scripts/tasks.py test -> pass after Phase 1 lock slice; 43 tests plus isolated standalone repetitions
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
+SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off
 ```
 
 ## Hardware state

@@ -37,6 +37,12 @@ an isolated temporary `pip --target` directory with `--no-index` and
 `--require-hashes`, followed by `python3.11 -S`. All six exact versions imported
 from that directory. BLE was not scanned or accessed, and this is not R2 HIL.
 
+A subsequent read-only host readiness audit found BlueZ 5.82 active, system
+D-Bus available, NTP synchronized, and sufficient temporary storage. The local
+Bluetooth controller was powered off, non-pairable, and non-discovering; it was
+not powered on or scanned. The measured 35.537 °C value is Pi CPU temperature
+only. It is not ambient temperature and is not a droid sensor reading.
+
 ## Simulation
 
 Run `python scripts/tasks.py p1-sim` (or `make p1-sim`). Output includes seed

@@ -24,3 +24,4 @@ R2-003,P1,in_progress,automated,r2-runtime/src/r2_runtime/spherov2_backend.py,"F
 SAFE-003,P1,in_progress,automated,r2-runtime/tests/test_hil_preflight.py,"Authorization identity and all stationary preflight conditions required; operator demonstration pending"
 R2-002,P1,in_progress,automated,scripts/verify_hardware_lock.py,"Six CPython 3.11 Linux/aarch64 wheel hashes locked and verified; target-host import recorded separately"
 R2-002,P1,in_progress,target_host,docs/phase-1-stationary-probe.md,"All six locked versions imported with Python 3.11.2 on Debian 13/aarch64; BLE and R2 not accessed"
+SAFE-003,P1,in_progress,target_host,r2-runtime/hardware-provenance.toml,"Read-only Pi audit passed; controller remained powered off, non-pairable, and non-discovering"

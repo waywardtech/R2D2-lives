@@ -34,6 +34,20 @@ verified_architecture = "aarch64"
 verification_install_scope = "isolated temporary --target directory"
 ble_accessed_during_verification = false
 
+[target_pi_readiness]
+checked_date = "2026-08-11"
+kernel = "Linux 6.18.39+rpt-rpi-v8"
+bluez_version = "5.82"
+bluez_service_active = true
+system_dbus_available = true
+ntp_synchronized = true
+controller_powered = false
+controller_pairable = false
+controller_discovering = false
+pi_cpu_temperature_c = 35.537
+ambient_temperature_verified = false
+droid_temperature_verified = false
+
 [safety]
 default_backend = "simulation"
 real_hardware_automated_tests = false
