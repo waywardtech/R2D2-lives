@@ -15,6 +15,8 @@
   artifact manifest, offline verifier, and Windows-package rejection tests.
 - Add a target-only import/version checker that refuses the wrong platform and
   never scans BLE or constructs the hardware backend.
+- Verify all six locked packages offline on the Debian 13/aarch64 target host
+  under Python 3.11.2 without BLE access.
 
 ## 0.1.0 - 2026-08-11
 

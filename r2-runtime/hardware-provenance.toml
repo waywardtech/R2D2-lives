@@ -26,8 +26,13 @@ python = "CPython 3.11"
 platform = "manylinux2014_aarch64"
 artifact_count = 6
 hashes_verified = true
-target_import_verified = false
 resolved_date = "2026-08-11"
+target_import_verified = true
+verified_python = "3.11.2"
+verified_os = "Debian GNU/Linux 13 (trixie)"
+verified_architecture = "aarch64"
+verification_install_scope = "isolated temporary --target directory"
+ble_accessed_during_verification = false
 
 [safety]
 default_backend = "simulation"

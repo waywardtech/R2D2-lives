@@ -30,6 +30,13 @@ After installing from the verified offline wheelhouse, run
 than Python 3.11 on Linux/aarch64, checks every installed version against the
 lock, and imports modules only. It does not scan BLE or construct a backend.
 
+Target-host verification completed on 2026-08-11 using Python 3.11.2 on Debian
+13/aarch64. The Pi's default `python3` is 3.13.5, so deployment must explicitly
+select Python 3.11. The host lacks `python3.11-venv`; verification therefore used
+an isolated temporary `pip --target` directory with `--no-index` and
+`--require-hashes`, followed by `python3.11 -S`. All six exact versions imported
+from that directory. BLE was not scanned or accessed, and this is not R2 HIL.
+
 ## Simulation
 
 Run `python scripts/tasks.py p1-sim` (or `make p1-sim`). Output includes seed

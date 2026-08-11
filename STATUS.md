@@ -42,11 +42,11 @@ Evidence category: automated, contract, simulation. No HIL evidence.
   lazy, exact-identity R2 adapter implemented without importing or using BLE in tests.
 - Target CPython 3.11 Linux/aarch64 hardware wheel set resolved into a six-artifact
   hash lock and manifest; downloaded wheels verified without installation.
+- All six locked packages installed offline and imported successfully with
+  Python 3.11.2 on the Debian 13/aarch64 target host; BLE was not accessed.
 
 ## Remaining gate items
 
-- Transfer the verified wheelhouse and verify installation/import compatibility
-  on the target Pi without connecting to the droid.
 - After explicit stationary-HIL authorization and preflight: run five real
   connect/probe/disconnect cycles and a 30-minute stationary session.
 - After separate explicit motion authorization: run the <=0.25 m calibration
@@ -66,8 +66,8 @@ Evidence category: automated, contract, simulation. No HIL evidence.
 - The supplied OpenAPI/AsyncAPI drafts receive deterministic structural checks;
   full standards-validator tooling remains a Phase 1 dependency decision.
 - No physical capability, BLE behavior, acoustic accuracy, or real-room safety is verified.
-- The target-Pi dependency set and wheel hashes are locked, but the wheels have
-  not been installed/imported on a Pi and all actual firmware/BLE behavior remains unverified.
+- Target-host dependency imports are verified, but the Pi defaults to Python
+  3.13.5 and deployment must explicitly use 3.11. All actual firmware/BLE behavior remains unverified.
 
 ## Last verification
 
@@ -81,6 +81,7 @@ python scripts/tasks.py docs-check -> pass
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
 python scripts/tasks.py test -> pass after Phase 1 lock slice; 43 tests plus isolated standalone repetitions
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
+SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 ```
 
 ## Hardware state
@@ -88,10 +89,9 @@ python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarc
 - Real R2 movement authorized for next run: no
 - Last known droid state: unknown/stopped (never assume active)
 - Capability profile: none/unverified
-- Hardware evidence category: none
+- Hardware evidence category: target-host dependency import only; no R2 HIL
 
 ## Exact next task
 
-Verify the locked wheel set installs and imports on the target Pi without BLE
-access, then run only the stationary HIL preflight/probe after explicit operator
-authorization. Movement remains a later, separately authorized final subtest.
+Run only the stationary HIL preflight/probe after explicit operator authorization.
+Movement remains a later, separately authorized final subtest.
