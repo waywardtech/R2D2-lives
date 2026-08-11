@@ -64,6 +64,19 @@ temporary_files_removed = true
 mac_address_persisted = false
 result = "blocked-awaiting-droid-advertisement"
 
+[stationary_hil_discovery_attempt_2]
+attempted_date = "2026-08-11"
+authorization = "stationary while charging; no heading, direction, or location change"
+r2_advertisements_found = 1
+bb8_advertisements_found = 1
+type_filter_verified = true
+advertised_names_persisted = false
+mac_address_persisted = false
+droid_connected = false
+droid_command_sent = false
+movement_performed = false
+result = "ready-for-exact-identity-stationary-probe"
+
 [safety]
 default_backend = "simulation"
 real_hardware_automated_tests = false

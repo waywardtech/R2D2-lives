@@ -48,6 +48,8 @@ Evidence category: automated, contract, simulation. No HIL evidence.
   thermal state; the Bluetooth controller remains powered off and undiscoverable.
 - First authorized stationary discovery attempt characterized the Pi's software
   rfkill state but found no R2 advertisement; no connection or command occurred.
+- Second discovery classified one R2-D2 and one BB-8 without connecting either;
+  hardware modules now import without SAP or peer-product source.
 
 ## Remaining gate items
 
@@ -85,11 +87,12 @@ python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, 
 python scripts/tasks.py test -> pass; 19 tests plus isolated standalone repetitions
 python scripts/tasks.py docs-check -> pass
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass after Phase 1 lock slice; 43 tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass after hardware import isolation slice; 44 tests plus isolated standalone repetitions
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off
 stationary HIL discovery attempt 1 -> blocked; no R2 advertisement, no connection/command
+stationary HIL discovery attempt 2 -> pass; one R2 and one BB-8 type-filtered, no connection/command
 ```
 
 ## Hardware state
@@ -101,5 +104,6 @@ stationary HIL discovery attempt 1 -> blocked; no R2 advertisement, no connectio
 
 ## Exact next task
 
-Run only the stationary HIL preflight/probe after explicit operator authorization.
-Movement remains a later, separately authorized final subtest.
+Transfer the minimal R2-owned stationary-HIL source to the Pi after explicit
+source-transfer approval, then run the exact-identity probe. Movement remains a
+later subtest and is prohibited while charging.

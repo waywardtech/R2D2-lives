@@ -21,6 +21,8 @@
   distinguish Pi CPU temperature from ambient and droid sensor evidence.
 - Characterize the first stationary-HIL discovery attempt: Pi rfkill recovery
   succeeded, R2 did not advertise, and no droid connection or command occurred.
+- Load top-level R2 Runtime exports lazily so the hardware adapter can be tested
+  without importing SAP or simulation application modules.
 
 ## 0.1.0 - 2026-08-11
 

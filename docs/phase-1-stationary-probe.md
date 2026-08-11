@@ -55,6 +55,12 @@ software-blocked state and all temporary files were removed. No device address
 is stored in repository evidence. Testing is blocked until R2 advertises while
 remaining on charge and stationary.
 
+On the second attempt, one R2-D2 advertisement and one BB-8 advertisement were
+classified correctly by the pinned library. This verifies that the discovery
+filter distinguishes the in-scope R2 from the out-of-scope BB-8. Neither device
+was connected or commanded. Advertised names remain external configuration and
+are not persisted in repository evidence.
+
 ## Simulation
 
 Run `python scripts/tasks.py p1-sim` (or `make p1-sim`). Output includes seed
