@@ -23,6 +23,8 @@
   succeeded, R2 did not advertise, and no droid connection or command occurred.
 - Load top-level R2 Runtime exports lazily so the hardware adapter can be tested
   without importing SAP or simulation application modules.
+- Verify bounded discovery distinguishes one in-scope R2-D2 from one out-of-scope
+  BB-8 without connecting either or persisting advertised identity.
 
 ## 0.1.0 - 2026-08-11
 
