@@ -1,0 +1,37 @@
+{
+  "schema_version": "0.1.0",
+  "event_id": "0198a33c-7800-7000-8000-000000000010",
+  "event_type": "agent.pose.observed",
+  "producer_id": "urn:sap:agent:home:r2-d2-01",
+  "session_id": "0198a33c-7800-7000-8000-000000000002",
+  "correlation_id": "0198a33c-7800-7000-8000-000000000003",
+  "causation_id": null,
+  "sequence": 1042,
+  "occurred_at": "2026-08-11T18:00:00.123456Z",
+  "monotonic_ns": 9912345678,
+  "clock": {
+    "clock_id": "r2-pi-monotonic-boot-example",
+    "sync_source": "ntp",
+    "uncertainty_ms": 2.5,
+    "offset_ms": null,
+    "drift_ppm": 7.2,
+    "synchronized": true
+  },
+  "payload": {
+    "pose": {
+      "frame_id": "urn:sap:frame:agent:r2-d2-01:odom",
+      "child_frame_id": "urn:sap:frame:agent:r2-d2-01:base_link",
+      "position_m": { "x": 0.42, "y": 1.1, "z": 0.0 },
+      "orientation": { "x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0 },
+      "linear_velocity_mps": { "x": 0.0, "y": 0.0, "z": 0.0 },
+      "angular_velocity_rps": { "x": 0.0, "y": 0.0, "z": 0.0 },
+      "covariance_6x6": null,
+      "status": "unverified",
+      "confidence": 0.55,
+      "source": "r2_locator",
+      "valid_until": "2026-08-11T18:00:00.623456Z",
+      "map_revision": null
+    }
+  }
+}
+

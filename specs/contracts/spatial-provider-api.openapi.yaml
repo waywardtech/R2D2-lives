@@ -1,0 +1,232 @@
+openapi: 3.1.0
+info:
+  title: Spatial Agent Protocol - Spatial Provider API
+  version: 0.1.0
+  description: Generic spatial-provider API implemented first by Bat-Space Modeler.
+servers:
+  - url: https://spatial-provider.local
+security:
+  - bearerAuth: []
+paths:
+  /v1/health:
+    get:
+      summary: Get spatial-provider health
+      operationId: getSpatialProviderHealth
+      responses:
+        "200":
+          description: Health and readiness
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/Health
+  /v1/capabilities:
+    get:
+      summary: Get spatial-provider capabilities
+      operationId: getSpatialProviderCapabilities
+      responses:
+        "200":
+          description: Capability snapshot
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/Capabilities
+  /v1/sessions:
+    post:
+      summary: Create an integration session
+      operationId: createSpatialProviderSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./sap-common.schema.json#/$defs/SessionRequest
+      responses:
+        "201":
+          description: Negotiated session
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/SessionResponse
+        "409": { $ref: "#/components/responses/Problem" }
+  /v1/sessions/{session_id}:
+    delete:
+      summary: End an integration session
+      operationId: endSpatialProviderSession
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "204": { description: Session ended }
+        "404": { $ref: "#/components/responses/Problem" }
+  /v1/observations:
+    post:
+      summary: Submit a normalized observation
+      operationId: submitSpatialObservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./sap-common.schema.json#/$defs/Observation
+      responses:
+        "202":
+          description: Observation accepted for validation/processing
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [observation_id, status]
+                properties:
+                  observation_id: { type: string, format: uuid }
+                  status: { type: string, enum: [accepted, rejected, duplicate] }
+                  reason_code: { type: [string, "null"] }
+        "400": { $ref: "#/components/responses/Problem" }
+        "422": { $ref: "#/components/responses/Problem" }
+  /v1/route-requests:
+    post:
+      summary: Request a route or hazard advisory
+      operationId: createRouteAdvisory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./sap-common.schema.json#/$defs/RouteRequest
+      responses:
+        "200":
+          description: Route/hazard advisory
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/RouteAdvisory
+        "409": { $ref: "#/components/responses/Problem" }
+        "422": { $ref: "#/components/responses/Problem" }
+  /v1/localization/{agent_id}:
+    get:
+      summary: Get an agent localization estimate
+      operationId: getAgentLocalization
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: at
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: Latest applicable estimate
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/LocalizationEstimate
+        "404": { $ref: "#/components/responses/Problem" }
+  /v1/maps/{map_id}/revisions/{revision}:
+    get:
+      summary: Get immutable map-revision metadata
+      operationId: getMapRevision
+      parameters:
+        - name: map_id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: revision
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Immutable map revision metadata
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/MapRevision
+        "404": { $ref: "#/components/responses/Problem" }
+  /v1/features/{feature_id}:
+    get:
+      summary: Get a spatial feature and its evidence
+      operationId: getSpatialFeature
+      parameters:
+        - name: feature_id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Feature, uncertainty, semantic links, and evidence
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [feature_id, map_id, map_revision, frame_id, status, confidence, geometry, evidence_ids]
+                properties:
+                  feature_id: { type: string }
+                  map_id: { type: string }
+                  map_revision: { type: string }
+                  frame_id: { type: string }
+                  status: { $ref: ./sap-common.schema.json#/$defs/EstimateStatus }
+                  confidence: { $ref: ./sap-common.schema.json#/$defs/Confidence }
+                  geometry: { type: object, additionalProperties: true }
+                  semantic_entity_ids: { type: array, items: { type: string } }
+                  evidence_ids: { type: array, items: { type: string } }
+        "404": { $ref: "#/components/responses/Problem" }
+  /v1/artifacts:
+    post:
+      summary: Upload a content-addressed spatial artifact
+      operationId: uploadSpatialArtifact
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [metadata, file]
+              properties:
+                metadata:
+                  $ref: ./sap-common.schema.json#/$defs/Artifact
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Verified artifact receipt
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/Artifact
+        "400": { $ref: "#/components/responses/Problem" }
+  /v1/events:
+    get:
+      summary: Stream spatial-provider events
+      operationId: streamSpatialProviderEvents
+      description: Resumable SSE. Clients send Last-Event-ID and tolerate duplicates.
+      parameters:
+        - name: after
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: SSE stream whose data fields validate as EventEnvelope
+          content:
+            text/event-stream:
+              schema: { type: string }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+  parameters:
+    SessionId:
+      name: session_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Problem:
+      description: SAP problem details
+      content:
+        application/problem+json:
+          schema:
+            $ref: ./sap-common.schema.json#/$defs/Problem

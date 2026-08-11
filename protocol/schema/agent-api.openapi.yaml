@@ -1,0 +1,191 @@
+openapi: 3.1.0
+info:
+  title: Spatial Agent Protocol - Mobile Agent API
+  version: 0.1.0
+  description: Generic high-level API implemented first by R2 Agent Runtime.
+servers:
+  - url: https://agent.local
+security:
+  - bearerAuth: []
+paths:
+  /v1/health:
+    get:
+      summary: Get agent health
+      operationId: getAgentHealth
+      responses:
+        "200":
+          description: Health and readiness
+          headers:
+            SAP-Version:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/Health
+  /v1/capabilities:
+    get:
+      summary: Get agent capabilities
+      operationId: getAgentCapabilities
+      responses:
+        "200":
+          description: Capability snapshot
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/Capabilities
+  /v1/sessions:
+    post:
+      summary: Create an integration session
+      operationId: createAgentSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./sap-common.schema.json#/$defs/SessionRequest
+      responses:
+        "201":
+          description: Negotiated session
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/SessionResponse
+        "409":
+          $ref: "#/components/responses/Problem"
+  /v1/sessions/{session_id}:
+    delete:
+      summary: End an integration session
+      operationId: endAgentSession
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "204": { description: Session ended; active work canceled or safe-held }
+        "404": { $ref: "#/components/responses/Problem" }
+  /v1/commands:
+    post:
+      summary: Submit a high-level agent command
+      operationId: submitAgentCommand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./sap-common.schema.json#/$defs/CommandRequest
+      responses:
+        "202":
+          description: Command accepted for deterministic validation/execution
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/CommandStatus
+        "400": { $ref: "#/components/responses/Problem" }
+        "409": { $ref: "#/components/responses/Problem" }
+        "422": { $ref: "#/components/responses/Problem" }
+  /v1/commands/{command_id}:
+    get:
+      summary: Get command state
+      operationId: getAgentCommand
+      parameters:
+        - $ref: "#/components/parameters/CommandId"
+      responses:
+        "200":
+          description: Current or terminal command state
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/CommandStatus
+        "404": { $ref: "#/components/responses/Problem" }
+  /v1/commands/{command_id}/cancel:
+    post:
+      summary: Cancel a command or request safe hold
+      operationId: cancelAgentCommand
+      parameters:
+        - $ref: "#/components/parameters/CommandId"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 500 }
+      responses:
+        "202":
+          description: Cancellation/safe-hold request accepted
+          content:
+            application/json:
+              schema:
+                $ref: ./sap-common.schema.json#/$defs/CommandStatus
+        "404": { $ref: "#/components/responses/Problem" }
+  /v1/events:
+    get:
+      summary: Stream agent events
+      operationId: streamAgentEvents
+      description: Resumable SSE. Clients send Last-Event-ID and tolerate duplicates.
+      parameters:
+        - name: after
+          in: query
+          required: false
+          schema: { type: string }
+        - name: event_type
+          in: query
+          required: false
+          schema: { type: array, items: { type: string } }
+          style: form
+          explode: true
+      responses:
+        "200":
+          description: SSE stream whose data fields validate as EventEnvelope
+          content:
+            text/event-stream:
+              schema: { type: string }
+  /v1/transforms:
+    get:
+      summary: Query agent-known transforms
+      operationId: getAgentTransforms
+      parameters:
+        - name: parent_frame_id
+          in: query
+          required: false
+          schema: { type: string }
+        - name: child_frame_id
+          in: query
+          required: false
+          schema: { type: string }
+        - name: at
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: Known transforms with uncertainty
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ./sap-common.schema.json#/$defs/Transform
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+  parameters:
+    SessionId:
+      name: session_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    CommandId:
+      name: command_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Problem:
+      description: SAP problem details
+      content:
+        application/problem+json:
+          schema:
+            $ref: ./sap-common.schema.json#/$defs/Problem

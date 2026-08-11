@@ -1,0 +1,26 @@
+{
+  "command_id": "0198a33c-7800-7000-8000-000000000001",
+  "idempotency_key": "mission-42-step-7-probe-1",
+  "session_id": "0198a33c-7800-7000-8000-000000000002",
+  "type": "emit_acoustic_probe",
+  "parameters": {
+    "probe_source_id": "urn:sap:source:home:r2-d2-01:pi-speaker",
+    "waveform_id": "urn:sap:waveform:ess:2k-18k:1.0.0",
+    "waveform_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "gain_normalized": 0.2,
+    "repetitions": 3,
+    "interval_s": 1.5,
+    "capture_id": "capture-42-7"
+  },
+  "deadline": "2026-08-11T18:00:10Z",
+  "correlation_id": "0198a33c-7800-7000-8000-000000000003",
+  "causation_id": null,
+  "preconditions": {
+    "mode": "mapping",
+    "agent_state": "safe_hold",
+    "max_clock_uncertainty_ms": 5,
+    "safety_config_revision": "sha256:example"
+  },
+  "dry_run": false
+}
+

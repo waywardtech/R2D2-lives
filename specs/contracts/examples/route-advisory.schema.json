@@ -1,0 +1,4 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "https://example.invalid/sap/0.1.0/sap-common.schema.json#/$defs/RouteAdvisory"
+}

@@ -1,0 +1,35 @@
+asyncapi: 3.1.0
+info:
+  title: Spatial Agent Protocol event streams
+  version: 0.1.0
+  description: Transport-neutral event semantics with an SSE MVP binding.
+defaultContentType: application/json
+channels:
+  agentEvents:
+    address: /v1/events
+    description: Events produced by a SAP Mobile Agent.
+    messages:
+      sapEvent:
+        $ref: "#/components/messages/SapEvent"
+  spatialProviderEvents:
+    address: /v1/events
+    description: Events produced by a SAP Spatial Provider.
+    messages:
+      sapEvent:
+        $ref: "#/components/messages/SapEvent"
+operations:
+  receiveAgentEvents:
+    action: receive
+    channel:
+      $ref: "#/channels/agentEvents"
+  receiveSpatialProviderEvents:
+    action: receive
+    channel:
+      $ref: "#/channels/spatialProviderEvents"
+components:
+  messages:
+    SapEvent:
+      name: SapEvent
+      title: Spatial Agent Protocol event envelope
+      payload:
+        $ref: ./sap-common.schema.json#/$defs/EventEnvelope

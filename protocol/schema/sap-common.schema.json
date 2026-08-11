@@ -1,0 +1,486 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sap/0.1.0/sap-common.schema.json",
+  "title": "Spatial Agent Protocol common schemas",
+  "type": "object",
+  "$defs": {
+    "Id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "Uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "Confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "ClockQuality": {
+      "type": "object",
+      "required": ["clock_id", "sync_source", "uncertainty_ms"],
+      "properties": {
+        "clock_id": { "$ref": "#/$defs/Id" },
+        "sync_source": {
+          "type": "string",
+          "enum": ["none", "system", "ntp", "ptp", "shared_audio", "measured_offset", "simulation"]
+        },
+        "uncertainty_ms": { "type": "number", "minimum": 0 },
+        "offset_ms": { "type": ["number", "null"] },
+        "drift_ppm": { "type": ["number", "null"] },
+        "synchronized": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": true
+    },
+    "Vector3": {
+      "type": "object",
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "Quaternion": {
+      "type": "object",
+      "description": "Normalized quaternion in x, y, z, w order.",
+      "required": ["x", "y", "z", "w"],
+      "properties": {
+        "x": { "type": "number", "minimum": -1, "maximum": 1 },
+        "y": { "type": "number", "minimum": -1, "maximum": 1 },
+        "z": { "type": "number", "minimum": -1, "maximum": 1 },
+        "w": { "type": "number", "minimum": -1, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "Pose": {
+      "type": "object",
+      "required": ["frame_id", "position_m", "orientation", "status", "confidence"],
+      "properties": {
+        "frame_id": { "$ref": "#/$defs/Id" },
+        "child_frame_id": { "anyOf": [{ "$ref": "#/$defs/Id" }, { "type": "null" }] },
+        "position_m": { "$ref": "#/$defs/Vector3" },
+        "orientation": { "$ref": "#/$defs/Quaternion" },
+        "linear_velocity_mps": { "anyOf": [{ "$ref": "#/$defs/Vector3" }, { "type": "null" }] },
+        "angular_velocity_rps": { "anyOf": [{ "$ref": "#/$defs/Vector3" }, { "type": "null" }] },
+        "covariance_6x6": {
+          "type": ["array", "null"],
+          "items": { "type": "number" },
+          "minItems": 36,
+          "maxItems": 36
+        },
+        "status": { "$ref": "#/$defs/EstimateStatus" },
+        "confidence": { "$ref": "#/$defs/Confidence" },
+        "source": { "type": ["string", "null"] },
+        "valid_until": { "type": ["string", "null"], "format": "date-time" },
+        "map_revision": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "Transform": {
+      "type": "object",
+      "required": ["parent_frame_id", "child_frame_id", "translation_m", "rotation", "status", "confidence"],
+      "properties": {
+        "parent_frame_id": { "$ref": "#/$defs/Id" },
+        "child_frame_id": { "$ref": "#/$defs/Id" },
+        "translation_m": { "$ref": "#/$defs/Vector3" },
+        "rotation": { "$ref": "#/$defs/Quaternion" },
+        "covariance_6x6": {
+          "type": ["array", "null"],
+          "items": { "type": "number" },
+          "minItems": 36,
+          "maxItems": 36
+        },
+        "status": { "$ref": "#/$defs/EstimateStatus" },
+        "confidence": { "$ref": "#/$defs/Confidence" },
+        "valid_from": { "type": ["string", "null"], "format": "date-time" },
+        "valid_until": { "type": ["string", "null"], "format": "date-time" },
+        "provenance": { "type": "array", "items": { "$ref": "#/$defs/Id" } }
+      },
+      "additionalProperties": true
+    },
+    "EstimateStatus": {
+      "type": "string",
+      "enum": ["unknown", "unverified", "degraded", "valid", "invalid", "expired"]
+    },
+    "Health": {
+      "type": "object",
+      "required": ["status", "product", "version", "protocol_versions", "components"],
+      "properties": {
+        "status": { "type": "string", "enum": ["healthy", "degraded", "unready", "failed"] },
+        "product": { "type": "string" },
+        "version": { "type": "string" },
+        "protocol_versions": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "components": { "type": "object", "additionalProperties": { "type": "string" } },
+        "checked_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": true
+    },
+    "Capabilities": {
+      "type": "object",
+      "required": ["role", "product", "version", "protocol_versions", "capabilities", "verification"],
+      "properties": {
+        "role": { "type": "string", "enum": ["mobile_agent", "spatial_provider"] },
+        "product": { "type": "string" },
+        "version": { "type": "string" },
+        "instance_id": { "$ref": "#/$defs/Id" },
+        "protocol_versions": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "capabilities": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "events": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "frames": { "type": "array", "items": { "$ref": "#/$defs/Id" } },
+        "transports": { "type": "array", "items": { "type": "string" } },
+        "limits": { "type": "object", "additionalProperties": true },
+        "clock": { "$ref": "#/$defs/ClockQuality" },
+        "verification": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/EstimateStatus" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "SessionRequest": {
+      "type": "object",
+      "required": ["peer_id", "protocol_versions", "required_capabilities", "requested_duration_s"],
+      "properties": {
+        "peer_id": { "$ref": "#/$defs/Id" },
+        "protocol_versions": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "required_capabilities": { "type": "array", "items": { "type": "string" } },
+        "optional_capabilities": { "type": "array", "items": { "type": "string" } },
+        "requested_mode": { "type": ["string", "null"] },
+        "requested_duration_s": { "type": "number", "exclusiveMinimum": 0, "maximum": 86400 },
+        "frames": { "type": "array", "items": { "$ref": "#/$defs/Id" } },
+        "clock": { "anyOf": [{ "$ref": "#/$defs/ClockQuality" }, { "type": "null" }] },
+        "retention": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    },
+    "SessionResponse": {
+      "type": "object",
+      "required": ["session_id", "selected_protocol_version", "accepted_capabilities", "expires_at", "event_cursor"],
+      "properties": {
+        "session_id": { "$ref": "#/$defs/Uuid" },
+        "selected_protocol_version": { "type": "string" },
+        "accepted_capabilities": { "type": "array", "items": { "type": "string" } },
+        "rejected_requirements": { "type": "array", "items": { "type": "string" } },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "event_cursor": { "type": "string" },
+        "policy": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    },
+    "StopParameters": {
+      "type": "object",
+      "properties": { "reason": { "type": "string", "maxLength": 500 } },
+      "additionalProperties": false
+    },
+    "MoveRelativeParameters": {
+      "type": "object",
+      "required": ["distance_m", "heading_rad", "speed_mps"],
+      "properties": {
+        "distance_m": { "type": "number", "minimum": 0 },
+        "heading_rad": { "type": "number" },
+        "speed_mps": { "type": "number", "exclusiveMinimum": 0 },
+        "tolerance_m": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "RotateToParameters": {
+      "type": "object",
+      "required": ["yaw_rad", "angular_speed_rps"],
+      "properties": {
+        "yaw_rad": { "type": "number" },
+        "angular_speed_rps": { "type": "number", "exclusiveMinimum": 0 },
+        "tolerance_rad": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "NavigateToParameters": {
+      "type": "object",
+      "required": ["target_pose"],
+      "properties": {
+        "target_pose": { "$ref": "#/$defs/Pose" },
+        "max_speed_mps": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+        "route_advisory_id": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "HoldPoseParameters": {
+      "type": "object",
+      "required": ["duration_s"],
+      "properties": { "duration_s": { "type": "number", "minimum": 0, "maximum": 600 } },
+      "additionalProperties": false
+    },
+    "ProbeParameters": {
+      "type": "object",
+      "required": ["probe_source_id", "waveform_id", "waveform_sha256", "gain_normalized", "repetitions", "interval_s"],
+      "properties": {
+        "probe_source_id": { "$ref": "#/$defs/Id" },
+        "waveform_id": { "$ref": "#/$defs/Id" },
+        "waveform_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "gain_normalized": { "type": "number", "minimum": 0, "maximum": 1 },
+        "repetitions": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "interval_s": { "type": "number", "minimum": 0 },
+        "capture_id": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "SetModeParameters": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["manual", "discovery", "patrol", "mapping", "attention", "charging_staging", "safe_hold"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "LookTowardParameters": {
+      "type": "object",
+      "properties": {
+        "zone_id": { "type": "string", "minLength": 1 },
+        "bearing_rad": { "type": "number" },
+        "confidence": { "$ref": "#/$defs/Confidence" }
+      },
+      "oneOf": [
+        { "required": ["zone_id"] },
+        { "required": ["bearing_rad"] }
+      ],
+      "additionalProperties": false
+    },
+    "SemanticExpression": {
+      "type": "object",
+      "required": ["speech_act", "meaning", "emotion", "urgency", "motion_allowed"],
+      "properties": {
+        "speech_act": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "meaning": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "emotion": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "urgency": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "attention_target": { "type": ["string", "null"], "maxLength": 255 },
+        "motion_allowed": { "type": "boolean" },
+        "phone_text": { "type": ["string", "null"], "maxLength": 1000 }
+      },
+      "additionalProperties": true
+    },
+    "ExpressParameters": {
+      "type": "object",
+      "required": ["expression"],
+      "properties": {
+        "expression": { "$ref": "#/$defs/SemanticExpression" }
+      },
+      "additionalProperties": false
+    },
+    "CommandRequest": {
+      "type": "object",
+      "required": ["command_id", "idempotency_key", "session_id", "type", "parameters", "deadline", "correlation_id", "preconditions"],
+      "properties": {
+        "command_id": { "$ref": "#/$defs/Uuid" },
+        "idempotency_key": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "session_id": { "$ref": "#/$defs/Uuid" },
+        "type": {
+          "type": "string",
+          "enum": ["stop", "safe_hold", "move_relative", "rotate_to", "navigate_to", "hold_pose", "emit_acoustic_probe", "set_mode", "look_toward", "express"]
+        },
+        "parameters": { "type": "object" },
+        "deadline": { "type": "string", "format": "date-time" },
+        "correlation_id": { "$ref": "#/$defs/Uuid" },
+        "causation_id": { "anyOf": [{ "$ref": "#/$defs/Uuid" }, { "type": "null" }] },
+        "preconditions": { "type": "object", "additionalProperties": true },
+        "dry_run": { "type": "boolean", "default": false }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "enum": ["stop", "safe_hold"] } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/StopParameters" } } } },
+        { "if": { "properties": { "type": { "const": "move_relative" } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/MoveRelativeParameters" } } } },
+        { "if": { "properties": { "type": { "const": "rotate_to" } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/RotateToParameters" } } } },
+        { "if": { "properties": { "type": { "const": "navigate_to" } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/NavigateToParameters" } } } },
+        { "if": { "properties": { "type": { "const": "hold_pose" } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/HoldPoseParameters" } } } },
+        { "if": { "properties": { "type": { "const": "emit_acoustic_probe" } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/ProbeParameters" } } } },
+        { "if": { "properties": { "type": { "const": "set_mode" } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/SetModeParameters" } } } },
+        { "if": { "properties": { "type": { "const": "look_toward" } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/LookTowardParameters" } } } },
+        { "if": { "properties": { "type": { "const": "express" } } }, "then": { "properties": { "parameters": { "$ref": "#/$defs/ExpressParameters" } } } }
+      ],
+      "additionalProperties": true
+    },
+    "CommandStatus": {
+      "type": "object",
+      "required": ["command_id", "state", "updated_at"],
+      "properties": {
+        "command_id": { "$ref": "#/$defs/Uuid" },
+        "state": { "type": "string", "enum": ["received", "accepted", "rejected", "queued", "running", "succeeded", "failed", "canceled", "timed_out"] },
+        "reason_code": { "type": ["string", "null"] },
+        "message": { "type": ["string", "null"] },
+        "progress": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "result": { "type": ["object", "null"], "additionalProperties": true },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": true
+    },
+    "EventEnvelope": {
+      "type": "object",
+      "required": ["schema_version", "event_id", "event_type", "producer_id", "sequence", "occurred_at", "monotonic_ns", "clock", "payload"],
+      "properties": {
+        "schema_version": { "type": "string" },
+        "event_id": { "$ref": "#/$defs/Uuid" },
+        "event_type": { "type": "string", "minLength": 3, "maxLength": 200 },
+        "producer_id": { "$ref": "#/$defs/Id" },
+        "session_id": { "anyOf": [{ "$ref": "#/$defs/Uuid" }, { "type": "null" }] },
+        "correlation_id": { "anyOf": [{ "$ref": "#/$defs/Uuid" }, { "type": "null" }] },
+        "causation_id": { "anyOf": [{ "$ref": "#/$defs/Uuid" }, { "type": "null" }] },
+        "sequence": { "type": "integer", "minimum": 0 },
+        "occurred_at": { "type": "string", "format": "date-time" },
+        "monotonic_ns": { "type": "integer", "minimum": 0 },
+        "clock": { "$ref": "#/$defs/ClockQuality" },
+        "payload": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    },
+    "Observation": {
+      "type": "object",
+      "required": ["observation_id", "type", "producer_id", "occurred_at", "clock", "payload"],
+      "properties": {
+        "observation_id": { "$ref": "#/$defs/Uuid" },
+        "type": { "type": "string" },
+        "producer_id": { "$ref": "#/$defs/Id" },
+        "session_id": { "anyOf": [{ "$ref": "#/$defs/Uuid" }, { "type": "null" }] },
+        "occurred_at": { "type": "string", "format": "date-time" },
+        "monotonic_ns": { "type": ["integer", "null"], "minimum": 0 },
+        "clock": { "$ref": "#/$defs/ClockQuality" },
+        "pose": { "anyOf": [{ "$ref": "#/$defs/Pose" }, { "type": "null" }] },
+        "payload": { "type": "object", "additionalProperties": true },
+        "artifact_ids": { "type": "array", "items": { "$ref": "#/$defs/Id" } }
+      },
+      "additionalProperties": true
+    },
+    "RouteRequest": {
+      "type": "object",
+      "required": ["request_id", "session_id", "agent_id", "start", "target", "agent_footprint", "deadline"],
+      "properties": {
+        "request_id": { "$ref": "#/$defs/Uuid" },
+        "session_id": { "$ref": "#/$defs/Uuid" },
+        "agent_id": { "$ref": "#/$defs/Id" },
+        "start": { "$ref": "#/$defs/Pose" },
+        "target": { "$ref": "#/$defs/Pose" },
+        "agent_footprint": { "type": "object", "additionalProperties": true },
+        "max_speed_mps": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+        "deadline": { "type": "string", "format": "date-time" },
+        "map_revision": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "RouteAdvisory": {
+      "type": "object",
+      "required": ["advisory_id", "request_id", "map_id", "map_revision", "frame_id", "status", "confidence", "created_at", "expires_at", "path"],
+      "properties": {
+        "advisory_id": { "$ref": "#/$defs/Uuid" },
+        "request_id": { "$ref": "#/$defs/Uuid" },
+        "map_id": { "$ref": "#/$defs/Id" },
+        "map_revision": { "type": "string" },
+        "frame_id": { "$ref": "#/$defs/Id" },
+        "status": { "$ref": "#/$defs/EstimateStatus" },
+        "confidence": { "$ref": "#/$defs/Confidence" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "path": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Pose" }
+        },
+        "clearance_m": { "type": ["number", "null"], "minimum": 0 },
+        "recommended_speed_mps": { "type": ["number", "null"], "minimum": 0 },
+        "hazards": { "type": "array", "items": { "$ref": "#/$defs/Id" } },
+        "reason_codes": { "type": "array", "items": { "type": "string" } },
+        "evidence_ids": { "type": "array", "items": { "$ref": "#/$defs/Id" } }
+      },
+      "additionalProperties": true
+    },
+    "LocalizationEstimate": {
+      "type": "object",
+      "required": ["agent_id", "pose", "estimated_at", "map_id", "map_revision", "evidence_ids"],
+      "properties": {
+        "agent_id": { "$ref": "#/$defs/Id" },
+        "pose": { "$ref": "#/$defs/Pose" },
+        "estimated_at": { "type": "string", "format": "date-time" },
+        "map_id": { "$ref": "#/$defs/Id" },
+        "map_revision": { "type": "string" },
+        "evidence_ids": { "type": "array", "items": { "$ref": "#/$defs/Id" } }
+      },
+      "additionalProperties": true
+    },
+    "MapRevision": {
+      "type": "object",
+      "required": ["map_id", "revision", "frame_id", "status", "created_at", "artifact_ids", "evidence_ids"],
+      "properties": {
+        "map_id": { "$ref": "#/$defs/Id" },
+        "revision": { "type": "string" },
+        "parent_revisions": { "type": "array", "items": { "type": "string" } },
+        "frame_id": { "$ref": "#/$defs/Id" },
+        "status": { "$ref": "#/$defs/EstimateStatus" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "supported_envelope": { "type": "object", "additionalProperties": true },
+        "metrics": { "type": "object", "additionalProperties": true },
+        "artifact_ids": { "type": "array", "items": { "$ref": "#/$defs/Id" } },
+        "evidence_ids": { "type": "array", "items": { "$ref": "#/$defs/Id" } }
+      },
+      "additionalProperties": true
+    },
+    "Artifact": {
+      "type": "object",
+      "required": ["artifact_id", "media_type", "size_bytes", "sha256", "producer_id", "created_at"],
+      "properties": {
+        "artifact_id": { "$ref": "#/$defs/Id" },
+        "media_type": { "type": "string" },
+        "size_bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "producer_id": { "$ref": "#/$defs/Id" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": ["string", "null"], "format": "date-time" },
+        "uri": { "type": ["string", "null"], "format": "uri" },
+        "links": { "type": "array", "items": { "$ref": "#/$defs/Id" } }
+      },
+      "additionalProperties": true
+    },
+    "ProbeEmission": {
+      "type": "object",
+      "required": ["probe_source_id", "waveform_id", "waveform_sha256", "actual_gain_normalized", "sample_rate_hz", "duration_s", "repetition_index", "emission_monotonic_ns", "clock", "source_pose", "status"],
+      "properties": {
+        "probe_source_id": { "$ref": "#/$defs/Id" },
+        "waveform_id": { "$ref": "#/$defs/Id" },
+        "waveform_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "requested_gain_normalized": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "actual_gain_normalized": { "type": "number", "minimum": 0, "maximum": 1 },
+        "sample_rate_hz": { "type": "integer", "minimum": 1 },
+        "bandwidth_hz": {
+          "type": ["array", "null"],
+          "items": { "type": "number", "minimum": 0 },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "duration_s": { "type": "number", "minimum": 0 },
+        "repetition_index": { "type": "integer", "minimum": 0 },
+        "emission_monotonic_ns": { "type": "integer", "minimum": 0 },
+        "clock": { "$ref": "#/$defs/ClockQuality" },
+        "source_pose": { "$ref": "#/$defs/Pose" },
+        "capture_id": { "type": ["string", "null"] },
+        "status": { "type": "string", "enum": ["emitted", "clipped", "partial", "failed"] },
+        "fault_code": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "Problem": {
+      "type": "object",
+      "required": ["type", "title", "status", "code"],
+      "properties": {
+        "type": { "type": "string", "format": "uri-reference" },
+        "title": { "type": "string" },
+        "status": { "type": "integer", "minimum": 400, "maximum": 599 },
+        "detail": { "type": ["string", "null"] },
+        "instance": { "type": ["string", "null"], "format": "uri-reference" },
+        "code": { "type": "string", "pattern": "^sap\\.[a-z0-9_.-]+$" },
+        "correlation_id": { "anyOf": [{ "$ref": "#/$defs/Uuid" }, { "type": "null" }] }
+      },
+      "additionalProperties": true
+    }
+  }
+}

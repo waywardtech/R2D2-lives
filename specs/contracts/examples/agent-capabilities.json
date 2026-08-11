@@ -1,0 +1,49 @@
+{
+  "role": "mobile_agent",
+  "product": "r2-agent-runtime",
+  "version": "0.1.0",
+  "instance_id": "urn:sap:agent:home:r2-d2-01",
+  "protocol_versions": ["0.1.0"],
+  "capabilities": [
+    "command.stop",
+    "command.safe_hold",
+    "command.move_relative",
+    "command.rotate_to",
+    "command.hold_pose",
+    "command.emit_acoustic_probe",
+    "telemetry.pose.odom",
+    "telemetry.velocity",
+    "telemetry.collision",
+    "expression.semantic"
+  ],
+  "events": [
+    "agent.pose.observed",
+    "agent.command.completed",
+    "agent.probe.emitted",
+    "agent.collision.detected"
+  ],
+  "frames": [
+    "urn:sap:frame:agent:r2-d2-01:odom",
+    "urn:sap:frame:agent:r2-d2-01:base_link",
+    "urn:sap:frame:agent:r2-d2-01:probe"
+  ],
+  "transports": ["https-json", "sse"],
+  "limits": {
+    "motion_requires_lease": true,
+    "max_blind_segment_m": 0.25
+  },
+  "clock": {
+    "clock_id": "r2-pi-monotonic-boot-example",
+    "sync_source": "ntp",
+    "uncertainty_ms": 2.5,
+    "offset_ms": null,
+    "drift_ppm": 7.2,
+    "synchronized": true
+  },
+  "verification": {
+    "command.stop": "valid",
+    "command.move_relative": "unverified",
+    "command.emit_acoustic_probe": "unverified"
+  }
+}
+
