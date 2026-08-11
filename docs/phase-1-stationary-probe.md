@@ -61,6 +61,25 @@ filter distinguishes the in-scope R2 from the out-of-scope BB-8. Neither device
 was connected or commanded. Advertised names remain external configuration and
 are not persisted in repository evidence.
 
+## Stationary HIL probe result
+
+The exact-identity probe connected to the R201 and observed firmware `7.0.101`,
+board revision `3`, battery state `ok` at `3.77 V`, and the advertised telemetry
+inventory. Both the original zero-speed/heading stop and a deterministic raw
+motor OFF/0 stop timed out waiting for firmware acknowledgment while charging.
+No other motor variant was attempted. A cleanup defect that retried stop and
+prevented BLE close was fixed: stop is now attempted once and BLE always closes.
+
+The immutable report is `evidence/hil/cycle-1-stop-timeout.json`, SHA-256
+`9a422c5c2c8e566b13755636c139b1b0a77fcbceab82944968e9f8277b7e6c85`.
+It records `movement_performed: false`, failed `stop.latency`, and terminal state
+`disconnected_stop_unconfirmed`. This does not pass a Gate P1 cycle.
+
+One separately authorized LED/head-read/quiet-audio pass exceeded its watchdog
+before producing an artifact. The process was terminated, R2 was disconnected,
+and no retry was made. Operator confirmation of restored LED/audio state is
+required before any further optional action.
+
 ## Simulation
 
 Run `python scripts/tasks.py p1-sim` (or `make p1-sim`). Output includes seed

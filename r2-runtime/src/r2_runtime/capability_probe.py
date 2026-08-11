@@ -63,6 +63,7 @@ class StationaryCapabilityProbe:
         self.owner.connect_for_stationary_probe()
         evidence: dict[str, CapabilityEvidence] = {}
         identity: Mapping[str, str] = {}
+        final_state = "safe_hold"
         try:
             identity = self.owner.serialized(self.driver.backend.identity)
             observed_status = "simulated" if evidence_category == "simulation" else "observed"
@@ -95,8 +96,19 @@ class StationaryCapabilityProbe:
                 evidence[capability] = CapabilityEvidence(
                     "untested", {"reason": "requires separately authorized motion HIL"}
                 )
-            self.driver.safe_hold()
-            self.owner.mark_ready()
+            try:
+                self.driver.safe_hold()
+            except TimeoutError:
+                evidence["stop.latency"] = CapabilityEvidence(
+                    "failed",
+                    {
+                        "reason": "stop command acknowledgement timeout",
+                        "fail_closed": "BLE disconnected without retry",
+                    },
+                )
+                final_state = "disconnected_stop_unconfirmed"
+            else:
+                self.owner.mark_ready()
         finally:
             self.owner.disconnect("stationary_probe_complete")
         timestamp = generated_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -113,5 +125,5 @@ class StationaryCapabilityProbe:
             },
             capabilities=evidence,
             movement_performed=False,
-            final_state="safe_hold",
+            final_state=final_state,
         )

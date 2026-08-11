@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import compileall
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -82,6 +83,8 @@ def docs_check() -> None:
         ROOT / "r2-runtime" / "hardware-wheelhouse.manifest.json",
         ROOT / "r2-runtime" / "THIRD_PARTY_NOTICES.md",
         ROOT / "traceability" / "evidence.csv",
+        ROOT / "evidence" / "hil" / "cycle-1-stop-timeout.json",
+        ROOT / "evidence" / "hil" / "cycle-1-stop-timeout.json.sha256",
         ROOT / "specs" / "traceability" / "requirements.csv",
     ]
     missing = [str(path.relative_to(ROOT)) for path in required if not path.is_file()]
@@ -92,6 +95,14 @@ def docs_check() -> None:
         if phrase not in status:
             raise SystemExit(f"STATUS.md missing required phrase: {phrase}")
     json.loads((ROOT / "protocol" / "schema" / "sap-common.schema.json").read_text(encoding="utf-8"))
+    hil_evidence = ROOT / "evidence" / "hil" / "cycle-1-stop-timeout.json"
+    expected_hil_hash = (
+        (ROOT / "evidence" / "hil" / "cycle-1-stop-timeout.json.sha256")
+        .read_text(encoding="utf-8")
+        .split()[0]
+    )
+    if hashlib.sha256(hil_evidence.read_bytes()).hexdigest() != expected_hil_hash:
+        raise SystemExit("HIL evidence hash mismatch")
     _run([sys.executable, "scripts/verify_hardware_lock.py"])
     yaml_expectations = {
         "agent-api.openapi.yaml": ("openapi: 3.1.0", "paths:", "SAP-Version"),

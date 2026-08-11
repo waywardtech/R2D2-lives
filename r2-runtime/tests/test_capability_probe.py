@@ -12,7 +12,11 @@ from r2_runtime.drivers import (
     Spherov2R2Driver,
     UnavailableSpherov2Backend,
 )
-from r2_runtime.recording import read_verified_json, write_immutable_json
+from r2_runtime.recording import (
+    build_hil_failure_evidence,
+    read_verified_json,
+    write_immutable_json,
+)
 from r2_runtime.sim_hardware import SimSpherov2Backend
 
 
@@ -81,6 +85,41 @@ class CapabilityProbeTest(unittest.TestCase):
         self.assertFalse(driver.connected)
         self.assertEqual(owner.state, ConnectionState.OFFLINE)
 
+    def test_stop_timeout_is_not_retried_and_ble_always_disconnects(self) -> None:
+        class StopTimeoutBackend(SimSpherov2Backend):
+            def stop(self) -> None:
+                self.calls.append("stop_timeout")
+                raise TimeoutError("injected stop acknowledgement timeout")
+
+        backend = StopTimeoutBackend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        owner = BleOwner(driver)
+        owner.connect_for_stationary_probe()
+        with self.assertRaisesRegex(TimeoutError, "stop acknowledgement"):
+            owner.disconnect("test_timeout")
+        self.assertEqual(backend.calls, ["connect", "stop_timeout", "disconnect"])
+        self.assertFalse(driver.connected)
+        self.assertTrue(owner.stopped)
+        self.assertEqual(owner.state, ConnectionState.OFFLINE)
+
+    def test_probe_records_stop_timeout_and_returns_failure_evidence(self) -> None:
+        class StopTimeoutBackend(SimSpherov2Backend):
+            def stop(self) -> None:
+                self.calls.append("stop_timeout")
+                raise TimeoutError("injected stop acknowledgement timeout")
+
+        backend = StopTimeoutBackend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        owner = BleOwner(driver)
+        report = StationaryCapabilityProbe(owner, driver).run(
+            generated_at="2030-01-01T00:00:00Z", evidence_category="HIL-stationary"
+        )
+        self.assertEqual(report.capabilities["stop.latency"].status, "failed")
+        self.assertEqual(report.final_state, "disconnected_stop_unconfirmed")
+        self.assertEqual(backend.calls.count("stop_timeout"), 1)
+        self.assertEqual(backend.calls[-1], "disconnect")
+        self.assertEqual(owner.state, ConnectionState.OFFLINE)
+
     def test_unavailable_backend_has_no_implicit_hardware_fallback(self) -> None:
         driver = Spherov2R2Driver(
             backend=UnavailableSpherov2Backend(), configured_identity="configured-outside-source"
@@ -128,6 +167,19 @@ class CapabilityProbeTest(unittest.TestCase):
             if capability not in {"identity.system_info", "battery.state_voltage"}:
                 self.assertEqual(evidence.status, "untested")
         self.assertEqual(report.final_state, "safe_hold")
+
+    def test_hil_failure_evidence_excludes_identity_and_exception_text(self) -> None:
+        payload = build_hil_failure_evidence(
+            error_type="TimeoutError",
+            owner_state="offline",
+            driver_connected=False,
+            driver_stopped=True,
+        )
+        self.assertEqual(payload["terminal"], "failed")
+        self.assertFalse(payload["movement_performed"])
+        self.assertNotIn("configured-name", str(payload))
+        self.assertNotIn("private exception detail", str(payload))
+        self.assertNotIn("address", str(payload))
 
 
 if __name__ == "__main__":

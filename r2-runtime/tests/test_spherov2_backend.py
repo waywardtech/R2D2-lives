@@ -25,6 +25,10 @@ class FakeLeds(IntEnum):
     LOGIC_DISPLAYS = 3
 
 
+class FakeRawMotorModes(IntEnum):
+    OFF = 0
+
+
 class FakeLedControl:
     def __init__(self, calls: list[object]) -> None:
         self.calls = calls
@@ -37,8 +41,14 @@ class FakeDriveControl:
     def __init__(self, calls: list[object]) -> None:
         self.calls = calls
 
-    def roll_stop(self, heading: int) -> None:
-        self.calls.append(("stop", heading))
+    def set_raw_motors(
+        self,
+        left_mode: FakeRawMotorModes,
+        left_speed: int,
+        right_mode: FakeRawMotorModes,
+        right_speed: int,
+    ) -> None:
+        self.calls.append(("raw_motors", left_mode, left_speed, right_mode, right_speed))
 
 
 class FakeToy:
@@ -122,6 +132,7 @@ class Spherov2BackendTest(unittest.TestCase):
         modules = {
             "spherov2.scanner": scanner,
             "spherov2.toy.r2d2": SimpleNamespace(R2D2=r2_type),
+            "spherov2.controls": SimpleNamespace(RawMotorModes=FakeRawMotorModes),
         }
         backend = Spherov2LibraryBackend(
             policy=policy,
@@ -181,13 +192,16 @@ class Spherov2BackendTest(unittest.TestCase):
         )
         backend.disconnect()
 
-    def test_owner_disconnect_dispatches_zero_speed_stop_before_close(self) -> None:
+    def test_owner_disconnect_dispatches_raw_motor_off_before_close(self) -> None:
         backend, toy, _, _ = self.make_backend()
         driver = Spherov2R2Driver(backend=backend, configured_identity="D2-TEST")
         owner = BleOwner(driver)
         owner.connect_for_stationary_probe()
         owner.disconnect("test")
-        self.assertEqual(toy.calls[-2:], [("stop", 0), "exit"])
+        self.assertEqual(
+            toy.calls[-2:],
+            [("raw_motors", FakeRawMotorModes.OFF, 0, FakeRawMotorModes.OFF, 0), "exit"],
+        )
         self.assertTrue(owner.stopped)
 
     def test_read_only_capability_inventory_does_not_start_streaming(self) -> None:
@@ -205,4 +219,3 @@ class Spherov2BackendTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

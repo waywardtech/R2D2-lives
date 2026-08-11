@@ -22,13 +22,13 @@ evidence while keeping all physical operations separately gated.
 | TEST-001, TEST-003 | pass | simulation fault tests | No hardware path; final safe state asserted |
 | Gate P0 | pass | `python scripts/tasks.py test`, `sim-smoke`, `docs-check` | Automated/contract/simulation evidence complete |
 | R2-001 / single BLE owner | in_progress | `r2_runtime.ble_owner.BleOwner` | Simulation verified; real process/HIL pending |
-| R2-002, R2-003 / capability probe | in_progress | `python scripts/tasks.py p1-sim` | Actual R201 firmware remains unverified |
+| R2-002, R2-003 / capability probe | in_progress | `evidence/hil/cycle-1-stop-timeout.json` | Firmware observed; stop and optional actions incomplete |
 | R2-004 / reconnect no-resume | pass | `test_link_loss_and_reconnect_do_not_resume` | Simulation evidence |
 | Gate P1 / five cycles | incomplete | five simulation cycles | Five real HIL cycles required |
 | Gate P1 / 30-minute session | incomplete | 1,800-second virtual soak | Real stationary HIL session required |
 | Gate P1 / bounded movement | incomplete | none | Explicit motion authorization and preflight required |
 
-Evidence category: automated, contract, simulation. No HIL evidence.
+Evidence category: automated, contract, simulation, HIL failure. No passing HIL cycle.
 
 ## Completed this phase
 
@@ -50,6 +50,8 @@ Evidence category: automated, contract, simulation. No HIL evidence.
   rfkill state but found no R2 advertisement; no connection or command occurred.
 - Second discovery classified one R2-D2 and one BB-8 without connecting either;
   hardware modules now import without SAP or peer-product source.
+- Exact-identity HIL observed firmware 7.0.101 and battery 3.77 V/ok; both
+  zero-speed stop forms timed out, but fixed cleanup closed BLE without retry.
 
 ## Remaining gate items
 
@@ -71,11 +73,12 @@ Evidence category: automated, contract, simulation. No HIL evidence.
 
 - The supplied OpenAPI/AsyncAPI drafts receive deterministic structural checks;
   full standards-validator tooling remains a Phase 1 dependency decision.
-- No physical capability, BLE behavior, acoustic accuracy, or real-room safety is verified.
+- Some physical identity, battery, and BLE behavior is observed; acoustic accuracy
+  and real-room safety remain unverified.
 - Target-host dependency imports are verified, but the Pi defaults to Python
   3.13.5 and deployment must explicitly use 3.11. All actual firmware/BLE behavior remains unverified.
-- R2 did not advertise during bounded discovery while charging; operator action
-  is required to wake advertising without moving or unplugging the droid.
+- R201 firmware 7.0.101 does not acknowledge drive stop commands while charging.
+  The failed cycle disconnects safely but cannot count as Gate P1 success.
 
 ## Last verification
 
@@ -87,23 +90,23 @@ python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, 
 python scripts/tasks.py test -> pass; 19 tests plus isolated standalone repetitions
 python scripts/tasks.py docs-check -> pass
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass after hardware import isolation slice; 44 tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass after HIL timeout hardening; 47 tests plus isolated standalone repetitions
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off
 stationary HIL discovery attempt 1 -> blocked; no R2 advertisement, no connection/command
 stationary HIL discovery attempt 2 -> pass; one R2 and one BB-8 type-filtered, no connection/command
+stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disconnected, no movement
 ```
 
 ## Hardware state
 
 - Real R2 movement authorized for next run: no
-- Last known droid state: unknown/stopped (never assume active)
-- Capability profile: none/unverified
-- Hardware evidence category: target-host import plus HIL discovery; no R2 connection
+- Last known droid state: disconnected after optional-pass watchdog; physical LED/audio state needs confirmation
+- Capability profile: partial; firmware/identity/battery/advertised telemetry observed
+- Hardware evidence category: target-host import, HIL discovery, and failed stationary probe
 
 ## Exact next task
 
-Transfer the minimal R2-owned stationary-HIL source to the Pi after explicit
-source-transfer approval, then run the exact-identity probe. Movement remains a
-later subtest and is prohibited while charging.
+Confirm R2 returned to normal LED/audio state after the optional watchdog timeout.
+Do not retry optional or motor actions while charging. Movement remains prohibited.

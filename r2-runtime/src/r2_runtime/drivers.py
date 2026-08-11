@@ -63,6 +63,7 @@ class Spherov2R2Driver:
     configured_identity: str = ""
     connected: bool = False
     stopped: bool = True
+    stop_attempted_since_connect: bool = False
 
     expected_library_version = "0.12.1"
 
@@ -92,18 +93,32 @@ class Spherov2R2Driver:
             raise
         self.connected = True
         self.stopped = True
+        self.stop_attempted_since_connect = False
 
     def safe_hold(self) -> None:
-        self.stopped = True
-        if self.connected:
+        if not self.connected:
+            self.stopped = True
+            return
+        self.stop_attempted_since_connect = True
+        try:
             self.backend.stop()
+        except Exception:
+            self.stopped = False
+            raise
+        self.stopped = True
 
     def disconnect(self) -> None:
         if self.connected:
-            self.safe_hold()
-            self.backend.disconnect()
-        self.connected = False
-        self.stopped = True
+            try:
+                if not self.stop_attempted_since_connect:
+                    self.safe_hold()
+            finally:
+                try:
+                    self.backend.disconnect()
+                finally:
+                    self.connected = False
+                    self.stopped = True
+                    self.stop_attempted_since_connect = False
 
 
 @dataclass

@@ -96,7 +96,9 @@ class Spherov2LibraryBackend:
 
     def stop(self) -> None:
         toy = self._require_toy()
-        toy.drive_control.roll_stop(0)
+        controls = self._module_loader("spherov2.controls")
+        off = controls.RawMotorModes.OFF
+        toy.drive_control.set_raw_motors(off, 0, off, 0)
 
     def identity(self) -> Mapping[str, str]:
         toy = self._require_toy()
@@ -161,4 +163,3 @@ class Spherov2LibraryBackend:
                 "configuration_supported": hasattr(toy, "configure_collision_detection"),
             }
         raise ValueError(f"unsupported stationary capability: {capability}")
-

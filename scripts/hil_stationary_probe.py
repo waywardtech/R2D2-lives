@@ -20,7 +20,7 @@ from r2_runtime.ble_owner import BleOwner
 from r2_runtime.capability_probe import StationaryCapabilityProbe
 from r2_runtime.drivers import Spherov2R2Driver
 from r2_runtime.hil_preflight import validate_stationary_preflight
-from r2_runtime.recording import write_immutable_json
+from r2_runtime.recording import build_hil_failure_evidence, write_immutable_json
 from r2_runtime.spherov2_backend import Spherov2LibraryBackend, StationaryProbePolicy
 
 
@@ -56,9 +56,31 @@ def main() -> None:
     )
     backend = Spherov2LibraryBackend(policy=policy)
     driver = Spherov2R2Driver(backend=backend, configured_identity=identity)
-    report = StationaryCapabilityProbe(BleOwner(driver), driver).run(
-        evidence_category="HIL-stationary"
-    )
+    owner = BleOwner(driver)
+    try:
+        report = StationaryCapabilityProbe(owner, driver).run(
+            evidence_category="HIL-stationary"
+        )
+    except Exception as error:
+        failure = build_hil_failure_evidence(
+            error_type=type(error).__name__,
+            owner_state=owner.state.value,
+            driver_connected=driver.connected,
+            driver_stopped=driver.stopped,
+        )
+        digest = write_immutable_json(args.output, failure)
+        print(
+            json.dumps(
+                {
+                    "evidence_category": failure["evidence_category"],
+                    "report_sha256": digest,
+                    "movement_performed": False,
+                    "terminal": "failed",
+                },
+                sort_keys=True,
+            )
+        )
+        raise SystemExit(2) from None
     digest = write_immutable_json(args.output, report.to_dict())
     print(
         json.dumps(
@@ -71,6 +93,8 @@ def main() -> None:
             sort_keys=True,
         )
     )
+    if report.final_state != "safe_hold":
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":

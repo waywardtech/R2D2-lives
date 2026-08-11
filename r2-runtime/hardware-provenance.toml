@@ -77,6 +77,33 @@ droid_command_sent = false
 movement_performed = false
 result = "ready-for-exact-identity-stationary-probe"
 
+[stationary_hil_probe_attempt_1]
+attempted_date = "2026-08-11"
+evidence_file = "evidence/hil/cycle-1-stop-timeout.json"
+evidence_sha256 = "9a422c5c2c8e566b13755636c139b1b0a77fcbceab82944968e9f8277b7e6c85"
+firmware = "7.0.101"
+board_revision = "3"
+battery_state = "ok"
+battery_voltage_v = 3.77
+identity_and_battery_queries_succeeded = true
+zero_speed_heading_stop_acknowledged = false
+raw_motor_off_stop_acknowledged = false
+stop_attempts_retried_per_connection = false
+ble_disconnected = true
+movement_performed = false
+final_state = "disconnected_stop_unconfirmed"
+gate_cycle_passed = false
+
+[stationary_hil_optional_attempt_1]
+attempted_date = "2026-08-11"
+authorized_actions = ["low-brightness LED preview", "head-position read", "quiet R2 audio preview"]
+terminal_result = "watchdog timeout"
+immutable_report_created = false
+probe_process_terminated = true
+ble_disconnected = true
+movement_performed = false
+result = "failed-no-retry-awaiting-operator-state-confirmation"
+
 [safety]
 default_backend = "simulation"
 real_hardware_automated_tests = false

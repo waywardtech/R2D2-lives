@@ -25,6 +25,14 @@
   without importing SAP or simulation application modules.
 - Verify bounded discovery distinguishes one in-scope R2-D2 from one out-of-scope
   BB-8 without connecting either or persisting advertised identity.
+- Fix HIL stop-timeout cleanup so stop is attempted once and BLE always closes;
+  use deterministic raw motor OFF/0 without changing heading.
+- Persist stop-timeout HIL evidence with a failed capability and
+  `disconnected_stop_unconfirmed` terminal state instead of claiming success.
+- Persist sanitized immutable failure evidence for earlier probe exceptions,
+  excluding exception text, configured identity, and device addresses.
+- Add the first immutable real-R201 HIL report and enforce its SHA-256 during
+  documentation checks; the stop-timeout cycle remains a failed gate result.
 
 ## 0.1.0 - 2026-08-11
 
