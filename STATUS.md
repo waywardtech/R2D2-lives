@@ -78,6 +78,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 - Bench session orchestration is now owned by R2 Runtime and simulation-tested
   across success, response timeout, unsafe battery, and battery-query failure;
   every connected case performs one stop attempt and one BLE disconnect.
+- A least-privilege GitHub Actions workflow now runs Python 3.11 checks, contract
+  and standalone suites, deterministic simulations, and documentation evidence.
+  A static CI guard rejects HIL entry points, hardware identity/arm variables,
+  Bluetooth/SSH/sudo commands, and self-hosted runners.
 
 ## Remaining gate items
 
@@ -139,7 +143,7 @@ stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disc
 
 ## Exact next task
 
-Await a future off-charger, physically contained bench window and exact operator
-authorization before running the stop-response command. Separately, configure a
-Git remote so commits can be pushed. Do not retry optional or motor actions while
-charging; no hardware work is currently authorized.
+Confirm the first hosted simulation-CI run passes. Then await a future off-charger,
+physically contained bench window and exact operator authorization before running
+the stop-response command. Do not retry optional or motor actions while charging;
+no hardware work is currently authorized.

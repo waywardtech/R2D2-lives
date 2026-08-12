@@ -56,6 +56,10 @@
   keeping unsafe battery, missing confirmation, and unrelated errors invalid.
 - Extract bench-session orchestration into R2 Runtime and cover normal, timeout,
   unsafe-battery, and query-failure paths with one-stop/no-retry assertions.
+- Add least-privilege Python 3.11 GitHub Actions simulation CI and a static guard
+  rejecting HIL, hardware identities, Bluetooth/SSH/sudo, and self-hosted runners.
+- Update the root README to distinguish simulation-default automation from the
+  separate disabled-by-default local R201 hardware profile.
 
 ## 0.1.0 - 2026-08-11
 

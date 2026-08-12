@@ -1,0 +1,37 @@
+name: simulation-ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: simulation-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Verify hosted-CI safety policy
+        run: python scripts/verify_ci_safety.py
+      - name: Verify runtime and boundaries
+        run: python scripts/tasks.py bootstrap
+      - name: Run full automated suite
+        run: python scripts/tasks.py test
+      - name: Run deterministic integration smoke
+        run: python scripts/tasks.py sim-smoke
+      - name: Run Phase 1 stationary simulation
+        run: python scripts/tasks.py p1-sim
+      - name: Verify documentation and evidence
+        run: python scripts/tasks.py docs-check
