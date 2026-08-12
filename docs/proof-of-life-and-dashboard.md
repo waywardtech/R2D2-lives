@@ -84,6 +84,13 @@ command. Use the reviewed Pi launcher only for one explicitly authorized run,
 under a bounded external watchdog, and preserve its immutable JSON output and
 progress journal. Never retry automatically after a timeout or physical anomaly.
 
+Live launchers require `R2_DEVICE_IDENTITY` to be supplied outside source
+control before scanning. Discovery may observe other R2-class advertisements,
+but proceeds only when exactly one advertisement matches the configured identity.
+Zero or duplicate exact matches fail closed without logging any advertised name
+or BLE address. A launcher never adopts the first or only nearby display name as
+identity.
+
 ## First deployment and HIL attempt
 
 Commits `eda49e6`, `7adeab4`, and the private-IPv6 allowlist correction

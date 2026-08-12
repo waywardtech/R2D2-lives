@@ -189,6 +189,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   and one BB-8, with repeated fresh packets from each. This rules out a test
   fixture and makes a transient nearby R2-class advertiser the best current
   explanation; no droid was connected or commanded during diagnosis.
+- Proof-of-life and encounter launchers now require the private configured R2
+  identity before live discovery and select exactly one matching advertisement.
+  Unrelated R2-class advertisements no longer create false ambiguity, while zero
+  or duplicate exact matches still fail closed without persisting nearby names
+  or addresses. This policy is simulation-tested only.
 
 ## Remaining gate items
 

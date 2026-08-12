@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
 import runpy
 import sys
 import unittest
@@ -31,6 +32,17 @@ class EncounterLauncherTest(unittest.TestCase):
             self.assertEqual(Path(sys.path[0]), expected)
         finally:
             sys.path[:] = original_path
+
+    def test_launchers_require_external_identity_before_live_scanning(self) -> None:
+        original = os.environ.pop("R2_DEVICE_IDENTITY", None)
+        try:
+            for launcher in (LAUNCHER, PROOF_LAUNCHER):
+                namespace = runpy.run_path(str(launcher), run_name="identity_gate_test")
+                with self.assertRaisesRegex(SystemExit, "configured outside source control"):
+                    namespace["main"]()
+        finally:
+            if original is not None:
+                os.environ["R2_DEVICE_IDENTITY"] = original
 
 
 if __name__ == "__main__":
