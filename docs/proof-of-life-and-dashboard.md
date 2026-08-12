@@ -83,6 +83,11 @@ The HIL entry point intentionally is not documented as a copy-paste convenience
 command. Use the reviewed Pi launcher only for one explicitly authorized run,
 under a bounded external watchdog, and preserve its immutable JSON output and
 progress journal. Never retry automatically after a timeout or physical anomaly.
+The reviewed proof-of-life watchdog is separately armed, accepts only a 20-120
+second bound, refuses existing evidence paths before child creation, terminates
+then kills a hung child if necessary, and emits immutable identity-free timeout
+evidence classified from the last durable phase. A timeout always requires
+operator confirmation and never causes an automatic retry.
 
 Live launchers require `R2_DEVICE_IDENTITY` to be supplied outside source
 control before scanning. Discovery may observe other R2-class advertisements,

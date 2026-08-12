@@ -116,6 +116,7 @@ def docs_check() -> None:
         ROOT / "scripts" / "hil_watch_stationary_droid_encounter.py",
         ROOT / "scripts" / "hil_proof_of_life.py",
         ROOT / "scripts" / "hil_launch_proof_of_life.py",
+        ROOT / "scripts" / "hil_watch_proof_of_life.py",
         ROOT / "scripts" / "write_r2_dashboard_status.py",
         ROOT / "scripts" / "classify_encounter_watchdog.py",
         ROOT / "r2-runtime" / "hardware-provenance.toml",

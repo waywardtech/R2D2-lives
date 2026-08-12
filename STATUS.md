@@ -200,6 +200,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   EOF, unsafe-battery, primary-timeout, and disconnect-EOF scenarios all end
   offline/stopped in simulation; no firmware response is reinterpreted as
   success.
+- A separately armed proof-of-life watchdog now owns the external child-process
+  bound. It refuses reused evidence paths, preserves the durable stage journal,
+  classifies the exact stalled boundary, terminates/kills a hung child, requires
+  operator state confirmation, and never retries. This path is simulation-tested
+  only and remains disabled by default.
 
 ## Remaining gate items
 
