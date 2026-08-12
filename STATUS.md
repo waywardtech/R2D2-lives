@@ -75,6 +75,9 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 - Bench-result simulation preserves an operator-confirmed response timeout as
   `stop_unconfirmed`, while unsafe battery, missing confirmation, and unrelated
   execution errors remain `invalid_test` rather than being conflated.
+- Bench session orchestration is now owned by R2 Runtime and simulation-tested
+  across success, response timeout, unsafe battery, and battery-query failure;
+  every connected case performs one stop attempt and one BLE disconnect.
 
 ## Remaining gate items
 
@@ -118,7 +121,7 @@ python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, 
 python scripts/tasks.py test -> pass; 19 tests plus isolated standalone repetitions
 python scripts/tasks.py docs-check -> pass
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 60 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 64 primary suite tests plus isolated standalone repetitions
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off

@@ -28,6 +28,7 @@ from r2_runtime.packet_trace import (
 from r2_runtime.recording import build_hil_failure_evidence, write_immutable_json
 from r2_runtime.session_recording import SessionClock
 from r2_runtime.spherov2_backend import Spherov2LibraryBackend, TracedRawMotorOffExecutor
+from r2_runtime.stop_bench import run_stop_bench_session
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -82,20 +83,8 @@ def main() -> None:
     backend = Spherov2LibraryBackend(stop_executor=TracedRawMotorOffExecutor(recorder))
     driver = Spherov2R2Driver(backend=backend, configured_identity=preflight.identity)
     owner = BleOwner(driver)
-    error_type: str | None = None
-    try:
-        owner.connect_for_stationary_probe()
-        battery = owner.serialized(backend.battery)
-        if str(battery.get("state", "unknown")).lower() not in {"ok", "charged", "not_charging"}:
-            error_type = "UnsafeBatteryState"
-    except Exception as error:
-        error_type = type(error).__name__
-    finally:
-        if driver.connected:
-            try:
-                owner.disconnect("stationary_probe_complete")
-            except Exception as error:
-                error_type = error_type or type(error).__name__
+    session_result = run_stop_bench_session(owner, driver)
+    error_type = session_result.error_type
 
     if recorder.observation_count == 0:
         failure = build_hil_failure_evidence(

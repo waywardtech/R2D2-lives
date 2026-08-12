@@ -71,6 +71,10 @@ after timeout. Any earlier exception, unsafe battery, remaining Bluetooth
 connection, missing physical confirmation, or non-success response exits failed.
 An operator-confirmed `TimeoutError` remains valid failed evidence classified as
 `stop_unconfirmed`; it is not relabeled as invalid or promoted to success.
+The connect/battery/disconnect-stop sequence lives in
+`r2_runtime.stop_bench.run_stop_bench_session` and has deterministic coverage for
+normal, timeout, unsafe-battery, and battery-query-failure paths. Each connected
+path asserts exactly one stop attempt and terminal BLE disconnect.
 
 The supplied R201 product manual does not document an app-independent physical
 power cutoff. Do not substitute instructions for unrelated R2-D2 products. The

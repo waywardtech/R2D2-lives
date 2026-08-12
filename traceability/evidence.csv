@@ -38,3 +38,4 @@ SAFE-003,P1,pass,simulation,r2-runtime/tests/test_packet_trace.py,"Stop trace ad
 R2-002,P1,in_progress,automated,r2-runtime/tests/test_spherov2_backend.py,"Opt-in traced executor observes the pinned exact OFF/0 encode/execute path without changing flags; default backend remains public and untraced"
 SAFE-004,P1,in_progress,automated,r2-runtime/tests/test_hil_preflight.py,"Bench runner refuses default and requires explicit authorization off-charger containment emergency path second go external arm token synchronized clock and post-test confirmation"
 SAFE-003,P1,pass,simulation,r2-runtime/tests/test_packet_trace.py,"Confirmed response timeout remains stop_unconfirmed; unsafe battery missing operator confirmation and unrelated errors remain invalid"
+SAFE-003,P1,pass,simulation,r2-runtime/tests/test_stop_bench.py,"Normal timeout unsafe-battery and battery-query-failure sessions each terminate offline with exactly one stop attempt and disconnect"

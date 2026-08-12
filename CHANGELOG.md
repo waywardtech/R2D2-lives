@@ -54,6 +54,8 @@
   no retry, zero residual BLE connections, and post-test physical confirmation.
 - Preserve an operator-confirmed response timeout as `stop_unconfirmed` while
   keeping unsafe battery, missing confirmation, and unrelated errors invalid.
+- Extract bench-session orchestration into R2 Runtime and cover normal, timeout,
+  unsafe-battery, and query-failure paths with one-stop/no-retry assertions.
 
 ## 0.1.0 - 2026-08-11
 
