@@ -3,6 +3,36 @@ const chatForm = document.querySelector("#chat-form");
 const messageInput = document.querySelector("#message");
 const refreshButton = document.querySelector("#refresh");
 let latestStatus = null;
+const signalState = { mood: 0.28, input: 0.04, output: 0.03 };
+let outputDecayTimer = null;
+let microphoneStream = null;
+let microphoneFrame = null;
+
+function pulseModules(moduleName) {
+  const matrix = document.querySelector("#module-matrix");
+  matrix.dataset.module = moduleName;
+  matrix.querySelectorAll("i").forEach((lamp, index) => {
+    lamp.classList.toggle("active", ((index * 7 + moduleName.length * 3) % 11) < 5);
+  });
+}
+
+function setMood(value, label) {
+  signalState.mood = Math.max(0.08, Math.min(1, value));
+  document.querySelector("#mood-value").textContent = label;
+}
+
+function pulseOutput(level = 0.86) {
+  signalState.output = level;
+  document.querySelector("#output-value").textContent = "ACTIVE";
+  window.clearInterval(outputDecayTimer);
+  outputDecayTimer = window.setInterval(() => {
+    signalState.output = Math.max(0.03, signalState.output * 0.82);
+    if (signalState.output < 0.07) {
+      window.clearInterval(outputDecayTimer);
+      document.querySelector("#output-value").textContent = "IDLE";
+    }
+  }, 80);
+}
 
 const escapeText = (value) => String(value ?? "UNAVAILABLE");
 const compact = (value) => {
@@ -30,6 +60,8 @@ function addMessage(kind, primary, translation = "") {
   }
   transcript.append(article);
   transcript.scrollTop = transcript.scrollHeight;
+  pulseModules(kind === "droid" ? "translation" : "comms-in");
+  if (kind === "droid") pulseOutput();
 }
 
 function droidReply(text) {
@@ -61,6 +93,9 @@ chatForm.addEventListener("submit", (event) => {
   const text = messageInput.value.trim();
   if (!text) return;
   addMessage("user", text);
+  if (/thank|good|hello|hi|great|love/i.test(text)) setMood(0.72, "BRIGHT");
+  else if (/warning|issue|problem|bad|danger/i.test(text)) setMood(0.88, "ALERT");
+  else setMood(0.44, "CURIOUS");
   messageInput.value = "";
   const [binary, translation] = droidReply(text);
   window.setTimeout(() => addMessage("droid", binary, translation), 260);
@@ -113,12 +148,16 @@ function renderStatus(status) {
     return node;
   }));
   const overall = status.overall || "unknown";
+  if (overall === "nominal") setMood(0.34, "CALM");
+  else if (overall === "attention") setMood(0.82, "ALERT");
+  else setMood(0.48, "WATCHFUL");
   document.querySelector("#overall").textContent = overall.toUpperCase();
   document.querySelector("#measured").textContent = status.measured_at ? `UTC ${status.measured_at}` : "NO TIMESTAMP";
   document.querySelector("#alert-strip").dataset.level = overall;
 }
 
 async function loadStatus() {
+  pulseModules("status");
   refreshButton.disabled = true;
   try {
     const response = await fetch(`status.json?t=${Date.now()}`, { cache: "no-store" });
@@ -140,8 +179,42 @@ refreshButton.addEventListener("click", loadStatus);
 loadStatus();
 window.setInterval(loadStatus, 10000);
 
+document.querySelector("#mic-toggle").addEventListener("click", async (event) => {
+  const button = event.currentTarget;
+  if (microphoneStream) {
+    microphoneStream.getTracks().forEach((track) => track.stop());
+    microphoneStream = null;
+    window.cancelAnimationFrame(microphoneFrame);
+    signalState.input = 0.04;
+    button.textContent = "ENABLE";
+    pulseModules("mic-off");
+    return;
+  }
+  try {
+    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    const audioContext = new AudioContext();
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    audioContext.createMediaStreamSource(microphoneStream).connect(analyser);
+    const samples = new Uint8Array(analyser.fftSize);
+    const sampleLevel = () => {
+      analyser.getByteTimeDomainData(samples);
+      const energy = samples.reduce((sum, sample) => sum + ((sample - 128) / 128) ** 2, 0) / samples.length;
+      signalState.input = Math.min(1, Math.sqrt(energy) * 3.8 + 0.025);
+      microphoneFrame = window.requestAnimationFrame(sampleLevel);
+    };
+    sampleLevel();
+    button.textContent = "LIVE";
+    pulseModules("mic-in");
+  } catch (_error) {
+    button.textContent = "BLOCKED";
+    signalState.input = 0.03;
+  }
+});
+
 document.querySelectorAll("canvas.scope").forEach((canvas, index) => {
   const context = canvas.getContext("2d");
+  const channel = canvas.dataset.wave;
   let phase = index * 1.7;
   function draw() {
     const ratio = window.devicePixelRatio || 1;
@@ -156,21 +229,26 @@ document.querySelectorAll("canvas.scope").forEach((canvas, index) => {
     context.strokeStyle = "#183136";
     context.lineWidth = 1;
     for (let x = 0; x < width; x += 14) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, height); context.stroke(); }
-    context.strokeStyle = index === 1 ? "#ffb43b" : "#ff5a1f";
+    const level = signalState[channel] ?? 0.05;
+    context.strokeStyle = channel === "input" ? "#ffb43b" : "#ff5a1f";
     context.shadowColor = context.strokeStyle;
     context.shadowBlur = 5;
     context.beginPath();
     for (let x = 0; x <= width; x += 2) {
-      const burst = Math.sin(x * .19 + phase) * Math.sin(x * .043 - phase * .7);
-      const y = height / 2 + burst * height * .28 + Math.sin(x * .05 + phase) * 3;
+      const carrier = channel === "mood" ? .075 : channel === "input" ? .22 : .15;
+      const burst = Math.sin(x * carrier + phase) * Math.sin(x * .043 - phase * .7);
+      const jitter = Math.sin(x * .31 + phase * 1.8) * level * height * .09;
+      const y = height / 2 + burst * height * level * .43 + jitter;
       if (x === 0) context.moveTo(x, y); else context.lineTo(x, y);
     }
     context.stroke();
     context.shadowBlur = 0;
-    phase += .045;
+    phase += .025 + level * .095;
     requestAnimationFrame(draw);
   }
   draw();
 });
+
+pulseModules("boot");
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("service-worker.js");

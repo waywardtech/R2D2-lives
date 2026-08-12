@@ -40,6 +40,25 @@ class WebAppTest(unittest.TestCase):
         self.assertIn("var(--translation-font)", stylesheet)
         self.assertIn('"fonts/Clynese_Hand.otf"', worker)
 
+    def test_viewport_scopes_and_module_matrix_are_live_but_non_actuating(self) -> None:
+        html = (WEBAPP / "index.html").read_text(encoding="utf-8")
+        stylesheet = (WEBAPP / "app.css").read_text(encoding="utf-8")
+        javascript = (WEBAPP / "app.js").read_text(encoding="utf-8")
+        self.assertIn('id="module-matrix"', html)
+        self.assertIn('data-wave="mood"', html)
+        self.assertIn('data-wave="input"', html)
+        self.assertIn('data-wave="output"', html)
+        self.assertIn('id="mic-toggle"', html)
+        self.assertIn('content="/R2D2/og.png"', html)
+        self.assertTrue((WEBAPP / "og.png").is_file())
+        self.assertIn("height: 100dvh", stylesheet)
+        self.assertIn("overflow: hidden", stylesheet)
+        self.assertIn("navigator.mediaDevices.getUserMedia", javascript)
+        self.assertIn('pulseModules("status")', javascript)
+        self.assertIn("signalState.output", javascript)
+        for forbidden in ("/drive", "/move", "/heading", "/proof-of-life"):
+            self.assertNotIn(forbidden, javascript)
+
     def test_apache_surface_is_lan_only_read_only_and_hardened(self) -> None:
         config = (ROOT / "r2-runtime" / "deploy" / "apache" / "r2d2-dashboard.conf").read_text(
             encoding="utf-8"

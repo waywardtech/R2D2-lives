@@ -8,6 +8,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="R2 Link">
     <meta name="description" content="A local X-wing-inspired R2-D2 dialogue and systems console.">
+    <meta property="og:title" content="R2-D2 Astromech Link">
+    <meta property="og:description" content="A local dialogue, signal, and systems console for R2-D2.">
+    <meta property="og:image" content="/R2D2/og.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="app.css">
     <title>R2-D2 Astromech Link</title>
@@ -20,7 +25,10 @@
           <i class="lamp red"></i><i class="lamp warm"></i><i class="lamp amber"></i>
           <i class="lamp white"></i>
         </div>
-        <div class="bezel-mark" aria-hidden="true"><span>R2</span></div>
+        <div class="module-matrix" id="module-matrix" aria-label="Module activity display">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
         <div class="link-title">
           <span>ASTROMECH LINK</span>
           <strong>R2-D2 / LOCAL</strong>
@@ -28,14 +36,14 @@
       </header>
 
       <section class="panel" aria-label="Dialogue and telemetry panel">
-        <aside class="scope-bank" aria-label="Decorative signal scopes">
-          <div class="scope-label">SIG A</div>
-          <canvas class="scope" data-wave="1" aria-hidden="true"></canvas>
-          <div class="scope-label">SIG B</div>
-          <canvas class="scope" data-wave="2" aria-hidden="true"></canvas>
+        <aside class="scope-bank" aria-label="Live signal scopes">
+          <div class="scope-label"><span>MOOD</span><b id="mood-value">CALM</b></div>
+          <canvas class="scope" data-wave="mood" aria-label="R2 mood waveform"></canvas>
+          <div class="scope-label"><span>VOL IN</span><button id="mic-toggle" type="button">ENABLE</button></div>
+          <canvas class="scope" data-wave="input" aria-label="Microphone input waveform"></canvas>
           <div class="signal-disc" aria-hidden="true"><span></span></div>
-          <div class="scope-label">COMMS</div>
-          <canvas class="scope tall" data-wave="3" aria-hidden="true"></canvas>
+          <div class="scope-label"><span>VOL OUT</span><b id="output-value">IDLE</b></div>
+          <canvas class="scope tall" data-wave="output" aria-label="R2 output waveform"></canvas>
         </aside>
 
         <section class="chat-bay" aria-labelledby="dialogue-title">

@@ -54,6 +54,15 @@ Archive. R2's English translation remains in a conventional condensed Latin
 face for immediate readability. The bundled font is attributed to AurekFonts;
 the archive classifies it as free for everyone, forever.
 
+The console occupies the available browser viewport without page scrolling;
+individual transcript and telemetry bays scroll only when their content needs
+it. Its live scopes visualize status-derived mood, optional foreground
+microphone input, and R2 dialogue-output activity. Microphone capture starts
+only after the operator presses `ENABLE`, stops on a second press or page exit,
+and is never uploaded or persisted. The header's red micro-LED matrix changes
+with local module calls such as status refresh, chat input, translation, and
+microphone state. These visual signals do not expose a physical-control path.
+
 ## Deployment model
 
 Apache serves release-owned static assets and the generated status file. A
