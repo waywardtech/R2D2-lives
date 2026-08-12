@@ -60,6 +60,8 @@
   rejecting HIL, hardware identities, Bluetooth/SSH/sudo, and self-hosted runners.
 - Update the root README to distinguish simulation-default automation from the
   separate disabled-by-default local R201 hardware profile.
+- Remove an unnecessary pip cache after the first hosted run failed in post-job
+  cleanup, and update checkout/setup-python to their Node 24 action releases.
 
 ## 0.1.0 - 2026-08-11
 

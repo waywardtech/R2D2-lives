@@ -9,6 +9,8 @@ WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 
 REQUIRED = (
     "runs-on: ubuntu-latest",
+    "uses: actions/checkout@v6",
+    "uses: actions/setup-python@v6",
     "python-version: \"3.11\"",
     "python scripts/tasks.py test",
     "python scripts/tasks.py p1-sim",
@@ -23,6 +25,7 @@ BANNED = (
     "ssh ",
     "scp ",
     "sudo ",
+    "cache: pip",
 )
 
 

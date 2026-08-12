@@ -82,6 +82,9 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   and standalone suites, deterministic simulations, and documentation evidence.
   A static CI guard rejects HIL entry points, hardware identity/arm variables,
   Bluetooth/SSH/sudo commands, and self-hosted runners.
+- The first hosted run reached post-job cleanup but failed because pip caching was
+  configured for a dependency-free workflow. The cache was removed and official
+  checkout/setup actions were advanced to their Node 24 releases; rerun pending.
 
 ## Remaining gate items
 
