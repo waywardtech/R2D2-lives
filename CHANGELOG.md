@@ -62,6 +62,8 @@
   separate disabled-by-default local R201 hardware profile.
 - Remove an unnecessary pip cache after the first hosted run failed in post-job
   cleanup, and update checkout/setup-python to their Node 24 action releases.
+- Verify the corrected GitHub Actions simulation workflow passes on the hosted
+  Python 3.11 runner with hardware-capable paths statically excluded.
 
 ## 0.1.0 - 2026-08-11
 

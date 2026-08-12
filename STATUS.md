@@ -84,7 +84,8 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   Bluetooth/SSH/sudo commands, and self-hosted runners.
 - The first hosted run reached post-job cleanup but failed because pip caching was
   configured for a dependency-free workflow. The cache was removed and official
-  checkout/setup actions were advanced to their Node 24 releases; rerun pending.
+  checkout/setup actions were advanced to their Node 24 releases. The corrected
+  hosted run passed all simulation-only jobs.
 
 ## Remaining gate items
 
@@ -135,6 +136,7 @@ SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller 
 stationary HIL discovery attempt 1 -> blocked; no R2 advertisement, no connection/command
 stationary HIL discovery attempt 2 -> pass; one R2 and one BB-8 type-filtered, no connection/command
 stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disconnected, no movement
+GitHub Actions simulation-ci run 31550425423 -> pass; Python 3.11 hosted runner, no HIL/hardware path
 ```
 
 ## Hardware state
@@ -146,7 +148,6 @@ stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disc
 
 ## Exact next task
 
-Confirm the first hosted simulation-CI run passes. Then await a future off-charger,
-physically contained bench window and exact operator authorization before running
-the stop-response command. Do not retry optional or motor actions while charging;
-no hardware work is currently authorized.
+Await a future off-charger, physically contained bench window and exact operator
+authorization before running the stop-response command. Do not retry optional or
+motor actions while charging; no hardware work is currently authorized.

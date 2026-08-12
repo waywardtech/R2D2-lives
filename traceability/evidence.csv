@@ -39,6 +39,7 @@ R2-002,P1,in_progress,automated,r2-runtime/tests/test_spherov2_backend.py,"Opt-i
 SAFE-004,P1,in_progress,automated,r2-runtime/tests/test_hil_preflight.py,"Bench runner refuses default and requires explicit authorization off-charger containment emergency path second go external arm token synchronized clock and post-test confirmation"
 SAFE-003,P1,pass,simulation,r2-runtime/tests/test_packet_trace.py,"Confirmed response timeout remains stop_unconfirmed; unsafe battery missing operator confirmation and unrelated errors remain invalid"
 SAFE-003,P1,pass,simulation,r2-runtime/tests/test_stop_bench.py,"Normal timeout unsafe-battery and battery-query-failure sessions each terminate offline with exactly one stop attempt and disconnect"
-TEST-001,P1,in_progress,automated,.github/workflows/ci.yml,"Hosted Python 3.11 CI runs boundaries contracts tests simulations and docs; first remote run pending"
+TEST-001,P1,pass,automated,.github/workflows/ci.yml,"Hosted Python 3.11 CI runs boundaries contracts tests simulations and docs; corrected remote run passed"
 SAFE-003,P1,pass,automated,scripts/verify_ci_safety.py,"CI guard rejects HIL entry points hardware identity/arm variables Bluetooth SSH sudo and self-hosted runners"
 TEST-001,P1,in_progress,hosted_ci,https://github.com/waywardtech/R2D2-lives/actions/runs/31550340841,"All steps ran but setup-python pip cache cleanup failed because dependency-free CI created no cache directory; corrected rerun pending"
+TEST-001,P1,pass,hosted_ci,https://github.com/waywardtech/R2D2-lives/actions/runs/31550425423,"Corrected Python 3.11 simulation CI passed boundaries contracts 64 tests deterministic smoke P1 simulation docs evidence and CI safety guard"
