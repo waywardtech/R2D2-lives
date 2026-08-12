@@ -139,3 +139,9 @@ offline command classified an intentionally absent journal as `no_progress` and
 wrote deterministic `watchdog_timeout` evidence with SHA-256
 `fb53159fe9f63e69a37a9a3b0c28bc97ead6e1df25dc1c2f7ded1e8101193c86`.
 No scan, droid connection, command, or actuation occurred.
+
+Commit `7c90a1f` passed hosted simulation CI run `31564021923` and was copied to
+new rollback-safe Pi staging `/home/pi/r2d2-hil-7c90a1f`. The three changed-file
+SHA-256 hashes matched. With Bluetooth soft-blocked and no arm token or flag, the
+wrapper exited 1 with its disabled message, created no progress/live/watchdog
+file, and never started the child launcher. No droid was accessed.

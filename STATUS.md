@@ -133,6 +133,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   journal into immutable evidence, and states that BLE disconnect remains
   unverified and operator confirmation is required after process termination.
   Normal child exits pass through unchanged. This path is simulation-tested only.
+- Commit `7c90a1f` passed hosted simulation CI run `31564021923` and was copied
+  to rollback-safe Pi staging `/home/pi/r2d2-hil-7c90a1f`. Three hashes matched;
+  its default invocation refused before child launch and created no output files.
+  Bluetooth remained soft-blocked and no droid was accessed.
 
 ## Remaining gate items
 
@@ -190,8 +194,10 @@ GitHub Actions simulation-ci run 31551031074 -> pass; repository hygiene and imm
 GitHub Actions simulation-ci run 31551472563 -> pass; hash-locked quality tools, 67 tests, simulations, docs
 GitHub Actions simulation-ci run 31552293911 -> pass; 82 tests and stationary droid-encounter simulation
 GitHub Actions simulation-ci run 31563552918 -> pass; 95 tests and watchdog recovery evidence
+GitHub Actions simulation-ci run 31564021923 -> pass; 100 tests and external watchdog coverage
 Pi encounter staging -> pass; 6 hashes/versions verified, default HIL refusal before BLE
 Pi progress staging 8c5bae3 -> pass; 5 source hashes matched, offline recovery passed, Bluetooth blocked
+Pi watchdog staging 7c90a1f -> pass; 3 hashes matched, default refused, Bluetooth blocked
 stationary droid encounter attempt 1 -> expression observed; timed out, normal final state, not a passing cycle
 ```
 
@@ -205,7 +211,7 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 ## Exact next task
 
 Do not retry the live session under the prior authorization. The durable progress
-checkpoint is deployed; the new external watchdog remains workstation-only until
-its full automated gate and hosted CI pass. A future hardware run still requires
-new explicit authorization and a fresh physical preflight. The stop-response
-bench remains blocked while charging.
+checkpoint and external watchdog are deployed but remain disabled. A future
+hardware run requires new explicit authorization and a fresh physical preflight.
+Until then, continue Phase 1 simulation-only failure/recovery coverage. The
+stop-response bench remains blocked while charging.
