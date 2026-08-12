@@ -101,6 +101,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   dome gestures to ±20 degrees, restores head/audio/LED state, and forbids drive,
   heading, legs, and unverified stock animations. Simulation passes; live head
   and audio evidence awaits completion of the explicit physical preflight.
+- Commit `ed76384` passed hosted simulation CI run 31552293911. Its exact
+  six-wheel hardware profile was re-verified and installed offline into isolated
+  Pi staging `/home/pi/r2d2-hil-ed76384`; all locked versions match and the
+  staged encounter command refuses by default before Bluetooth access.
 
 ## Remaining gate items
 
@@ -156,6 +160,8 @@ stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disc
 GitHub Actions simulation-ci run 31550425423 -> pass; Python 3.11 hosted runner, no HIL/hardware path
 GitHub Actions simulation-ci run 31551031074 -> pass; repository hygiene and immutable action pins
 GitHub Actions simulation-ci run 31551472563 -> pass; hash-locked quality tools, 67 tests, simulations, docs
+GitHub Actions simulation-ci run 31552293911 -> pass; 82 tests and stationary droid-encounter simulation
+Pi encounter staging -> pass; 6 hashes/versions verified, default HIL refusal before BLE
 ```
 
 ## Hardware state

@@ -50,3 +50,5 @@ TEST-001,P1,pass,hosted_ci,https://github.com/waywardtech/R2D2-lives/actions/run
 R2-003,P1,pass,simulation,python scripts/tasks.py encounter-sim,"Nearby BB-8 class triggers three seeded nonrepeating R2-only sounds and bounded neutral-restoring head gestures; no drive heading leg or animation primitive"
 SAFE-003,P1,pass,automated,r2-runtime/tests/test_encounter_session.py,"No-droid unsafe-battery failed-chat privacy bounds restoration and default-denial cases end offline with no motion"
 R2-003,P1,in_progress,HIL,scripts/hil_stationary_droid_encounter.py,"Separately armed charging-safe head/audio/LED spectator test implemented; live physical preflight and evidence pending"
+TEST-001,P1,pass,hosted_ci,https://github.com/waywardtech/R2D2-lives/actions/runs/31552293911,"Hosted simulation CI passed 82 tests strict quality standalone boundaries encounter simulation and docs with HIL excluded"
+R2-003,P1,in_progress,target_host,docs/stationary-droid-encounter.md,"Commit ed76384 staged on Pi with all six wheel hashes and exact versions verified; default command refused before BLE; physical preflight pending"
