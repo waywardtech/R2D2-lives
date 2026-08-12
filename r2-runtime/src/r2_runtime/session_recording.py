@@ -12,6 +12,8 @@ from .ble_owner import ConnectionState, OwnerEvent
 
 _SAFE_TOKEN = re.compile(r"^[a-z0-9][a-z0-9_.:-]{0,127}$")
 _OPAQUE_SESSION_REF = re.compile(r"^session-[0-9a-f]{16,64}$")
+_OPAQUE_CLOCK_ID = re.compile(r"^(?:sim-)?clock-[0-9a-f]{8,64}$")
+_SYNC_SOURCES = {"deterministic", "ntp", "chrony", "unsynchronized"}
 _RECORDED_REASONS = {
     "startup_safe_hold",
     "stationary_probe",
@@ -77,12 +79,14 @@ class StationarySessionRecorder:
         if not _OPAQUE_SESSION_REF.fullmatch(session_ref):
             raise ValueError("session_ref must be an opaque session token")
         for label, value in (
-            ("clock_id", clock.clock_id),
-            ("sync_source", clock.sync_source),
             ("evidence_category", evidence_category),
         ):
             if not _SAFE_TOKEN.fullmatch(value):
                 raise ValueError(f"{label} must be a privacy-safe token")
+        if not _OPAQUE_CLOCK_ID.fullmatch(clock.clock_id):
+            raise ValueError("clock_id must be opaque")
+        if clock.sync_source not in _SYNC_SOURCES:
+            raise ValueError("unsupported clock synchronization source")
         if clock.uncertainty_ms < 0:
             raise ValueError("clock uncertainty must be non-negative")
         self.session_ref = session_ref
@@ -181,9 +185,9 @@ def replay_stationary_session(payload: Mapping[str, object]) -> tuple[RecordedOw
         clock_id = raw_clock.get("clock_id")
         sync_source = raw_clock.get("sync_source")
         uncertainty_ms = raw_clock.get("uncertainty_ms")
-        if not isinstance(clock_id, str) or not _SAFE_TOKEN.fullmatch(clock_id):
+        if not isinstance(clock_id, str) or not _OPAQUE_CLOCK_ID.fullmatch(clock_id):
             raise ValueError("invalid clock identity")
-        if not isinstance(sync_source, str) or not _SAFE_TOKEN.fullmatch(sync_source):
+        if sync_source not in _SYNC_SOURCES:
             raise ValueError("invalid clock sync source")
         if not isinstance(uncertainty_ms, (int, float)) or uncertainty_ms < 0:
             raise ValueError("invalid clock uncertainty")

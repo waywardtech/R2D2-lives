@@ -123,6 +123,12 @@ restricted transport trace for the stop-response investigation remains a
 separate, explicitly authorized bench diagnostic. Its non-executing procedure is
 documented in `docs/r201-stop-response-bench.md`.
 
+The simulation-only stop-response metadata boundary enforces one DID 22/CID 1
+transmission, hashes and discards encoded bytes, admits at most one correlated
+response, uses an allowlisted firmware-error vocabulary, and classifies missing
+responses as `stop_unconfirmed`. Cleanup that is not offline, zero-connected,
+and physically normal classifies the trace as `invalid_test`.
+
 ## HIL entry point
 
 `python scripts/hil_stationary_probe.py --output <new-file>` is separately

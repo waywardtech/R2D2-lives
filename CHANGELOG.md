@@ -44,6 +44,9 @@
 - Add a non-executing R201 stop-response bench procedure with a one-command limit,
   privacy-safe metadata capture, physical shutdown prerequisite, fail-closed
   result classification, and no-retry cleanup.
+- Add a simulation-only stop-response metadata recorder/classifier that accepts
+  only one DID 22/CID 1 transmission, hashes and discards packet bytes, correlates
+  one response, restricts decoded errors, and never promotes timeout to success.
 
 ## 0.1.0 - 2026-08-11
 

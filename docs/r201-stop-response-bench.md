@@ -46,6 +46,13 @@ credentials, hostnames, unrelated notifications, or arbitrary packet payloads.
 Keep any temporary byte-level trace outside the repository and remove it from the
 Pi after deriving and independently reviewing the sanitized artifact.
 
+`r2_runtime.packet_trace.StopResponseTraceRecorder` implements the sanitized
+artifact boundary in simulation. It accepts only DID 22/CID 1, prohibits a
+second transmitted command, retains packet length and SHA-256 rather than bytes,
+requires opaque session/clock identities, correlates the response sequence, and
+uses the finite protocol-v2 error vocabulary. It is not yet connected to the
+pinned library transport and does not authorize or execute this procedure.
+
 ## Staged execution
 
 1. Re-run the full simulation and recorder/replay tests. Confirm the repository

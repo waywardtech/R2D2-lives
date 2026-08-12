@@ -60,6 +60,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 - A non-executing stop-response bench procedure defines the exact one-command
   limit, privacy-safe capture, physical shutdown prerequisite, abort conditions,
   cleanup, and evidence classifications. No new hardware action was taken.
+- A simulation-only stop-response metadata recorder now admits exactly one raw
+  motor OFF command observation, hashes/discards encoded bytes, correlates at
+  most one response, rejects retries/tampering, and fails timeout closed as
+  `stop_unconfirmed`. It is not connected to the hardware transport.
 
 ## Remaining gate items
 
@@ -121,7 +125,7 @@ stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disc
 
 ## Exact next task
 
-Implement and simulation-test the privacy-safe command/response metadata capture
-boundary described by the bench procedure. Do not retry optional or motor actions
-while charging. Hardware execution remains blocked pending exact authorization
-and a demonstrated manufacturer-supported physical shutdown path.
+Design a reviewed transport-observer seam for the pinned library without changing
+packet flags or command behavior. Do not retry optional or motor actions while
+charging. Hardware execution remains blocked pending exact authorization and a
+demonstrated manufacturer-supported physical shutdown path.
