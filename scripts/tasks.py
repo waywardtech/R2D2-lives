@@ -108,6 +108,7 @@ def docs_check() -> None:
         ROOT / "scripts" / "hil_stop_response_bench.py",
         ROOT / "scripts" / "hil_stationary_droid_encounter.py",
         ROOT / "scripts" / "hil_launch_single_r2_encounter.py",
+        ROOT / "scripts" / "classify_encounter_watchdog.py",
         ROOT / "r2-runtime" / "hardware-provenance.toml",
         ROOT / "r2-runtime" / "requirements-hardware-pi.lock",
         ROOT / "r2-runtime" / "hardware-wheelhouse.manifest.json",

@@ -93,3 +93,24 @@ stage, droid-class count, battery-safe boolean, and reaction number. Device
 identity, BLE address, exception detail, semantic/audio selection, and packet
 data are forbidden. This journal is simulation-tested but was not deployed for
 the first live attempt.
+
+### Watchdog evidence recovery
+
+After a watchdog terminates the process, classify the journal before any retry:
+
+```text
+python scripts/classify_encounter_watchdog.py --progress <progress.jsonl> --output <evidence.json>
+```
+
+The offline command validates the exact journal state-machine prefix, sequence,
+stage-specific value types, reaction numbering, and terminal ordering. Invalid
+or tampered input fails without producing a report. A valid or absent journal
+produces immutable, deterministic timeout evidence containing only the last
+durable stage, a stable stall classification, marker/reaction counts, and
+explicit privacy/safety assertions. It does not copy droid kinds, identities,
+addresses, exception text, chosen sounds, or chat meanings.
+
+`completed` means the progress journal reached `session_completed`; it does not
+convert an externally timed-out invocation into a passing HIL cycle. The
+watchdog report remains terminal `watchdog_timeout`, and operator observation
+and normal session evidence must still be evaluated separately.

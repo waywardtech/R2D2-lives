@@ -77,6 +77,9 @@
   encounter as indeterminate after watchdog expiry and controller-level cleanup.
 - Add append-only, fsynced, privacy-safe encounter stage markers so watchdog
   termination preserves the last completed scan/connect/battery/expression/cleanup stage.
+- Validate encounter journals as legal state-machine prefixes and convert a
+  watchdog-truncated or absent journal into immutable, deterministic,
+  identity-free stall evidence without promoting it to a passing HIL cycle.
 
 ## 0.1.0 - 2026-08-11
 
