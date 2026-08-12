@@ -276,8 +276,10 @@ class Spherov2LibraryBackend:
             original_head = float(toy.get_head_position())
             phase = "audio_volume_read"
             original_volume = int(toy.get_audio_volume())
-            phase = "logic_display_set"
-            toy.multi_led_control.set_leds({logic_display: plan.logic_display_brightness})
+            phase = "logic_display_flash"
+            for brightness in plan.logic_display_pattern:
+                toy.multi_led_control.set_leds({logic_display: brightness})
+                self._sleeper(plan.light_dwell_s)
             phase = "audio_volume_set"
             toy.set_audio_volume(plan.audio_volume)
             for position in plan.head_positions_deg:

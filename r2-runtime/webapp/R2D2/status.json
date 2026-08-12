@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "measured_at": null,
+  "overall": "attention",
+  "clock": {"synchronized": false},
+  "issues": [
+    {"severity": "info", "code": "not_deployed", "message": "Awaiting the first Pi status snapshot."}
+  ],
+  "droid": {"connection": "offline", "status": "unobserved", "safe_hold": true, "movement_performed": false},
+  "pi": {}
+}

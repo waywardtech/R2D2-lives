@@ -261,6 +261,16 @@ class Spherov2BackendTest(unittest.TestCase):
         )
         self.assertIn(("audio_play", FakeAudio.R2_HEY_1, 0), toy.calls)
         self.assertEqual(
+            [call for call in toy.calls if isinstance(call, tuple) and call[0] == "leds"][:5],
+            [
+                ("leds", {FakeLeds.LOGIC_DISPLAYS: 0}),
+                ("leds", {FakeLeds.LOGIC_DISPLAYS: 8}),
+                ("leds", {FakeLeds.LOGIC_DISPLAYS: 0}),
+                ("leds", {FakeLeds.LOGIC_DISPLAYS: 8}),
+                ("leds", {FakeLeds.LOGIC_DISPLAYS: 0}),
+            ],
+        )
+        self.assertEqual(
             toy.calls[-2:], [("head_set", 0.0), ("leds", {FakeLeds.LOGIC_DISPLAYS: 0})]
         )
         backend.disconnect()

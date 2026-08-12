@@ -2,6 +2,7 @@ from argparse import Namespace
 import unittest
 
 from r2_runtime.hil_preflight import (
+    validate_proof_of_life_preflight,
     validate_stationary_encounter_preflight,
     validate_stationary_preflight,
     validate_stop_bench_preflight,
@@ -50,6 +51,21 @@ def encounter_arguments(**overrides: object) -> Namespace:
         "charging_safe_only": False,
         "second_go_confirmed": False,
         "max_reactions": 3,
+    }
+    values.update(overrides)
+    return Namespace(**values)
+
+
+def proof_arguments(**overrides: object) -> Namespace:
+    values = {
+        "authorize_proof_of_life": False,
+        "operator_present": False,
+        "device_inspected": False,
+        "temperature_ok": False,
+        "keepout_clear": False,
+        "emergency_stop_ready": False,
+        "charging_safe_only": False,
+        "second_go_confirmed": False,
     }
     values.update(overrides)
     return Namespace(**values)
@@ -171,6 +187,35 @@ class HilPreflightTest(unittest.TestCase):
         )
         self.assertEqual(result.identity, "private")
         self.assertEqual(result.max_reactions, 3)
+
+    def test_proof_of_life_requires_every_gate_and_exact_arm_token(self) -> None:
+        with self.assertRaisesRegex(ValueError, "exact stationary authorization"):
+            validate_proof_of_life_preflight(proof_arguments(), {})
+        args = proof_arguments(
+            **{
+                name: True
+                for name in (
+                    "authorize_proof_of_life",
+                    "operator_present",
+                    "device_inspected",
+                    "temperature_ok",
+                    "keepout_clear",
+                    "emergency_stop_ready",
+                    "charging_safe_only",
+                    "second_go_confirmed",
+                )
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "external arm token"):
+            validate_proof_of_life_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
+        result = validate_proof_of_life_preflight(
+            args,
+            {
+                "R2_DEVICE_IDENTITY": "private",
+                "R2_PROOF_OF_LIFE_ARM_TOKEN": "AUTHORIZE_STATIONARY_PROOF_OF_LIFE",
+            },
+        )
+        self.assertEqual(result.identity, "private")
 
 
 if __name__ == "__main__":

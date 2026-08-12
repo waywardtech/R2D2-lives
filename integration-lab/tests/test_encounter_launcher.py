@@ -8,6 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 LAUNCHER = ROOT / "scripts" / "hil_launch_single_r2_encounter.py"
+PROOF_LAUNCHER = ROOT / "scripts" / "hil_launch_proof_of_life.py"
 
 
 class EncounterLauncherTest(unittest.TestCase):
@@ -15,6 +16,16 @@ class EncounterLauncherTest(unittest.TestCase):
         original_path = list(sys.path)
         try:
             namespace = runpy.run_path(str(LAUNCHER), run_name="encounter_launcher_test")
+            expected = ROOT / "site-packages"
+            self.assertEqual(namespace["STAGED_SITE_PACKAGES"], expected)
+            self.assertEqual(Path(sys.path[0]), expected)
+        finally:
+            sys.path[:] = original_path
+
+    def test_proof_launcher_adds_isolated_hardware_dependencies_before_main(self) -> None:
+        original_path = list(sys.path)
+        try:
+            namespace = runpy.run_path(str(PROOF_LAUNCHER), run_name="proof_launcher_test")
             expected = ROOT / "site-packages"
             self.assertEqual(namespace["STAGED_SITE_PACKAGES"], expected)
             self.assertEqual(Path(sys.path[0]), expected)

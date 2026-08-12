@@ -40,8 +40,10 @@ class StationaryExpressionPlan:
     audio_name: str
     head_positions_deg: tuple[float, ...]
     logic_display_brightness: int = 8
+    logic_display_pattern: tuple[int, ...] = (0, 8, 0, 8, 0)
     audio_volume: int = 8
     audio_dwell_s: float = 1.25
+    light_dwell_s: float = 0.12
 
     def __post_init__(self) -> None:
         if self.semantic not in ALLOWED_SEMANTICS:
@@ -54,10 +56,16 @@ class StationaryExpressionPlan:
             raise ValueError("stationary expression exceeds the 20 degree head bound")
         if not 0 <= self.logic_display_brightness <= 8:
             raise ValueError("logic-display brightness must be in [0, 8]")
+        if not self.logic_display_pattern or self.logic_display_pattern[-1] != 0:
+            raise ValueError("stationary expression must finish with logic displays off")
+        if any(not 0 <= level <= 8 for level in self.logic_display_pattern):
+            raise ValueError("logic-display pattern levels must be in [0, 8]")
         if not 0 <= self.audio_volume <= 8:
             raise ValueError("stationary expression volume must be in [0, 8]")
         if not 0.1 <= self.audio_dwell_s <= 2.0:
             raise ValueError("audio dwell must be in [0.1, 2.0] seconds")
+        if not 0.05 <= self.light_dwell_s <= 0.5:
+            raise ValueError("light dwell must be in [0.05, 0.5] seconds")
 
 
 @dataclass(frozen=True)
@@ -131,3 +139,16 @@ class DroidEncounterChat:
 
 def allowed_audio_names() -> frozenset[str]:
     return frozenset(name for palette in _AUDIO_PALETTES.values() for name in palette)
+
+
+def proof_of_life_plan(seed: int) -> StationaryExpressionPlan:
+    """Compile one reproducibly random, bounded, non-locomotive R2 expression."""
+
+    chooser = random.Random(seed)
+    semantic = chooser.choice(tuple(sorted(ALLOWED_SEMANTICS)))
+    audio_name = chooser.choice(_AUDIO_PALETTES[semantic])
+    return StationaryExpressionPlan(
+        semantic=semantic,
+        audio_name=audio_name,
+        head_positions_deg=_HEAD_GESTURES[semantic],
+    )

@@ -34,6 +34,11 @@ class StationaryEncounterPreflight:
     max_reactions: int
 
 
+@dataclass(frozen=True)
+class ProofOfLifePreflight:
+    identity: str
+
+
 def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
@@ -92,3 +97,22 @@ def validate_stationary_encounter_preflight(
     if not 1 <= args.max_reactions <= 5:
         raise ValueError("encounter HIL disabled: max reactions must be in [1, 5]")
     return StationaryEncounterPreflight(identity, args.max_reactions)
+
+
+def validate_proof_of_life_preflight(
+    args: argparse.Namespace, environment: Mapping[str, str]
+) -> ProofOfLifePreflight:
+    if not args.authorize_proof_of_life:
+        raise ValueError("proof of life disabled: exact stationary authorization is required")
+    required = PREFLIGHT_FLAGS + ("charging_safe_only", "second_go_confirmed")
+    missing = [name.replace("_", "-") for name in required if not getattr(args, name)]
+    if missing:
+        raise ValueError("proof of life disabled: incomplete preflight: " + ", ".join(missing))
+    identity = environment.get("R2_DEVICE_IDENTITY", "")
+    if not identity:
+        raise ValueError(
+            "proof of life disabled: R2_DEVICE_IDENTITY is required outside source control"
+        )
+    if environment.get("R2_PROOF_OF_LIFE_ARM_TOKEN") != "AUTHORIZE_STATIONARY_PROOF_OF_LIFE":
+        raise ValueError("proof of life disabled: exact external arm token is required")
+    return ProofOfLifePreflight(identity)

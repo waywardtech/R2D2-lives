@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import unittest
 
-from r2_runtime.encounters import DroidEncounterChat, StationaryExpressionPlan
+from r2_runtime.encounters import (
+    DroidEncounterChat,
+    StationaryExpressionPlan,
+    proof_of_life_plan,
+)
 
 
 class FakeDispatcher:
@@ -58,6 +62,16 @@ class DroidEncounterChatTest(unittest.TestCase):
     def test_unknown_droid_kind_is_not_inferred(self) -> None:
         with self.assertRaisesRegex(ValueError, "unsupported nearby droid"):
             DroidEncounterChat().plan("unknown", 1)
+
+    def test_proof_of_life_plan_is_seeded_bounded_and_restoring(self) -> None:
+        first = proof_of_life_plan(42)
+        second = proof_of_life_plan(42)
+        self.assertEqual(first, second)
+        self.assertGreaterEqual(len(set(first.logic_display_pattern)), 2)
+        self.assertEqual(first.logic_display_pattern[-1], 0)
+        self.assertIn(-abs(first.head_positions_deg[1]), first.head_positions_deg)
+        self.assertEqual(first.head_positions_deg[-1], 0.0)
+        self.assertLessEqual(first.audio_volume, 8)
 
 
 if __name__ == "__main__":

@@ -38,5 +38,7 @@ jobs:
         run: python scripts/tasks.py p1-sim
       - name: Run stationary droid-encounter simulation
         run: python scripts/tasks.py encounter-sim
+      - name: Run stationary proof-of-life simulation
+        run: python scripts/tasks.py proof-of-life-sim
       - name: Verify documentation and evidence
         run: python scripts/tasks.py docs-check

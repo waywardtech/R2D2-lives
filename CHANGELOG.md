@@ -88,6 +88,12 @@
 - Preserve the first failing stationary-expression phase across restoration,
   include that stable phase in sanitized HIL evidence, and close a failed BLE
   transport without waiting on another response-dependent motor-OFF command.
+- Add a separately armed stationary proof-of-life report with a seeded random
+  verified sound, bounded neutral-restoring dome sweep, logic-display flashes,
+  battery gate, durable progress, complete Pi/R2 state, and issue highlighting.
+- Add an iPhone-optimized, original X-wing-console-inspired PWA at `/R2D2/` with
+  local dialogue/translation, animated annunciators/waveforms, uncached live
+  status snapshots, LAN-only Apache hardening, and a sandboxed systemd refresher.
 
 ## 0.1.0 - 2026-08-11
 

@@ -15,3 +15,8 @@ The optional Raspberry Pi hardware profile is hash-locked in
 target installation. This does not authorize BLE access or physical movement.
 On the Pi, `python ../scripts/verify_hardware_imports.py` performs a versioned,
 import-only check and refuses non-Linux/aarch64 hosts before importing anything.
+
+The read-only iPhone dashboard lives under `webapp/R2D2` and is deployed by
+Apache at `/R2D2/`. See `../docs/proof-of-life-and-dashboard.md`. The page has no
+hardware command endpoint; real proof-of-life execution remains a separately
+armed HIL operation.

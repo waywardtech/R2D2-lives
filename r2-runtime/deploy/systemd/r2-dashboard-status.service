@@ -1,0 +1,15 @@
+[Unit]
+Description=Refresh privacy-safe R2 dashboard status
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+SupplementaryGroups=video
+ExecStart=/usr/bin/python3.11 /opt/r2-runtime/current/scripts/write_r2_dashboard_status.py --output /var/lib/r2-runtime/dashboard/status.json --droid-evidence /var/lib/r2-runtime/dashboard/proof-of-life-latest.json
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/r2-runtime/dashboard

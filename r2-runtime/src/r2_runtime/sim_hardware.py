@@ -58,6 +58,7 @@ class SimSpherov2Backend:
             (
                 f"expression:{plan.semantic}",
                 f"audio:{plan.audio_name}",
+                *(f"led:{brightness}" for brightness in plan.logic_display_pattern),
                 *(f"head:{position}" for position in plan.head_positions_deg),
                 "expression_restored",
             )

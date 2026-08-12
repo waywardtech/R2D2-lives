@@ -1,13 +1,13 @@
 # Project status
 
-Last updated: 2026-08-11  
+Last updated: 2026-08-12
 Current phase: Phase 1
 Gate state: IN PROGRESS
 
 ## Current objective
 
-Complete the Phase 1 stationary capability-probe dependency and simulation
-evidence while keeping all physical operations separately gated.
+Deploy and verify the stationary proof-of-life report and read-only iPhone
+dashboard while keeping locomotion and every physical operation separately gated.
 
 ## Requirement/evidence status
 
@@ -24,6 +24,9 @@ evidence while keeping all physical operations separately gated.
 | R2-001 / single BLE owner | in_progress | `r2_runtime.ble_owner.BleOwner` | Simulation verified; real process/HIL pending |
 | R2-002, R2-003 / capability probe | in_progress | `evidence/hil/cycle-1-stop-timeout.json` | Firmware observed; stop and optional actions incomplete |
 | R2-004 / reconnect no-resume | pass | `test_link_loss_and_reconnect_do_not_resume` | Simulation evidence |
+| R2-008 / bounded expressions | in_progress | `proof-of-life-sim`, expression tests | Simulation passes; one authorized HIL run pending |
+| R2-012 / Safari PWA | in_progress | `r2-runtime/tests/test_webapp.py` | Read-only portrait dashboard complete; Pi/browser/auth/control gates pending |
+| R2-014 / distinct health | in_progress | `r2-runtime/tests/test_system_status.py` | Collector and issue rules pass; target-host snapshot pending |
 | Gate P1 / five cycles | incomplete | five simulation cycles | Five real HIL cycles required |
 | Gate P1 / 30-minute session | incomplete | 1,800-second virtual soak | Real stationary HIL session required |
 | Gate P1 / bounded movement | incomplete | none | Explicit motion authorization and preflight required |
@@ -160,6 +163,13 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   reaction was seen/heard; base, legs, heading, and location did not change; R2
   ended stationary, silent, with all LEDs off. This characterizes a safe observed
   final state but not acknowledged restoration or a passing HIL cycle.
+- A seeded stationary proof-of-life path now reports Pi/R2 state and issues,
+  flashes the verified logic-display bank, plays one verified R2 sound, and
+  sweeps the dome within ±20 degrees before neutral restoration. It has no
+  drive, heading, leg, or stock-animation path and passes simulation.
+- An original X-wing-console-inspired portrait PWA now provides local R2 binary/
+  Basic dialogue, animated decorative waveforms, and uncached ten-second status
+  snapshots. The page is read-only and has no hardware command endpoint.
 
 ## Remaining gate items
 
@@ -227,15 +237,15 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 ## Hardware state
 
 - Real R2 movement authorized for next run: no
+- One stationary proof-of-life expression authorized for next run: yes; current operator preflight confirmed
 - Last known droid state: disconnected, stationary, silent, and all LEDs off per operator confirmation
 - Capability profile: partial; firmware/identity/battery/advertised telemetry observed
 - Hardware evidence category: target-host import, HIL discovery, and failed stationary probe
 
 ## Exact next task
 
-Do not retry the live session under the prior authorization. The durable progress
-Attempt 3 is closed as a characterized failure: `EOFError` during reaction 1,
-disconnect stall, no expression or movement observed, and a stationary/silent/
-LEDs-off final state. Continue simulation-only response-policy diagnosis. Any
-future hardware run requires new explicit authorization and preflight. The
-stop-response bench remains blocked while charging.
+Commit and stage the simulation-verified proof-of-life/dashboard release on the
+Pi, validate the Apache/systemd rollback deployment, then run exactly one bounded
+stationary proof of life under the fresh operator authorization and preflight.
+Do not retry after timeout or anomaly. Locomotion and the stop-response bench
+remain unauthorized while charging.

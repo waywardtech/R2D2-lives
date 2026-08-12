@@ -88,6 +88,10 @@ def encounter_sim() -> None:
     _run([sys.executable, "integration-lab/stationary_droid_encounter.py"])
 
 
+def proof_of_life_sim() -> None:
+    _run([sys.executable, "integration-lab/proof_of_life.py"])
+
+
 def test() -> None:
     check()
     contract()
@@ -105,10 +109,14 @@ def docs_check() -> None:
         ROOT / "docs" / "phase-1-stationary-probe.md",
         ROOT / "docs" / "r201-stop-response-bench.md",
         ROOT / "docs" / "stationary-droid-encounter.md",
+        ROOT / "docs" / "proof-of-life-and-dashboard.md",
         ROOT / "scripts" / "hil_stop_response_bench.py",
         ROOT / "scripts" / "hil_stationary_droid_encounter.py",
         ROOT / "scripts" / "hil_launch_single_r2_encounter.py",
         ROOT / "scripts" / "hil_watch_stationary_droid_encounter.py",
+        ROOT / "scripts" / "hil_proof_of_life.py",
+        ROOT / "scripts" / "hil_launch_proof_of_life.py",
+        ROOT / "scripts" / "write_r2_dashboard_status.py",
         ROOT / "scripts" / "classify_encounter_watchdog.py",
         ROOT / "r2-runtime" / "hardware-provenance.toml",
         ROOT / "r2-runtime" / "requirements-hardware-pi.lock",
@@ -179,6 +187,7 @@ TASKS = {
     "sim-smoke": sim_smoke,
     "p1-sim": p1_sim,
     "encounter-sim": encounter_sim,
+    "proof-of-life-sim": proof_of_life_sim,
     "test": test,
     "docs-check": docs_check,
 }

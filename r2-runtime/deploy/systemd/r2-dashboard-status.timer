@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh R2 dashboard status every ten seconds
+
+[Timer]
+OnBootSec=15s
+OnUnitActiveSec=10s
+AccuracySec=1s
+Unit=r2-dashboard-status.service
+
+[Install]
+WantedBy=timers.target

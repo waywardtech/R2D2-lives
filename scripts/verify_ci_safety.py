@@ -14,6 +14,7 @@ REQUIRED = (
     'python-version: "3.11"',
     "python scripts/tasks.py test",
     "python scripts/tasks.py p1-sim",
+    "python scripts/tasks.py proof-of-life-sim",
     "python scripts/verify_repository_hygiene.py",
     "permissions:\n  contents: read",
 )

@@ -1,0 +1,11 @@
+{
+  "name": "R2-D2 Astromech Link",
+  "short_name": "R2 Link",
+  "description": "Local R2-D2 dialogue, translation, and system status console.",
+  "start_url": "/R2D2/",
+  "scope": "/R2D2/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#030607",
+  "theme_color": "#070b0d"
+}
