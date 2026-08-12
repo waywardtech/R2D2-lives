@@ -148,6 +148,7 @@ stationary HIL discovery attempt 2 -> pass; one R2 and one BB-8 type-filtered, n
 stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disconnected, no movement
 GitHub Actions simulation-ci run 31550425423 -> pass; Python 3.11 hosted runner, no HIL/hardware path
 GitHub Actions simulation-ci run 31551031074 -> pass; repository hygiene and immutable action pins
+GitHub Actions simulation-ci run 31551472563 -> pass; hash-locked quality tools, 67 tests, simulations, docs
 ```
 
 ## Hardware state
