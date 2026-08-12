@@ -95,6 +95,12 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   `check`/`test` and hosted CI. Formatting, lint, and strict typing pass across
   36 source files; malformed JSON evidence, manifests, and schema references
   now fail at their typed boundaries.
+- Nearby Sphero advertisements can now be reduced to privacy-safe droid classes
+  and passed through the owned chat seam for semantic selection. A deterministic
+  compiler owns R2-only sound selection, prevents immediate repetition, bounds
+  dome gestures to ±20 degrees, restores head/audio/LED state, and forbids drive,
+  heading, legs, and unverified stock animations. Simulation passes; live head
+  and audio evidence awaits completion of the explicit physical preflight.
 
 ## Remaining gate items
 
@@ -132,14 +138,15 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 
 ```text
 python scripts/tasks.py bootstrap -> pass, 2026-08-11
-python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 36 source files
+python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 40 source files
 python scripts/tasks.py check -> pass; quality, generated-client drift, boundaries, and 2 isolated product suites
 python scripts/tasks.py contract -> pass; 7 contract tests
 python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, final safe_hold
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 67 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 82 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off
@@ -160,6 +167,7 @@ GitHub Actions simulation-ci run 31551472563 -> pass; hash-locked quality tools,
 
 ## Exact next task
 
-Await a future off-charger, physically contained bench window and exact operator
-authorization before running the stop-response command. Do not retry optional or
-motor actions while charging; no hardware work is currently authorized.
+After the operator confirms the stationary-expression physical preflight, run
+the charging-safe nearby-droid spectator test under a process watchdog. The
+separate stop-response bench still awaits an off-charger, physically contained
+window and exact authorization; do not run that motor test while charging.

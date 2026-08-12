@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Mapping, Protocol
 
+from .encounters import StationaryExpressionPlan
+
 
 class DroidDriver(Protocol):
     def safe_hold(self) -> None: ...
@@ -24,6 +26,8 @@ class Spherov2Backend(Protocol):
     def identity(self) -> Mapping[str, str]: ...
     def battery(self) -> Mapping[str, object]: ...
     def exercise_stationary(self, capability: str) -> Mapping[str, object]: ...
+    def discover_nearby_droids(self, configured_identity: str) -> tuple[str, ...]: ...
+    def perform_stationary_expression(self, plan: StationaryExpressionPlan) -> None: ...
 
 
 class UnavailableSpherov2Backend:
@@ -54,6 +58,13 @@ class UnavailableSpherov2Backend:
     def exercise_stationary(self, capability: str) -> Mapping[str, object]:
         self._raise()
         return {}
+
+    def discover_nearby_droids(self, configured_identity: str) -> tuple[str, ...]:
+        self._raise()
+        return ()
+
+    def perform_stationary_expression(self, plan: StationaryExpressionPlan) -> None:
+        self._raise()
 
 
 @dataclass
@@ -107,6 +118,16 @@ class Spherov2R2Driver:
             self.stopped = False
             raise
         self.stopped = True
+
+    def discover_nearby_droids(self) -> tuple[str, ...]:
+        if self.connected:
+            raise RuntimeError("nearby-droid scan requires an offline R2 connection")
+        return self.backend.discover_nearby_droids(self.configured_identity)
+
+    def perform_stationary_expression(self, plan: StationaryExpressionPlan) -> None:
+        if not self.connected or not self.stopped:
+            raise RuntimeError("stationary expression requires a connected, stopped R2")
+        self.backend.perform_stationary_expression(plan)
 
     def disconnect(self) -> None:
         if self.connected:

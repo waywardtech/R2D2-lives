@@ -8,6 +8,7 @@ from threading import Lock
 from typing import Callable, TypeVar
 
 from .drivers import Spherov2R2Driver
+from .encounters import StationaryExpressionPlan
 
 T = TypeVar("T")
 
@@ -94,6 +95,20 @@ class BleOwner:
     def serialized(self, operation: Callable[[], T]) -> T:
         with self._command_lock:
             return operation()
+
+    def discover_nearby_droids(self) -> tuple[str, ...]:
+        with self._command_lock:
+            if self._state is not ConnectionState.OFFLINE:
+                raise RuntimeError("nearby-droid scan requires the BLE owner to be offline")
+            self._append_event(self._state, "nearby_droid_scan")
+            return self._driver.discover_nearby_droids()
+
+    def perform_stationary_expression(self, plan: StationaryExpressionPlan) -> None:
+        with self._command_lock:
+            if self._state not in {ConnectionState.PROBING, ConnectionState.READY}:
+                raise RuntimeError("stationary expression requires an active stationary session")
+            self._driver.perform_stationary_expression(plan)
+            self._append_event(self._state, f"stationary_expression_{plan.semantic}")
 
     def disconnect(self, reason: str = "requested") -> None:
         with self._command_lock:

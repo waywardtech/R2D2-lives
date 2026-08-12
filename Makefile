@@ -1,4 +1,4 @@
-.PHONY: bootstrap quality check contract sim-smoke p1-sim test docs-check ci-safety repository-hygiene hardware-lock-check hardware-import-check
+.PHONY: bootstrap quality check contract sim-smoke p1-sim encounter-sim test docs-check ci-safety repository-hygiene hardware-lock-check hardware-import-check
 
 PYTHON ?= python3
 
@@ -19,6 +19,9 @@ sim-smoke:
 
 p1-sim:
 	$(PYTHON) scripts/tasks.py p1-sim
+
+encounter-sim:
+	$(PYTHON) scripts/tasks.py encounter-sim
 
 test:
 	$(PYTHON) scripts/tasks.py test

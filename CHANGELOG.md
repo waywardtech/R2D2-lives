@@ -70,6 +70,9 @@
   identities, forbidden credential files, and locked dependency license coverage.
 - Add a cross-platform SHA-256-locked Ruff/mypy toolchain and require formatting,
   lint, and strict typing in local checks and hosted CI; harden typed JSON roots.
+- Add privacy-safe nearby-droid classification and a chat-guided deterministic
+  stationary expression compiler using bounded R2 head, LED, and stock sound
+  primitives; exclude unverified full animations and add a separately armed HIL run.
 
 ## 0.1.0 - 2026-08-11
 

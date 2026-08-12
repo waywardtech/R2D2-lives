@@ -8,6 +8,7 @@ import unittest
 
 from r2_runtime.ble_owner import BleOwner
 from r2_runtime.drivers import Spherov2R2Driver
+from r2_runtime.encounters import StationaryExpressionPlan
 from r2_runtime.spherov2_backend import (
     HardwareActionNotAuthorized,
     Spherov2LibraryBackend,
@@ -31,6 +32,10 @@ class FakeLeds(IntEnum):
 
 class FakeRawMotorModes(IntEnum):
     OFF = 0
+
+
+class FakeAudio(IntEnum):
+    R2_HEY_1 = 2813
 
 
 class FakeLedControl:
@@ -59,6 +64,7 @@ class FakeToy:
     name = "D2-TEST"
     address = "private-address-must-not-escape"
     LEDs = FakeLeds
+    Audio = FakeAudio
     sensors = OrderedDict((name, object()) for name in ("quaternion", "locator"))
     extended_sensors = OrderedDict((name, object()) for name in ("r2_head_angle", "gyroscope"))
 
@@ -98,6 +104,9 @@ class FakeToy:
     def get_head_position(self) -> float:
         self.calls.append("head_read")
         return 0.0
+
+    def set_head_position(self, position: float) -> None:
+        self.calls.append(("head_set", position))
 
     def get_audio_volume(self) -> int:
         self.calls.append("audio_get_volume")
@@ -157,6 +166,10 @@ class FakeScanner:
     def find_toy(self, **kwargs: object) -> FakeToy:
         self.arguments = kwargs
         return self.toy
+
+    def find_toys(self, **kwargs: object) -> list[object]:
+        self.arguments = kwargs
+        return []
 
 
 class Spherov2BackendTest(unittest.TestCase):
@@ -231,6 +244,67 @@ class Spherov2BackendTest(unittest.TestCase):
             [("audio_volume", 8), ("audio_play", 1704, 0), "audio_stop", ("audio_volume", 40)],
         )
         backend.disconnect()
+
+    def test_stationary_expression_uses_only_head_audio_and_led_then_restores(self) -> None:
+        policy = StationaryProbePolicy(
+            allow_stationary_expressions=True,
+            allowed_audio_names=frozenset({"R2_HEY_1"}),
+        )
+        backend, toy, _, _ = self.make_backend(policy)
+        backend._sleeper = lambda _: None
+        backend.connect("D2-TEST")
+        plan = StationaryExpressionPlan("greeting", "R2_HEY_1", (0.0, -16.0, 16.0, 0.0))
+        backend.perform_stationary_expression(plan)
+        self.assertFalse(
+            any(call[0] == "raw_motors" for call in toy.calls if isinstance(call, tuple))
+        )
+        self.assertIn(("audio_play", FakeAudio.R2_HEY_1, 0), toy.calls)
+        self.assertEqual(
+            toy.calls[-2:], [("head_set", 0.0), ("leds", {FakeLeds.LOGIC_DISPLAYS: 0})]
+        )
+        backend.disconnect()
+
+    def test_stationary_expression_is_default_denied(self) -> None:
+        backend, _, _, _ = self.make_backend()
+        backend.connect("D2-TEST")
+        plan = StationaryExpressionPlan("greeting", "R2_HEY_1", (0.0,))
+        with self.assertRaises(HardwareActionNotAuthorized):
+            backend.perform_stationary_expression(plan)
+        backend.disconnect()
+
+    def test_nearby_scan_returns_only_types_and_excludes_configured_r2(self) -> None:
+        class R2Type(FakeToy):
+            pass
+
+        class R2Q5Type:
+            pass
+
+        class BB8Type:
+            def __init__(self) -> None:
+                self.name = "private-bb8-name"
+
+        class BB9EType:
+            pass
+
+        own_r2 = R2Type()
+        own_r2.name = "configured-private-r2"
+        bb8 = BB8Type()
+        scanner = FakeScanner(own_r2)
+        scanner.find_toys = lambda **kwargs: [own_r2, bb8]  # type: ignore[method-assign]
+        modules = {
+            "spherov2.scanner": scanner,
+            "spherov2.toy.r2d2": SimpleNamespace(R2D2=R2Type),
+            "spherov2.toy.r2q5": SimpleNamespace(R2Q5=R2Q5Type),
+            "spherov2.toy.bb8": SimpleNamespace(BB8=BB8Type),
+            "spherov2.toy.bb9e": SimpleNamespace(BB9E=BB9EType),
+        }
+        backend = Spherov2LibraryBackend(
+            module_loader=lambda name: modules[name],  # type: ignore[arg-type]
+            version_resolver=lambda _: "0.12.1",
+        )
+        observed = backend.discover_nearby_droids("configured-private-r2")
+        self.assertEqual(observed, ("bb8",))
+        self.assertNotIn("private", str(observed))
 
     def test_owner_disconnect_dispatches_raw_motor_off_before_close(self) -> None:
         backend, toy, _, _ = self.make_backend()

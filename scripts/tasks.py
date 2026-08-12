@@ -84,6 +84,10 @@ def p1_sim() -> None:
     _run([sys.executable, "integration-lab/p1_stationary_probe.py"])
 
 
+def encounter_sim() -> None:
+    _run([sys.executable, "integration-lab/stationary_droid_encounter.py"])
+
+
 def test() -> None:
     check()
     contract()
@@ -100,7 +104,9 @@ def docs_check() -> None:
         ROOT / "docs" / "phase-0-operator.md",
         ROOT / "docs" / "phase-1-stationary-probe.md",
         ROOT / "docs" / "r201-stop-response-bench.md",
+        ROOT / "docs" / "stationary-droid-encounter.md",
         ROOT / "scripts" / "hil_stop_response_bench.py",
+        ROOT / "scripts" / "hil_stationary_droid_encounter.py",
         ROOT / "r2-runtime" / "hardware-provenance.toml",
         ROOT / "r2-runtime" / "requirements-hardware-pi.lock",
         ROOT / "r2-runtime" / "hardware-wheelhouse.manifest.json",
@@ -150,6 +156,7 @@ TASKS = {
     "contract": contract,
     "sim-smoke": sim_smoke,
     "p1-sim": p1_sim,
+    "encounter-sim": encounter_sim,
     "test": test,
     "docs-check": docs_check,
 }

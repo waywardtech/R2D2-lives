@@ -1,7 +1,11 @@
 from argparse import Namespace
 import unittest
 
-from r2_runtime.hil_preflight import validate_stationary_preflight, validate_stop_bench_preflight
+from r2_runtime.hil_preflight import (
+    validate_stationary_encounter_preflight,
+    validate_stationary_preflight,
+    validate_stop_bench_preflight,
+)
 
 
 def arguments(**overrides: object) -> Namespace:
@@ -30,6 +34,22 @@ def bench_arguments(**overrides: object) -> Namespace:
         "unplugged_from_charger": False,
         "physically_contained": False,
         "second_go_confirmed": False,
+    }
+    values.update(overrides)
+    return Namespace(**values)
+
+
+def encounter_arguments(**overrides: object) -> Namespace:
+    values = {
+        "authorize_stationary_encounter": False,
+        "operator_present": False,
+        "device_inspected": False,
+        "temperature_ok": False,
+        "keepout_clear": False,
+        "emergency_stop_ready": False,
+        "charging_safe_only": False,
+        "second_go_confirmed": False,
+        "max_reactions": 3,
     }
     values.update(overrides)
     return Namespace(**values)
@@ -119,6 +139,38 @@ class HilPreflightTest(unittest.TestCase):
                 broken[key] = "wrong"
                 with self.assertRaisesRegex(ValueError, "external arm token"):
                     validate_stop_bench_preflight(args, broken)
+
+    def test_encounter_default_refuses_before_scanning(self) -> None:
+        with self.assertRaisesRegex(ValueError, "exact stationary authorization"):
+            validate_stationary_encounter_preflight(encounter_arguments(), {})
+
+    def test_encounter_requires_charging_safe_gate_and_external_arm(self) -> None:
+        args = encounter_arguments(
+            **{
+                name: True
+                for name in (
+                    "authorize_stationary_encounter",
+                    "operator_present",
+                    "device_inspected",
+                    "temperature_ok",
+                    "keepout_clear",
+                    "emergency_stop_ready",
+                    "charging_safe_only",
+                    "second_go_confirmed",
+                )
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "external arm token"):
+            validate_stationary_encounter_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
+        result = validate_stationary_encounter_preflight(
+            args,
+            {
+                "R2_DEVICE_IDENTITY": "private",
+                "R2_ENCOUNTER_ARM_TOKEN": "AUTHORIZE_STATIONARY_HEAD_AUDIO",
+            },
+        )
+        self.assertEqual(result.identity, "private")
+        self.assertEqual(result.max_reactions, 3)
 
 
 if __name__ == "__main__":

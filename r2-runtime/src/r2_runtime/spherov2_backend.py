@@ -8,9 +8,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from importlib import import_module, metadata
+import time
 from types import ModuleType
 from typing import Any, Callable, Mapping, Protocol
 
+from .encounters import StationaryExpressionPlan
 from .packet_trace import StopResponseTraceRecorder
 
 
@@ -66,6 +68,8 @@ class StationaryProbePolicy:
     allow_audio_preview: bool = False
     audio_id: int | None = None
     audio_volume: int = 8
+    allow_stationary_expressions: bool = False
+    allowed_audio_names: frozenset[str] = frozenset()
 
     def __post_init__(self) -> None:
         if not 0 <= self.audio_volume <= 16:
@@ -100,6 +104,7 @@ class Spherov2LibraryBackend:
         module_loader: Callable[[str], ModuleType] = import_module,
         version_resolver: Callable[[str], str] = _installed_version,
         stop_executor: StopExecutor = _public_raw_motor_off,
+        sleeper: Callable[[float], None] = time.sleep,
     ) -> None:
         if not 0 < scan_timeout_s <= 30:
             raise ValueError("scan timeout must be in (0, 30] seconds")
@@ -108,6 +113,7 @@ class Spherov2LibraryBackend:
         self._module_loader = module_loader
         self._version_resolver = version_resolver
         self._stop_executor = stop_executor
+        self._sleeper = sleeper
         # The third-party package is deliberately absent from the simulation
         # environment, so its dynamic object is confined to this adapter boundary.
         self._toy: Any | None = None
@@ -135,6 +141,34 @@ class Spherov2LibraryBackend:
             raise RuntimeError("discovered droid identity did not exactly match configuration")
         toy.__enter__()
         self._toy = toy
+
+    def discover_nearby_droids(self, configured_identity: str) -> tuple[str, ...]:
+        if self._toy is not None:
+            raise RuntimeError("nearby-droid scan requires an offline R2 connection")
+        scanner = self._module_loader("spherov2.scanner")
+        modules_and_names = (
+            ("spherov2.toy.r2d2", "R2D2", "r2d2"),
+            ("spherov2.toy.r2q5", "R2Q5", "r2q5"),
+            ("spherov2.toy.bb8", "BB8", "bb8"),
+            ("spherov2.toy.bb9e", "BB9E", "bb9e"),
+        )
+        typed_kinds = tuple(
+            (getattr(self._module_loader(module_name), class_name), kind)
+            for module_name, class_name, kind in modules_and_names
+        )
+        toys = scanner.find_toys(
+            timeout=self.scan_timeout_s,
+            toy_types=tuple(toy_type for toy_type, _ in typed_kinds),
+        )
+        observed: set[str] = set()
+        for candidate in toys:
+            if getattr(candidate, "name", None) == configured_identity:
+                continue
+            for toy_type, kind in typed_kinds:
+                if isinstance(candidate, toy_type):
+                    observed.add(kind)
+                    break
+        return tuple(sorted(observed))
 
     def disconnect(self) -> None:
         toy, self._toy = self._toy, None
@@ -210,3 +244,39 @@ class Spherov2LibraryBackend:
                 "configuration_supported": hasattr(toy, "configure_collision_detection"),
             }
         raise ValueError(f"unsupported stationary capability: {capability}")
+
+    def perform_stationary_expression(self, plan: StationaryExpressionPlan) -> None:
+        if not self.policy.allow_stationary_expressions:
+            raise HardwareActionNotAuthorized(
+                "stationary expressions were not explicitly authorized"
+            )
+        if plan.audio_name not in self.policy.allowed_audio_names:
+            raise HardwareActionNotAuthorized("audio is outside the operator-authorized allowlist")
+        toy = self._require_toy()
+        if any(abs(position) > 20.0 for position in plan.head_positions_deg):
+            raise HardwareActionNotAuthorized("head gesture exceeds the stationary bound")
+        audio = getattr(toy.Audio, plan.audio_name, None)
+        if audio is None:
+            raise RuntimeError("authorized audio enum is unavailable on this R2 adapter")
+        original_head = float(toy.get_head_position())
+        original_volume = int(toy.get_audio_volume())
+        logic_display = toy.LEDs.LOGIC_DISPLAYS
+        try:
+            toy.multi_led_control.set_leds({logic_display: plan.logic_display_brightness})
+            toy.set_audio_volume(plan.audio_volume)
+            for position in plan.head_positions_deg:
+                toy.set_head_position(position)
+                self._sleeper(0.2)
+            toy.play_audio_file(audio, 0)
+            self._sleeper(plan.audio_dwell_s)
+        finally:
+            try:
+                toy.stop_all_audio()
+            finally:
+                try:
+                    toy.set_audio_volume(original_volume)
+                finally:
+                    try:
+                        toy.set_head_position(original_head)
+                    finally:
+                        toy.multi_led_control.set_leds({logic_display: 0})

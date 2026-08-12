@@ -28,6 +28,12 @@ class StopBenchPreflight:
     clock_uncertainty_ms: float
 
 
+@dataclass(frozen=True)
+class StationaryEncounterPreflight:
+    identity: str
+    max_reactions: int
+
+
 def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
@@ -65,3 +71,24 @@ def validate_stop_bench_preflight(
     if not 0 <= uncertainty_ms <= 1000:
         raise ValueError("bench disabled: clock uncertainty must be in [0, 1000] ms")
     return StopBenchPreflight(identity, sync_source, uncertainty_ms)
+
+
+def validate_stationary_encounter_preflight(
+    args: argparse.Namespace, environment: Mapping[str, str]
+) -> StationaryEncounterPreflight:
+    if not args.authorize_stationary_encounter:
+        raise ValueError("encounter HIL disabled: exact stationary authorization is required")
+    required = PREFLIGHT_FLAGS + ("charging_safe_only", "second_go_confirmed")
+    missing = [name.replace("_", "-") for name in required if not getattr(args, name)]
+    if missing:
+        raise ValueError("encounter HIL disabled: incomplete preflight: " + ", ".join(missing))
+    identity = environment.get("R2_DEVICE_IDENTITY", "")
+    if not identity:
+        raise ValueError(
+            "encounter HIL disabled: R2_DEVICE_IDENTITY is required outside source control"
+        )
+    if environment.get("R2_ENCOUNTER_ARM_TOKEN") != "AUTHORIZE_STATIONARY_HEAD_AUDIO":
+        raise ValueError("encounter HIL disabled: exact external arm token is required")
+    if not 1 <= args.max_reactions <= 5:
+        raise ValueError("encounter HIL disabled: max reactions must be in [1, 5]")
+    return StationaryEncounterPreflight(identity, args.max_reactions)

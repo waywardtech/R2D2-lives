@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Mapping
 
+from .encounters import StationaryExpressionPlan
+
 
 @dataclass
 class SimSpherov2Backend:
@@ -13,6 +15,7 @@ class SimSpherov2Backend:
     connected: bool = False
     stopped: bool = True
     calls: list[str] = field(default_factory=list)
+    nearby_droids: tuple[str, ...] = ("bb8",)
 
     def connect(self, configured_identity: str) -> None:
         if configured_identity != "D2-SIMULATED":
@@ -43,3 +46,19 @@ class SimSpherov2Backend:
             raise AssertionError("stationary probe attempted movement capability")
         self.calls.append(capability)
         return {"result": "simulated", "seed": self.seed}
+
+    def discover_nearby_droids(self, configured_identity: str) -> tuple[str, ...]:
+        self.calls.append("discover_nearby_droids")
+        return self.nearby_droids
+
+    def perform_stationary_expression(self, plan: StationaryExpressionPlan) -> None:
+        if any(abs(position) > 20.0 for position in plan.head_positions_deg):
+            raise AssertionError("simulated stationary expression exceeded head bound")
+        self.calls.extend(
+            (
+                f"expression:{plan.semantic}",
+                f"audio:{plan.audio_name}",
+                *(f"head:{position}" for position in plan.head_positions_deg),
+                "expression_restored",
+            )
+        )

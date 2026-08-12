@@ -11,6 +11,7 @@ extend-exclude = ["protocol/src/sap_protocol/generated.py"]
 
 [tool.ruff.lint.per-file-ignores]
 "scripts/hil_*.py" = ["E402"] # Local source paths are installed before HIL-only imports.
+"integration-lab/stationary_droid_encounter.py" = ["E402"] # Runs directly from a source checkout.
 
 [tool.mypy]
 python_version = "3.11"
