@@ -49,6 +49,11 @@ R2-012: emergency stop, deadman manual controls, authentication, and a live
 reasoning service remain future gates. The dialogue fallback runs locally in the
 browser and cannot issue physical commands.
 
+Console text uses the freely licensed Clynese Hand face from the AurekFonts
+Archive. R2's English translation remains in a conventional condensed Latin
+face for immediate readability. The bundled font is attributed to AurekFonts;
+the archive classifies it as free for everyone, forever.
+
 ## Deployment model
 
 Apache serves release-owned static assets and the generated status file. A

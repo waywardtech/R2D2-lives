@@ -1,5 +1,5 @@
-const CACHE = "r2-link-v1";
-const STATIC = ["./", "app.css", "app.js", "manifest.webmanifest"];
+const CACHE = "r2-link-v2";
+const STATIC = ["./", "app.css", "app.js", "manifest.webmanifest", "fonts/Clynese_Hand.otf"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(STATIC)));

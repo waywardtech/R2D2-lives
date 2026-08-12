@@ -37,3 +37,14 @@ names, versions, sizes, and SHA-256 hashes are in
 
 Redistributions must include each package's own license files. The checked
 manifest is dependency evidence and does not substitute for those notices.
+
+## Clynese Hand
+
+- Project: Clynese Hand, a handwritten Clynese/Corellian display font
+- Creator and archive: AurekFonts
+- Upstream: <https://github.com/AurekFonts/AurekFonts.github.io/tree/master/ClyneseHand>
+- Bundled file SHA-256: `73b4154240137a5b441d1234b1ded5d8c390d556deed836a6ce122f778451874`
+- Archive license statement: "This font is free for everyone, forever."
+
+The font is bundled only for the local R2 dashboard's console display text.
+R2's English translations use a conventional system font for readability.

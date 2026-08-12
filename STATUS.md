@@ -183,6 +183,12 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   confirmed no sound, dome movement, or LED activity; no base, leg, heading, or
   location change; and a stationary, silent final state with all LEDs off. This
   closes direct physical observation but does not make the HIL cycle pass.
+- A later authorized invocation failed closed before connection when two distinct
+  live `D2-` advertisements appeared in two consecutive scans. A subsequent
+  privacy-preserving 15-second packet sample observed only the expected one R2
+  and one BB-8, with repeated fresh packets from each. This rules out a test
+  fixture and makes a transient nearby R2-class advertiser the best current
+  explanation; no droid was connected or commanded during diagnosis.
 
 ## Remaining gate items
 

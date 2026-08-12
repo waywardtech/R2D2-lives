@@ -30,6 +30,16 @@ class WebAppTest(unittest.TestCase):
         self.assertIn('endsWith("/status.json")', worker)
         self.assertNotIn('"status.json"', worker.split("const STATIC", 1)[1].split(";", 1)[0])
 
+    def test_clynese_console_font_keeps_r2_english_translation_readable(self) -> None:
+        stylesheet = (WEBAPP / "app.css").read_text(encoding="utf-8")
+        worker = (WEBAPP / "service-worker.js").read_text(encoding="utf-8")
+        font = WEBAPP / "fonts" / "Clynese_Hand.otf"
+        self.assertTrue(font.is_file())
+        self.assertIn('font-family: "Clynese Hand"', stylesheet)
+        self.assertIn(".message.droid .translation", stylesheet)
+        self.assertIn("var(--translation-font)", stylesheet)
+        self.assertIn('"fonts/Clynese_Hand.otf"', worker)
+
     def test_apache_surface_is_lan_only_read_only_and_hardened(self) -> None:
         config = (ROOT / "r2-runtime" / "deploy" / "apache" / "r2d2-dashboard.conf").read_text(
             encoding="utf-8"
