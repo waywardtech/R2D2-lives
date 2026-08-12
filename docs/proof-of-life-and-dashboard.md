@@ -91,6 +91,12 @@ Zero or duplicate exact matches fail closed without logging any advertised name
 or BLE address. A launcher never adopts the first or only nearby display name as
 identity.
 
+The proof-of-life session preserves a sanitized stable failure phase across
+connect, identity, battery, head query, expression subphase, ready transition,
+and disconnect. If disconnect also fails, its exception type is recorded as
+cleanup uncertainty without replacing the primary failure. Exception messages,
+identities, and transport payloads are never written to the report.
+
 ## First deployment and HIL attempt
 
 Commits `eda49e6`, `7adeab4`, and the private-IPv6 allowlist correction

@@ -12,6 +12,22 @@ from .encounters import StationaryExpressionPlan, proof_of_life_plan
 from .system_status import collect_system_status, merge_droid_snapshot
 
 
+class ProofOfLifeSessionError(RuntimeError):
+    """Sanitized primary failure plus optional disconnect uncertainty."""
+
+    def __init__(
+        self,
+        phase: str,
+        error_type: str,
+        *,
+        cleanup_error_type: str | None = None,
+    ) -> None:
+        super().__init__(f"proof of life failed during {phase}")
+        self.phase = phase
+        self.error_type = error_type
+        self.cleanup_error_type = cleanup_error_type
+
+
 @dataclass(frozen=True)
 class ProofOfLifeReport:
     seed: int
@@ -45,6 +61,7 @@ def run_proof_of_life(
             stage_sink(stage, detail or {})
 
     plan = proof_of_life_plan(seed)
+    phase = "system_status_collection"
     host_status = system_collector()
     mark("system_status_collected")
     droid_status: dict[str, object] = {
@@ -53,12 +70,17 @@ def run_proof_of_life(
         "movement_performed": False,
     }
     mark("connect_started")
+    primary_failure: tuple[str, Exception] | None = None
+    disconnect_failure: Exception | None = None
     try:
+        phase = "connect"
         owner.connect_for_stationary_probe()
         mark("connect_completed")
         droid_status["connection"] = owner.state.value
+        phase = "identity_query"
         droid_status["identity"] = dict(owner.serialized(driver.backend.identity))
         mark("identity_checked")
+        phase = "battery_query"
         battery = dict(owner.serialized(driver.backend.battery))
         droid_status["battery"] = battery
         battery_state = str(battery.get("state", "unknown")).lower()
@@ -66,13 +88,16 @@ def run_proof_of_life(
         mark("battery_checked", {"battery_safe": battery_safe})
         if not battery_safe:
             raise PermissionError(f"battery state {battery_state!r} blocks proof of life")
+        phase = "head_position_query"
         droid_status["head"] = dict(
             owner.serialized(lambda: driver.backend.exercise_stationary("head.safe_range"))
         )
         mark("head_checked")
         mark("expression_started")
+        phase = "stationary_expression"
         owner.perform_stationary_expression(plan)
         mark("expression_completed")
+        phase = "ready_transition"
         owner.mark_ready()
         droid_status["expression"] = {
             "status": "completed",
@@ -82,15 +107,34 @@ def run_proof_of_life(
             "logic_displays_off": True,
             "audio_stopped": True,
         }
-    except Exception:
+    except Exception as error:
+        primary_failure = (phase, error)
         mark("session_failed")
-        raise
     finally:
         mark("disconnect_started")
-        owner.disconnect("proof_of_life_complete")
-        mark("disconnect_completed")
+        try:
+            owner.disconnect("proof_of_life_complete")
+        except Exception as error:
+            disconnect_failure = error
+        else:
+            mark("disconnect_completed")
         droid_status["connection"] = owner.state.value
         droid_status["safe_hold"] = owner.stopped
+    if primary_failure is not None:
+        failure_phase, original_failure = primary_failure
+        if hasattr(original_failure, "phase"):
+            failure_phase = f"{failure_phase}.{original_failure.phase}"
+        raise ProofOfLifeSessionError(
+            failure_phase,
+            getattr(original_failure, "error_type", type(original_failure).__name__),
+            cleanup_error_type=(
+                type(disconnect_failure).__name__ if disconnect_failure is not None else None
+            ),
+        ) from original_failure
+    if disconnect_failure is not None:
+        raise ProofOfLifeSessionError(
+            "disconnect", type(disconnect_failure).__name__
+        ) from disconnect_failure
     mark("session_completed")
     status = merge_droid_snapshot(host_status, droid_status)
     return ProofOfLifeReport(seed, plan, status, owner.state.value)

@@ -85,8 +85,9 @@ def main() -> None:
             "movement_performed": False,
             "expression": {
                 "status": "failed",
-                "error_type": type(error).__name__,
+                "error_type": getattr(error, "error_type", type(error).__name__),
                 "error_stage": getattr(error, "phase", None),
+                "cleanup_error_type": getattr(error, "cleanup_error_type", None),
             },
         }
         payload = {

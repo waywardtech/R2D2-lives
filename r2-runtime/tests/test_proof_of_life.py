@@ -4,7 +4,7 @@ import unittest
 
 from r2_runtime.ble_owner import BleOwner
 from r2_runtime.drivers import Spherov2R2Driver
-from r2_runtime.proof_of_life import run_proof_of_life
+from r2_runtime.proof_of_life import ProofOfLifeSessionError, run_proof_of_life
 from r2_runtime.sim_hardware import SimSpherov2Backend
 
 
@@ -58,14 +58,64 @@ class ProofOfLifeTest(unittest.TestCase):
 
         backend = UnsafeBackend()
         driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
-        with self.assertRaisesRegex(PermissionError, "blocks proof of life"):
+        with self.assertRaises(ProofOfLifeSessionError) as caught:
             run_proof_of_life(
                 BleOwner(driver),
                 driver,
                 seed=42,
                 system_collector=lambda: {"pi": {}, "clock": {}, "issues": []},
             )
+        self.assertEqual(caught.exception.phase, "battery_query")
+        self.assertEqual(caught.exception.error_type, "PermissionError")
+        self.assertIsNone(caught.exception.cleanup_error_type)
         self.assertFalse(any(call.startswith("expression:") for call in backend.calls))
+        self.assertFalse(driver.connected)
+        self.assertTrue(driver.stopped)
+
+    def test_head_query_failure_has_stable_phase_and_disconnects(self) -> None:
+        class HeadFailureBackend(SimSpherov2Backend):
+            def exercise_stationary(self, capability: str) -> dict[str, object]:
+                if capability == "head.safe_range":
+                    raise EOFError
+                return dict(super().exercise_stationary(capability))
+
+        backend = HeadFailureBackend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        with self.assertRaises(ProofOfLifeSessionError) as caught:
+            run_proof_of_life(
+                BleOwner(driver),
+                driver,
+                seed=42,
+                system_collector=lambda: {"pi": {}, "clock": {}, "issues": []},
+            )
+        self.assertEqual(caught.exception.phase, "head_position_query")
+        self.assertEqual(caught.exception.error_type, "EOFError")
+        self.assertFalse(driver.connected)
+        self.assertTrue(driver.stopped)
+
+    def test_disconnect_failure_does_not_replace_primary_failure(self) -> None:
+        class PrimaryAndCleanupFailureBackend(SimSpherov2Backend):
+            def exercise_stationary(self, capability: str) -> dict[str, object]:
+                if capability == "head.safe_range":
+                    raise TimeoutError
+                return dict(super().exercise_stationary(capability))
+
+            def disconnect(self) -> None:
+                super().disconnect()
+                raise EOFError
+
+        backend = PrimaryAndCleanupFailureBackend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        with self.assertRaises(ProofOfLifeSessionError) as caught:
+            run_proof_of_life(
+                BleOwner(driver),
+                driver,
+                seed=42,
+                system_collector=lambda: {"pi": {}, "clock": {}, "issues": []},
+            )
+        self.assertEqual(caught.exception.phase, "head_position_query")
+        self.assertEqual(caught.exception.error_type, "TimeoutError")
+        self.assertEqual(caught.exception.cleanup_error_type, "EOFError")
         self.assertFalse(driver.connected)
         self.assertTrue(driver.stopped)
 

@@ -194,6 +194,12 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   Unrelated R2-class advertisements no longer create false ambiguity, while zero
   or duplicate exact matches still fail closed without persisting nearby names
   or addresses. This policy is simulation-tested only.
+- Proof-of-life failures now retain stable session/subphase classification and
+  sanitized exception type. A disconnect failure is reported separately as
+  cleanup uncertainty and cannot overwrite the primary failure. Injected head
+  EOF, unsafe-battery, primary-timeout, and disconnect-EOF scenarios all end
+  offline/stopped in simulation; no firmware response is reinterpreted as
+  success.
 
 ## Remaining gate items
 
