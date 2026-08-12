@@ -80,4 +80,8 @@ expired after the session established an R2 BLE link but before it produced an
 immutable report. Python was terminated and the residual link was removed by
 powering off and soft-blocking the controller, with zero connections afterward.
 No retry was made. Primitive completion remains indeterminate until the operator
-reports what was directly seen and heard.
+reports what was directly seen and heard. The operator later confirmed that an
+expression was seen or heard and that R2 ended stationary, silent, and with its
+normal LED state. Because the confirmation did not distinguish head, LED, and
+audio primitives individually and no report was produced, this remains a timed-
+out characterized attempt rather than a passing HIL cycle.

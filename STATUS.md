@@ -109,7 +109,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   but its 40-second watchdog expired without a report. Python terminated; one
   residual BLE link was dropped by powering off/soft-blocking the controller,
   leaving zero connections. No retry was made. Whether head/audio primitives
-  visibly completed is indeterminate pending the operator's direct observation.
+  visibly completed was initially indeterminate. The operator subsequently
+  confirmed an expression was seen/heard and that R2 ended stationary, silent,
+  and in its normal LED state. Individual primitive completion is not known, and
+  the timed-out session does not count as a passing HIL cycle.
 
 ## Remaining gate items
 
@@ -167,7 +170,7 @@ GitHub Actions simulation-ci run 31551031074 -> pass; repository hygiene and imm
 GitHub Actions simulation-ci run 31551472563 -> pass; hash-locked quality tools, 67 tests, simulations, docs
 GitHub Actions simulation-ci run 31552293911 -> pass; 82 tests and stationary droid-encounter simulation
 Pi encounter staging -> pass; 6 hashes/versions verified, default HIL refusal before BLE
-stationary droid encounter attempt 1 -> indeterminate; watchdog timeout, controller cleanup, zero BLE
+stationary droid encounter attempt 1 -> expression observed; timed out, normal final state, not a passing cycle
 ```
 
 ## Hardware state
@@ -179,7 +182,6 @@ stationary droid encounter attempt 1 -> indeterminate; watchdog timeout, control
 
 ## Exact next task
 
-Record the operator's direct observation of R2 during/after the timed-out
-stationary encounter; do not retry the live session. Then add stage-level
-observability in simulation before considering another separately authorized
-HIL run. The stop-response bench remains blocked while charging.
+Do not retry the live session. Add stage-level durable observability in
+simulation before considering another separately authorized HIL run. The
+stop-response bench remains blocked while charging.
