@@ -31,3 +31,6 @@ R2-002,P1,in_progress,HIL,evidence/hil/cycle-1-stop-timeout.json,"Firmware 7.0.1
 R2-003,P1,in_progress,HIL,evidence/hil/cycle-1-stop-timeout.json,"Identity battery telemetry and collision inventory observed; optional actions remain incomplete"
 SAFE-003,P1,in_progress,HIL,r2-runtime/tests/test_capability_probe.py,"Stop timeout attempted once; BLE always disconnects; failed cycle records disconnected_stop_unconfirmed"
 SAFE-003,P1,blocked,inspection,docs/phase-1-stationary-probe.md,"Pinned library waits for every command but public protocol permits optional replies; motion HIL blocked pending authorized stationary packet trace and independent emergency stop"
+R2-001,P1,pass,simulation,r2-runtime/tests/test_session_recording.py,"Serialized owner lifecycle records ordered clocked transitions; replay rejects tampering and recorder failure cannot interrupt stop/disconnect"
+R2-004,P1,pass,simulation,r2-runtime/tests/fixtures/sim-owner-lifecycle-session.json,"Reviewed stationary lifecycle fixture begins and ends offline with no movement or device identity"
+SAFE-004,P1,blocked,inspection,docs/r201-stop-response-bench.md,"Bench procedure requires exact authorization containment keep-out battery/thermal/link checks and a demonstrated manufacturer-supported physical shutdown before one OFF/0 command"

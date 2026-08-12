@@ -37,6 +37,13 @@
   watchdog and prohibit further charging-state retries.
 - Document the upstream response-policy mismatch and block motion HIL rather
   than treating a transmitted, unacknowledged stop packet as success.
+- Add a deterministic, privacy-safe BLE-owner lifecycle recorder and strict
+  replay validator whose failures cannot interrupt stop/disconnect processing.
+- Add a reviewed stationary lifecycle fixture and reject movement, clock/sequence
+  tampering, invalid state transitions, external reason data, and unknown fields.
+- Add a non-executing R201 stop-response bench procedure with a one-command limit,
+  privacy-safe metadata capture, physical shutdown prerequisite, fail-closed
+  result classification, and no-retry cleanup.
 
 ## 0.1.0 - 2026-08-11
 

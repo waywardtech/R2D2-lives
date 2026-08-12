@@ -54,6 +54,12 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   zero-speed stop forms timed out, but fixed cleanup closed BLE without retry.
 - The operator confirmed R2 returned to its normal silent, LEDs-off state after
   the optional-pass watchdog; no further charging-state actions were attempted.
+- Deterministic, privacy-safe BLE-owner lifecycle recording and strict replay
+  validation now cover sequence, clocks, state transitions, redaction, tampering,
+  recorder failure isolation, and a reviewed stationary simulation fixture.
+- A non-executing stop-response bench procedure defines the exact one-command
+  limit, privacy-safe capture, physical shutdown prerequisite, abort conditions,
+  cleanup, and evidence classifications. No new hardware action was taken.
 
 ## Remaining gate items
 
@@ -115,7 +121,7 @@ stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disc
 
 ## Exact next task
 
-Add deterministic, sanitized session recording/replay coverage locally. Do not
-retry optional or motor actions while charging. Before any future motion HIL,
-resolve stop acknowledgement behavior in a separately authorized stationary
-bench trace and demonstrate a confirmed emergency-stop path.
+Implement and simulation-test the privacy-safe command/response metadata capture
+boundary described by the bench procedure. Do not retry optional or motor actions
+while charging. Hardware execution remains blocked pending exact authorization
+and a demonstrated manufacturer-supported physical shutdown path.

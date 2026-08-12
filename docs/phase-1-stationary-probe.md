@@ -108,6 +108,21 @@ non-secret device reference from public model/system fields. Movement, stop
 latency, and locator calibration remain `untested` because they require
 separately authorized motion HIL.
 
+The BLE owner also supports a deterministic lifecycle event sink. Its stationary
+session recorder stores only allowlisted state transitions with RFC 3339 UTC,
+producer monotonic time, clock identity/source/uncertainty, contiguous sequence,
+an opaque session reference, and `movement_performed: false`. Replay rejects
+movement, time regression, sequence gaps, invalid state transitions, and any
+unapproved field; external disconnect reasons are redacted. Recorder failure is
+observable but cannot interrupt stop or disconnect. The reviewed simulation
+fixture is `r2-runtime/tests/fixtures/sim-owner-lifecycle-session.json`.
+
+This intentionally is not a raw BLE-packet capture: packet payloads can contain
+device-specific data and are unnecessary for ordinary lifecycle evidence. A
+restricted transport trace for the stop-response investigation remains a
+separate, explicitly authorized bench diagnostic. Its non-executing procedure is
+documented in `docs/r201-stop-response-bench.md`.
+
 ## HIL entry point
 
 `python scripts/hil_stationary_probe.py --output <new-file>` is separately

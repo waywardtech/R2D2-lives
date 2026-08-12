@@ -1,0 +1,90 @@
+# R201 stop-response stationary bench procedure
+
+Status: procedure only; execution is not authorized.
+
+## Purpose
+
+Determine whether R201 firmware `7.0.101` acknowledges drive DID 22 stop
+commands when the droid is not charging, without changing heading, direction, or
+location. This procedure characterizes protocol behavior only. It does not pass
+the Phase 1 movement gate and must not be run from automated tests or CI.
+
+## Hard prerequisites
+
+The operator must explicitly authorize this exact bench test immediately before
+execution and remain present throughout. Stop if any item cannot be confirmed:
+
+- exact configured R2 identity is supplied outside source control;
+- R2 is unplugged from USB charging and its battery state is safe;
+- R2 and cable show no heat, swelling, leakage, or other damage;
+- ambient conditions are within the manual's 0-40 C envelope;
+- the droid is visible and physically contained so wheel activity cannot change
+  heading, direction, or location;
+- people and animals remain at least one meter away;
+- Pi/R2 BLE health and the Pi watchdog are confirmed;
+- a manufacturer-supported physical shutdown method is identified, reachable,
+  and demonstrated while stationary before any drive DID is transmitted;
+- the operator has approved the exact single-command limit and abort plan.
+
+A software command over the same BLE connection is not an independent shutdown
+method. A cradle or restraint limits location but is not proof that motors have
+stopped. Until the physical shutdown method is identified and demonstrated, the
+drive-command portion is blocked.
+
+## Privacy-safe capture design
+
+Instrument the owned library boundary, not BlueZ discovery output. Capture only:
+
+- UTC and monotonic timestamps with clock identity, synchronization source, and
+  uncertainty;
+- direction (`tx` or `rx`), DID, CID, sequence, flags, decoded error, byte count,
+  and a SHA-256 of the encoded packet;
+- connection/owner state transitions and terminal cleanup outcome.
+
+Do not capture or persist BLE addresses, advertised names, configured identity,
+credentials, hostnames, unrelated notifications, or arbitrary packet payloads.
+Keep any temporary byte-level trace outside the repository and remove it from the
+Pi after deriving and independently reviewing the sanitized artifact.
+
+## Staged execution
+
+1. Re-run the full simulation and recorder/replay tests. Confirm the repository
+   is clean and record the commit under test.
+2. Copy a hash-verified, minimal source bundle to a new Pi temporary directory.
+   Do not install a service or change boot configuration.
+3. Restore the Bluetooth controller's prior state, then run one read-only identity
+   query through the capture boundary. This proves TX/RX correlation without a
+   drive command. Abort on any unexpected device or response.
+4. Disconnect, verify the droid remains normal, and review the sanitized trace.
+5. Only after a second explicit go/no-go confirmation, connect once and transmit
+   exactly one raw-motor command: left `OFF/0`, right `OFF/0`. Do not send a
+   heading-bearing roll command, retry, LED/audio/animation action, or any
+   non-zero motor value.
+6. Wait only for the bounded response window. Record a matching response, an
+   explicit firmware error, or a timeout. A successful write without a matching
+   response remains `stop_unconfirmed`.
+7. Disconnect once. If disconnect or motor state is uncertain, use the previously
+   demonstrated physical shutdown method. Do not send another motor command.
+8. Verify R2's physical state, confirm zero BLE connections, restore the
+   controller's prior power/rfkill state, remove the Pi temporary directory, and
+   scan the proposed artifact for private identity data before committing it.
+
+## Abort conditions
+
+Abort immediately on unexpected wheel/head/leg movement, sound or LED behavior,
+wrong identity, battery/thermal anomaly, BLE ambiguity, operator loss, keep-out
+violation, watchdog failure, malformed/unrelated response, timeout, or cleanup
+failure. A failed or timed-out stage ends the hardware sequence without retry.
+
+## Result classification
+
+- `acknowledged_success`: matching DID/CID/sequence response with firmware
+  success, followed by verified disconnect and normal physical state.
+- `acknowledged_error`: matching response with a firmware error.
+- `stop_unconfirmed`: write observed but no valid matching response in the
+  bounded window.
+- `invalid_test`: any identity, clock, capture, preflight, or cleanup invariant
+  was not satisfied.
+
+Only `acknowledged_success` resolves the response-path question. It still does
+not establish moving stop latency, stopping distance, or collision prevention.

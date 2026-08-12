@@ -31,11 +31,19 @@ class OwnerEvent:
 class BleOwner:
     """The only class permitted to call the low-level driver lifecycle."""
 
-    def __init__(self, driver: Spherov2R2Driver) -> None:
+    def __init__(
+        self,
+        driver: Spherov2R2Driver,
+        *,
+        event_sink: Callable[[OwnerEvent], None] | None = None,
+    ) -> None:
         self._driver = driver
         self._command_lock = Lock()
         self._state = ConnectionState.OFFLINE
-        self._events: list[OwnerEvent] = [OwnerEvent(1, self._state, "startup_safe_hold")]
+        self._events: list[OwnerEvent] = []
+        self._event_sink = event_sink
+        self._event_sink_failed = False
+        self._append_event(self._state, "startup_safe_hold")
 
     @property
     def state(self) -> ConnectionState:
@@ -49,9 +57,23 @@ class BleOwner:
     def events(self) -> tuple[OwnerEvent, ...]:
         return tuple(self._events)
 
+    @property
+    def event_sink_failed(self) -> bool:
+        return self._event_sink_failed
+
+    def _append_event(self, state: ConnectionState, reason: str) -> None:
+        event = OwnerEvent(len(self._events) + 1, state, reason)
+        self._events.append(event)
+        if self._event_sink is not None:
+            try:
+                self._event_sink(event)
+            except Exception:
+                # Observability must never interrupt stop/disconnect processing.
+                self._event_sink_failed = True
+
     def _transition(self, state: ConnectionState, reason: str) -> None:
         self._state = state
-        self._events.append(OwnerEvent(len(self._events) + 1, state, reason))
+        self._append_event(state, reason)
 
     def connect_for_stationary_probe(self) -> None:
         with self._command_lock:
@@ -87,4 +109,3 @@ class BleOwner:
             self._driver.stopped = True
             self._driver.connected = False
             self._transition(ConnectionState.OFFLINE, "link_lost_no_resume")
-
