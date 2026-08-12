@@ -1,0 +1,15 @@
+{
+  "ble_disconnect_verified": false,
+  "completed_reactions": 0,
+  "device_identity_persisted": false,
+  "evidence_category": "stationary-droid-encounter-watchdog",
+  "journal_integrity": "verified",
+  "last_durable_stage": "disconnect_started",
+  "marker_count": 8,
+  "movement_performed": false,
+  "operator_state_confirmation_required": true,
+  "process_terminated": true,
+  "schema_version": "1.0",
+  "stall_classification": "disconnect_stalled",
+  "terminal": "watchdog_timeout"
+}

@@ -1,0 +1,12 @@
+{
+  "device_identity_persisted": false,
+  "driver_connected": false,
+  "driver_stopped": true,
+  "error_type": "EOFError",
+  "evidence_category": "HIL-stationary-failure",
+  "generated_at": "2026-08-12T04:51:10.220794Z",
+  "movement_performed": false,
+  "owner_state": "offline",
+  "schema_version": "1.0",
+  "terminal": "failed"
+}

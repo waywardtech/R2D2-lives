@@ -145,3 +145,19 @@ new rollback-safe Pi staging `/home/pi/r2d2-hil-7c90a1f`. The three changed-file
 SHA-256 hashes matched. With Bluetooth soft-blocked and no arm token or flag, the
 wrapper exited 1 with its disabled message, created no progress/live/watchdog
 file, and never started the child launcher. No droid was accessed.
+
+### Authorized run with durable evidence
+
+After the operator supplied a new stationary-only authorization and confirmed
+the physical preflight, the first invocation of the new staging stopped before
+scanner import because the isolated dependency path was missing. Bluetooth was
+re-blocked, no scan or droid access occurred, and a tested launcher fix was
+committed as `919713f`; hosted run `31564493652` passed.
+
+The corrected run found one nearby droid class, connected to R2, verified a safe
+battery state, and durably marked reaction 1 as started. The reaction did not
+reach its completed marker: the child recorded a sanitized `EOFError`, reached
+`disconnect_started`, and then the 40-second watchdog terminated the process.
+The controller was powered off and soft-blocked afterward. This is a failed,
+non-retry HIL attempt and not a Gate P1 cycle. Operator observation of the
+physical expression and final droid state is still required.

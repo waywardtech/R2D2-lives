@@ -141,6 +141,12 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   the staged launcher lacked its isolated dependency path. No scan, connection,
   droid command, or evidence file occurred; shutdown re-blocked Bluetooth. The
   launcher now owns that path explicitly and has a regression test.
+- Commit `919713f` passed hosted CI run `31564493652` and its corrected staging
+  completed discovery, connection, and the safe-battery gate. Reaction 1 started
+  but raised `EOFError` before completion. The child reached
+  `disconnect_started`; the external watchdog then terminated it at 40 seconds.
+  Sanitized failure, progress, and watchdog evidence are preserved. Bluetooth
+  was powered off and soft-blocked. No retry was made; operator observation is pending.
 
 ## Remaining gate items
 
@@ -215,7 +221,8 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 ## Exact next task
 
 Do not retry the live session under the prior authorization. The durable progress
-checkpoint and external watchdog are deployed but remain disabled. A future
-hardware run requires new explicit authorization and a fresh physical preflight.
-Until then, continue Phase 1 simulation-only failure/recovery coverage. The
-stop-response bench remains blocked while charging.
+evidence characterized an `EOFError` during reaction 1 followed by a disconnect
+stall. Obtain the operator's direct observation of expression and final state,
+then diagnose from simulation/source without another hardware retry. Any future
+hardware run requires new explicit authorization and preflight. The stop-response
+bench remains blocked while charging.

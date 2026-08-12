@@ -117,6 +117,12 @@ def docs_check() -> None:
         ROOT / "traceability" / "evidence.csv",
         ROOT / "evidence" / "hil" / "cycle-1-stop-timeout.json",
         ROOT / "evidence" / "hil" / "cycle-1-stop-timeout.json.sha256",
+        ROOT / "evidence" / "hil" / "encounter-attempt-3-failure.json",
+        ROOT / "evidence" / "hil" / "encounter-attempt-3-failure.json.sha256",
+        ROOT / "evidence" / "hil" / "encounter-attempt-3-watchdog.json",
+        ROOT / "evidence" / "hil" / "encounter-attempt-3-watchdog.json.sha256",
+        ROOT / "evidence" / "hil" / "encounter-attempt-3-progress.jsonl",
+        ROOT / "evidence" / "hil" / "encounter-attempt-3-progress.jsonl.sha256",
         ROOT / "specs" / "traceability" / "requirements.csv",
     ]
     missing = [str(path.relative_to(ROOT)) for path in required if not path.is_file()]
@@ -137,6 +143,19 @@ def docs_check() -> None:
     )
     if hashlib.sha256(hil_evidence.read_bytes()).hexdigest() != expected_hil_hash:
         raise SystemExit("HIL evidence hash mismatch")
+    for evidence_name in (
+        "encounter-attempt-3-failure.json",
+        "encounter-attempt-3-watchdog.json",
+        "encounter-attempt-3-progress.jsonl",
+    ):
+        evidence_path = ROOT / "evidence" / "hil" / evidence_name
+        expected_hash = (
+            evidence_path.with_name(evidence_name + ".sha256")
+            .read_text(encoding="utf-8")
+            .split()[0]
+        )
+        if hashlib.sha256(evidence_path.read_bytes()).hexdigest() != expected_hash:
+            raise SystemExit(f"HIL evidence hash mismatch: {evidence_name}")
     _run([sys.executable, "scripts/verify_hardware_lock.py"])
     _run([sys.executable, "scripts/verify_ci_safety.py"])
     _run([sys.executable, "scripts/verify_repository_hygiene.py"])

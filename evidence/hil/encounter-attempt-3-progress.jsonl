@@ -1,0 +1,8 @@
+{"detail":{},"sequence":1,"stage":"scan_started"}
+{"detail":{"droid_kind_count":1},"sequence":2,"stage":"scan_completed"}
+{"detail":{},"sequence":3,"stage":"connect_started"}
+{"detail":{},"sequence":4,"stage":"connect_completed"}
+{"detail":{"battery_safe":true},"sequence":5,"stage":"battery_checked"}
+{"detail":{"reaction_number":1},"sequence":6,"stage":"expression_started"}
+{"detail":{},"sequence":7,"stage":"session_failed"}
+{"detail":{},"sequence":8,"stage":"disconnect_started"}
