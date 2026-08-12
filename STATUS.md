@@ -152,6 +152,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   phase, attempts every restoration, and closes a transport after EOF without a
   second response-dependent motor-OFF wait. Injected EOF coverage passes; the
   prior HIL attempt's exact primitive remains unknown and no hardware retry occurred.
+- Commit `c9f344e` passed hosted simulation CI run `31609883254` and was copied
+  to rollback-safe Pi staging `/home/pi/r2d2-hil-c9f344e`. Five file hashes and
+  the import-only default refusal passed with Bluetooth soft-blocked. No scan,
+  connection, droid command, or HIL retry occurred.
 
 ## Remaining gate items
 
@@ -229,5 +233,7 @@ Do not retry the live session under the prior authorization. The durable progres
 evidence characterized an `EOFError` during reaction 1 followed by a disconnect
 stall. Obtain the operator's direct observation of expression and final state.
 Commit and deploy the simulation-verified transport-failure fix with Bluetooth
-blocked, but do not execute HIL. Any future hardware run requires new explicit
-authorization and preflight. The stop-response bench remains blocked while charging.
+blocked is complete. Obtain the operator's direct observation of the attempt-3
+expression and final state before closing its evidence classification. Any future
+hardware run requires new explicit authorization and preflight. The stop-response
+bench remains blocked while charging.

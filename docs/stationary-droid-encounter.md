@@ -175,3 +175,9 @@ wait. It does not claim the droid received a stop or restoration command.
 The existing attempt-3 journal predates this phase instrumentation, so its exact
 failing expression primitive remains unknown. The fix is simulation-tested and
 is not authorization for another hardware run.
+
+Commit `c9f344e` passed hosted simulation CI run `31609883254` and was copied to
+new rollback-safe Pi staging `/home/pi/r2d2-hil-c9f344e`. All five changed-file
+hashes matched. The import-only default-refusal path loaded successfully and
+exited before backend construction; Bluetooth remained soft-blocked and no
+evidence file, scan, connection, or droid command occurred.

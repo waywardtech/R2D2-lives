@@ -223,3 +223,17 @@ movement_performed = false
 operator_observation_pending = true
 gate_cycle_passed = false
 result = "reaction-started-eof-failure-disconnect-stalled-awaiting-operator-observation"
+
+[stationary_droid_encounter_transport_fix_staging]
+prepared_date = "2026-08-12"
+commit = "c9f344e"
+target_directory = "/home/pi/r2d2-hil-c9f344e"
+previous_staging_preserved = true
+deployed_file_hashes_match_commit = true
+import_only_default_refusal_verified = true
+controller_soft_blocked_before_and_after = true
+bluetooth_accessed = false
+droid_connected = false
+droid_command_sent = false
+movement_performed = false
+result = "transport-fix-deployed-disabled-awaiting-operator-observation"
