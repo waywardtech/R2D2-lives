@@ -14,6 +14,7 @@ REQUIRED = (
     "python-version: \"3.11\"",
     "python scripts/tasks.py test",
     "python scripts/tasks.py p1-sim",
+    "python scripts/verify_repository_hygiene.py",
     "permissions:\n  contents: read",
 )
 BANNED = (
@@ -28,6 +29,7 @@ BANNED = (
     "cache: pip",
     "uses: actions/checkout@v",
     "uses: actions/setup-python@v",
+    "secrets.",
 )
 
 

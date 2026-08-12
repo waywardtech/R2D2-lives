@@ -1,4 +1,4 @@
-.PHONY: bootstrap check contract sim-smoke p1-sim test docs-check ci-safety hardware-lock-check hardware-import-check
+.PHONY: bootstrap check contract sim-smoke p1-sim test docs-check ci-safety repository-hygiene hardware-lock-check hardware-import-check
 
 PYTHON ?= python3
 
@@ -25,6 +25,9 @@ docs-check:
 
 ci-safety:
 	$(PYTHON) scripts/verify_ci_safety.py
+
+repository-hygiene:
+	$(PYTHON) scripts/verify_repository_hygiene.py
 
 hardware-lock-check:
 	$(PYTHON) scripts/verify_hardware_lock.py

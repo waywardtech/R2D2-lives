@@ -107,6 +107,7 @@ def docs_check() -> None:
         raise SystemExit("HIL evidence hash mismatch")
     _run([sys.executable, "scripts/verify_hardware_lock.py"])
     _run([sys.executable, "scripts/verify_ci_safety.py"])
+    _run([sys.executable, "scripts/verify_repository_hygiene.py"])
     yaml_expectations = {
         "agent-api.openapi.yaml": ("openapi: 3.1.0", "paths:", "SAP-Version"),
         "spatial-provider-api.openapi.yaml": ("openapi: 3.1.0", "paths:", "sap-common.schema.json"),

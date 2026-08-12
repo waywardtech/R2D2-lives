@@ -88,6 +88,9 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   hosted run passed all simulation-only jobs.
 - Hosted third-party actions are pinned to immutable commits resolved from the
   official checkout/setup-python v6 tags; the CI guard rejects floating major tags.
+- Offline repository hygiene now scans tracked files for credential/private-key
+  formats, BLE addresses, private advertised identities, and forbidden credential
+  filenames, and verifies every locked hardware dependency has license notices.
 
 ## Remaining gate items
 
@@ -130,6 +133,7 @@ python scripts/tasks.py contract -> pass; 7 contract tests
 python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, final safe_hold
 python scripts/tasks.py test -> pass; 19 tests plus isolated standalone repetitions
 python scripts/tasks.py docs-check -> pass
+python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
 python scripts/tasks.py test -> pass; 64 primary suite tests plus isolated standalone repetitions
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels

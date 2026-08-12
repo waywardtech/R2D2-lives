@@ -66,6 +66,8 @@
   Python 3.11 runner with hardware-capable paths statically excluded.
 - Pin checkout and setup-python actions to immutable commits resolved from their
   official v6 tags, and reject floating action tags in the CI safety guard.
+- Add an offline tracked-file scan for secret/private-key formats, BLE/device
+  identities, forbidden credential files, and locked dependency license coverage.
 
 ## 0.1.0 - 2026-08-11
 

@@ -21,6 +21,7 @@ python scripts/tasks.py sim-smoke
 python scripts/tasks.py test
 python scripts/tasks.py docs-check
 python scripts/verify_ci_safety.py
+python scripts/verify_repository_hygiene.py
 ```
 
 GNU Make users can run the corresponding `make` targets. General automated paths
