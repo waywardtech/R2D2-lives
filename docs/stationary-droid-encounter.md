@@ -114,3 +114,11 @@ addresses, exception text, chosen sounds, or chat meanings.
 convert an externally timed-out invocation into a passing HIL cycle. The
 watchdog report remains terminal `watchdog_timeout`, and operator observation
 and normal session evidence must still be evaluated separately.
+
+Commit `8c5bae3` was copied into a new rollback-safe Pi staging directory at
+`/home/pi/r2d2-hil-8c5bae3`. SHA-256 hashes for all five changed runtime/runner
+files matched the committed workstation files. With Bluetooth soft-blocked, the
+offline command classified an intentionally absent journal as `no_progress` and
+wrote deterministic `watchdog_timeout` evidence with SHA-256
+`fb53159fe9f63e69a37a9a3b0c28bc97ead6e1df25dc1c2f7ded1e8101193c86`.
+No scan, droid connection, command, or actuation occurred.

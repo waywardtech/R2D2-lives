@@ -123,6 +123,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   offline recovery command converts a verified or absent journal into immutable,
   deterministic, identity-free watchdog evidence with an exact stall class. A
   journal ending in completion remains a watchdog timeout, not a passing cycle.
+- Commit `8c5bae3` passed hosted simulation CI run `31563552918` and was copied
+  into rollback-safe Pi staging `/home/pi/r2d2-hil-8c5bae3`. Five changed-file
+  hashes matched; the offline absent-journal recovery returned
+  `watchdog_timeout`/`no_progress`. Bluetooth stayed soft-blocked and no droid
+  discovery, connection, command, or actuation occurred.
 
 ## Remaining gate items
 
@@ -179,7 +184,9 @@ GitHub Actions simulation-ci run 31550425423 -> pass; Python 3.11 hosted runner,
 GitHub Actions simulation-ci run 31551031074 -> pass; repository hygiene and immutable action pins
 GitHub Actions simulation-ci run 31551472563 -> pass; hash-locked quality tools, 67 tests, simulations, docs
 GitHub Actions simulation-ci run 31552293911 -> pass; 82 tests and stationary droid-encounter simulation
+GitHub Actions simulation-ci run 31563552918 -> pass; 95 tests and watchdog recovery evidence
 Pi encounter staging -> pass; 6 hashes/versions verified, default HIL refusal before BLE
+Pi progress staging 8c5bae3 -> pass; 5 source hashes matched, offline recovery passed, Bluetooth blocked
 stationary droid encounter attempt 1 -> expression observed; timed out, normal final state, not a passing cycle
 ```
 
@@ -192,7 +199,8 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 
 ## Exact next task
 
-Commit and deploy the durable progress classifier to the isolated Pi staging
-without enabling Bluetooth or executing HIL. Do not retry the live session under
-the prior authorization; a new hardware run requires new explicit authorization.
-The stop-response bench remains blocked while charging.
+Do not retry the live session under the prior authorization. The durable progress
+checkpoint is deployed and ready, but a new hardware run requires new explicit
+authorization and a fresh physical preflight. Until then, continue Phase 1 with
+simulation-only persistent-session watchdog and recovery coverage. The
+stop-response bench remains blocked while charging.

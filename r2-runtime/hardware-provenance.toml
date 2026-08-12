@@ -147,3 +147,19 @@ operator_confirmed_final_stationary = true
 operator_confirmed_final_silent = true
 operator_confirmed_final_normal_led_state = true
 final_result = "expression-observed-session-timed-out-not-a-passing-cycle"
+
+[stationary_droid_encounter_progress_staging]
+prepared_date = "2026-08-11"
+commit = "8c5bae3"
+target_directory = "/home/pi/r2d2-hil-8c5bae3"
+previous_staging_preserved = true
+deployed_file_hashes_match_commit = true
+offline_absent_journal_classification = "no_progress"
+offline_evidence_sha256 = "fb53159fe9f63e69a37a9a3b0c28bc97ead6e1df25dc1c2f7ded1e8101193c86"
+offline_terminal = "watchdog_timeout"
+controller_soft_blocked_before_and_after = true
+bluetooth_accessed = false
+droid_connected = false
+droid_command_sent = false
+movement_performed = false
+result = "progress-checkpoint-deployed-offline-awaiting-new-hardware-authorization"
