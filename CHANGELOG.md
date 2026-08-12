@@ -83,6 +83,8 @@
 - Add a separately armed external HIL watchdog that refuses reused evidence,
   bounds and terminates one fixed encounter child, automatically classifies a
   timeout, and never equates process termination with verified BLE cleanup.
+- Make the Pi-only launcher load the verified isolated hardware dependency
+  directory itself rather than relying on an operator-supplied `PYTHONPATH`.
 
 ## 0.1.0 - 2026-08-11
 

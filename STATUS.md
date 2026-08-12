@@ -137,6 +137,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   to rollback-safe Pi staging `/home/pi/r2d2-hil-7c90a1f`. Three hashes matched;
   its default invocation refused before child launch and created no output files.
   Bluetooth remained soft-blocked and no droid was accessed.
+- The newly authorized encounter attempt stopped before scanner import because
+  the staged launcher lacked its isolated dependency path. No scan, connection,
+  droid command, or evidence file occurred; shutdown re-blocked Bluetooth. The
+  launcher now owns that path explicitly and has a regression test.
 
 ## Remaining gate items
 
@@ -181,7 +185,7 @@ python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, 
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 100 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 101 primary suite tests plus isolated standalone repetitions
 python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE

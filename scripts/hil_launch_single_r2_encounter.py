@@ -10,6 +10,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "encounter-live.json"
+STAGED_SITE_PACKAGES = ROOT / "site-packages"
+sys.path.insert(0, os.fspath(STAGED_SITE_PACKAGES))
 
 
 def main() -> None:
