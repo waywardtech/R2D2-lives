@@ -52,6 +52,8 @@
 - Add a separately marked stop-response runner that refuses by default and
   requires external arming, complete off-charger containment/clock preflight,
   no retry, zero residual BLE connections, and post-test physical confirmation.
+- Preserve an operator-confirmed response timeout as `stop_unconfirmed` while
+  keeping unsafe battery, missing confirmation, and unrelated errors invalid.
 
 ## 0.1.0 - 2026-08-11
 

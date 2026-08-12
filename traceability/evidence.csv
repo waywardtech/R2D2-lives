@@ -37,3 +37,4 @@ SAFE-004,P1,blocked,inspection,docs/r201-stop-response-bench.md,"Bench procedure
 SAFE-003,P1,pass,simulation,r2-runtime/tests/test_packet_trace.py,"Stop trace admits one DID 22/CID 1 TX and one correlated RX; retries payload fields time/sequence tampering and unsafe cleanup cannot produce success"
 R2-002,P1,in_progress,automated,r2-runtime/tests/test_spherov2_backend.py,"Opt-in traced executor observes the pinned exact OFF/0 encode/execute path without changing flags; default backend remains public and untraced"
 SAFE-004,P1,in_progress,automated,r2-runtime/tests/test_hil_preflight.py,"Bench runner refuses default and requires explicit authorization off-charger containment emergency path second go external arm token synchronized clock and post-test confirmation"
+SAFE-003,P1,pass,simulation,r2-runtime/tests/test_packet_trace.py,"Confirmed response timeout remains stop_unconfirmed; unsafe battery missing operator confirmation and unrelated errors remain invalid"

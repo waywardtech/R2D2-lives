@@ -69,6 +69,8 @@ post-disconnect `PHYSICAL_NORMAL` confirmation. It queries battery state, then
 relies on the owner's single normal disconnect stop; the driver prevents a retry
 after timeout. Any earlier exception, unsafe battery, remaining Bluetooth
 connection, missing physical confirmation, or non-success response exits failed.
+An operator-confirmed `TimeoutError` remains valid failed evidence classified as
+`stop_unconfirmed`; it is not relabeled as invalid or promoted to success.
 
 The supplied R201 product manual does not document an app-independent physical
 power cutoff. Do not substitute instructions for unrelated R2-D2 products. The

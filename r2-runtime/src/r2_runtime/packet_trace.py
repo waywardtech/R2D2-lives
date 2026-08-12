@@ -235,3 +235,11 @@ def classify_stop_response_trace(payload: Mapping[str, object]) -> str:
     if response_error is None:
         return "stop_unconfirmed"
     return "acknowledged_success" if response_error == "success" else "acknowledged_error"
+
+
+def physical_state_for_trace(*, operator_confirmed: bool, error_type: str | None) -> str:
+    """Keep an expected missing response distinct from an invalid bench run."""
+
+    if operator_confirmed and error_type in {None, "TimeoutError"}:
+        return "normal"
+    return "unconfirmed"

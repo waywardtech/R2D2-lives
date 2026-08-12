@@ -4,7 +4,11 @@ from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import unittest
 
-from r2_runtime.packet_trace import StopResponseTraceRecorder, classify_stop_response_trace
+from r2_runtime.packet_trace import (
+    StopResponseTraceRecorder,
+    classify_stop_response_trace,
+    physical_state_for_trace,
+)
 from r2_runtime.session_recording import SessionClock
 
 
@@ -87,6 +91,20 @@ class PacketTraceTest(unittest.TestCase):
                 direction="tx", did=22, cid=7, protocol_sequence=1, flags=10,
                 encoded_packet=b"heading-bearing command",
             )
+
+    def test_physical_confirmation_preserves_expected_timeout_classification(self) -> None:
+        self.assertEqual(
+            physical_state_for_trace(operator_confirmed=True, error_type="TimeoutError"),
+            "normal",
+        )
+        self.assertEqual(
+            physical_state_for_trace(operator_confirmed=True, error_type="UnsafeBatteryState"),
+            "unconfirmed",
+        )
+        self.assertEqual(
+            physical_state_for_trace(operator_confirmed=False, error_type=None),
+            "unconfirmed",
+        )
 
 
 if __name__ == "__main__":

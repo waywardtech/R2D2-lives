@@ -20,7 +20,11 @@ sys.path.insert(0, str(ROOT / "r2-runtime" / "src"))
 from r2_runtime.ble_owner import BleOwner
 from r2_runtime.drivers import Spherov2R2Driver
 from r2_runtime.hil_preflight import validate_stop_bench_preflight
-from r2_runtime.packet_trace import StopResponseTraceRecorder, classify_stop_response_trace
+from r2_runtime.packet_trace import (
+    StopResponseTraceRecorder,
+    classify_stop_response_trace,
+    physical_state_for_trace,
+)
 from r2_runtime.recording import build_hil_failure_evidence, write_immutable_json
 from r2_runtime.session_recording import SessionClock
 from r2_runtime.spherov2_backend import Spherov2LibraryBackend, TracedRawMotorOffExecutor
@@ -109,10 +113,9 @@ def main() -> None:
     payload = recorder.finalize(
         owner_state=owner.state.value,
         ble_connections=_connected_device_count(),
-        physical_state=(
-            "normal"
-            if confirmation == "PHYSICAL_NORMAL" and error_type is None
-            else "unconfirmed"
+        physical_state=physical_state_for_trace(
+            operator_confirmed=confirmation == "PHYSICAL_NORMAL",
+            error_type=error_type,
         ),
     )
     classification = classify_stop_response_trace(payload)
