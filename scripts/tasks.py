@@ -79,6 +79,7 @@ def docs_check() -> None:
         ROOT / "docs" / "phase-0-operator.md",
         ROOT / "docs" / "phase-1-stationary-probe.md",
         ROOT / "docs" / "r201-stop-response-bench.md",
+        ROOT / "scripts" / "hil_stop_response_bench.py",
         ROOT / "r2-runtime" / "hardware-provenance.toml",
         ROOT / "r2-runtime" / "requirements-hardware-pi.lock",
         ROOT / "r2-runtime" / "hardware-wheelhouse.manifest.json",

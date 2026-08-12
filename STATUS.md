@@ -66,7 +66,12 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   `stop_unconfirmed`. It is not connected to the hardware transport.
 - An opt-in, fake-vendor-tested observer seam now uses the pinned library's exact
   encode/execute path without altering flags, timeout, or error semantics. The
-  default backend remains unchanged and no operator/HIL command enables the seam.
+  default backend remains unchanged; only the separately gated bench runner
+  enables the seam.
+- A separately marked stop-response bench runner is implemented and verified to
+  refuse its default invocation. It requires an external exact arm token, all
+  physical/clock gates, one owner-disconnect OFF/0 attempt, zero residual BLE
+  connections, and interactive post-test confirmation; it has not been run.
 
 ## Remaining gate items
 
@@ -128,7 +133,7 @@ stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disc
 
 ## Exact next task
 
-Add a separately disabled bench entry point with stricter preflight and immutable
-trace output, but do not execute it. Do not retry optional or motor actions while
-charging. Hardware execution remains blocked pending exact authorization and a
-demonstrated manufacturer-supported physical shutdown path.
+Await a future off-charger, physically contained bench window and exact operator
+authorization before running the stop-response command. Separately, configure a
+Git remote so commits can be pushed. Do not retry optional or motor actions while
+charging; no hardware work is currently authorized.

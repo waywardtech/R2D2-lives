@@ -49,6 +49,9 @@
   one response, restricts decoded errors, and never promotes timeout to success.
 - Add an opt-in traced raw-motor-OFF executor over the pinned vendor encode/execute
   seam while leaving the normal public stop path and packet semantics unchanged.
+- Add a separately marked stop-response runner that refuses by default and
+  requires external arming, complete off-charger containment/clock preflight,
+  no retry, zero residual BLE connections, and post-test physical confirmation.
 
 ## 0.1.0 - 2026-08-11
 

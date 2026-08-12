@@ -78,6 +78,10 @@ class StopResponseTraceRecorder:
         self._monotonic_ns = monotonic_ns
         self._observations: list[PacketMetadata] = []
 
+    @property
+    def observation_count(self) -> int:
+        return len(self._observations)
+
     def record(
         self,
         *,

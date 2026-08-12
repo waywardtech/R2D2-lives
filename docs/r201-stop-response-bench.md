@@ -61,6 +61,20 @@ afterward, and leaves the original flags, synchronous timeout, and error behavio
 unchanged. The seam has fake-vendor simulation coverage but is not wired into an
 operator command.
 
+The separately marked runner is `scripts/hil_stop_response_bench.py`. Its default
+invocation exits before constructing the backend. It requires every physical
+preflight flag, an external exact arm token, synchronized clock source and
+bounded uncertainty, opaque boot-clock/session identities, and an interactive
+post-disconnect `PHYSICAL_NORMAL` confirmation. It queries battery state, then
+relies on the owner's single normal disconnect stop; the driver prevents a retry
+after timeout. Any earlier exception, unsafe battery, remaining Bluetooth
+connection, missing physical confirmation, or non-success response exits failed.
+
+The supplied R201 product manual does not document an app-independent physical
+power cutoff. Do not substitute instructions for unrelated R2-D2 products. The
+operator's emergency path and physical containment must therefore be reviewed
+for this exact R201 setup before authorizing the runner.
+
 ## Staged execution
 
 1. Re-run the full simulation and recorder/replay tests. Confirm the repository
