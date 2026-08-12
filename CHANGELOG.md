@@ -85,6 +85,9 @@
   timeout, and never equates process termination with verified BLE cleanup.
 - Make the Pi-only launcher load the verified isolated hardware dependency
   directory itself rather than relying on an operator-supplied `PYTHONPATH`.
+- Preserve the first failing stationary-expression phase across restoration,
+  include that stable phase in sanitized HIL evidence, and close a failed BLE
+  transport without waiting on another response-dependent motor-OFF command.
 
 ## 0.1.0 - 2026-08-11
 

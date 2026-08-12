@@ -65,3 +65,4 @@ SAFE-003,P1,pass,target_host,r2-runtime/hardware-provenance.toml,"External watch
 R2-002,P1,pass,automated,integration-lab/tests/test_encounter_launcher.py,"Pi launcher deterministically prepends its isolated hash-verified hardware dependency directory before importing the scanner"
 R2-003,P1,in_progress,HIL,evidence/hil/encounter-attempt-3-failure.json,"Corrected authorized run connected and passed battery gate but reaction 1 raised EOFError before completion; sanitized immutable failure evidence"
 SAFE-003,P1,in_progress,HIL,evidence/hil/encounter-attempt-3-watchdog.json,"Verified journal reached disconnect_started before watchdog termination; controller was powered off and soft-blocked; operator state observation pending"
+SAFE-003,P1,pass,automated,r2-runtime/tests/test_spherov2_backend.py,"Injected expression EOF preserves its first stable phase attempts all restorations skips a futile response-waiting stop and closes the adapter promptly"

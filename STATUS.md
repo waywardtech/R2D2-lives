@@ -147,6 +147,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   `disconnect_started`; the external watchdog then terminated it at 40 seconds.
   Sanitized failure, progress, and watchdog evidence are preserved. Bluetooth
   was powered off and soft-blocked. No retry was made; operator observation is pending.
+- Pinned-source inspection confirmed all expression primitives synchronously
+  await firmware responses. The failure path now preserves a stable first-failed
+  phase, attempts every restoration, and closes a transport after EOF without a
+  second response-dependent motor-OFF wait. Injected EOF coverage passes; the
+  prior HIL attempt's exact primitive remains unknown and no hardware retry occurred.
 
 ## Remaining gate items
 
@@ -191,7 +196,7 @@ python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, 
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 101 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 103 primary suite tests plus isolated standalone repetitions
 python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
@@ -222,7 +227,7 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 
 Do not retry the live session under the prior authorization. The durable progress
 evidence characterized an `EOFError` during reaction 1 followed by a disconnect
-stall. Obtain the operator's direct observation of expression and final state,
-then diagnose from simulation/source without another hardware retry. Any future
-hardware run requires new explicit authorization and preflight. The stop-response
-bench remains blocked while charging.
+stall. Obtain the operator's direct observation of expression and final state.
+Commit and deploy the simulation-verified transport-failure fix with Bluetooth
+blocked, but do not execute HIL. Any future hardware run requires new explicit
+authorization and preflight. The stop-response bench remains blocked while charging.

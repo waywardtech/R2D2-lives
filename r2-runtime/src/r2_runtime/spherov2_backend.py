@@ -20,6 +20,15 @@ class HardwareActionNotAuthorized(PermissionError):
     pass
 
 
+class StationaryExpressionError(RuntimeError):
+    """Sanitized expression failure retaining only a stable phase and exception type."""
+
+    def __init__(self, phase: str, error_type: str) -> None:
+        super().__init__(f"stationary expression failed during {phase}")
+        self.phase = phase
+        self.error_type = error_type
+
+
 class StopExecutor(Protocol):
     def __call__(self, toy: Any, module_loader: Callable[[str], ModuleType]) -> None: ...
 
@@ -258,25 +267,51 @@ class Spherov2LibraryBackend:
         audio = getattr(toy.Audio, plan.audio_name, None)
         if audio is None:
             raise RuntimeError("authorized audio enum is unavailable on this R2 adapter")
-        original_head = float(toy.get_head_position())
-        original_volume = int(toy.get_audio_volume())
         logic_display = toy.LEDs.LOGIC_DISPLAYS
+        phase = "head_position_read"
+        original_head: float | None = None
+        original_volume: int | None = None
+        failure: tuple[str, Exception] | None = None
         try:
+            original_head = float(toy.get_head_position())
+            phase = "audio_volume_read"
+            original_volume = int(toy.get_audio_volume())
+            phase = "logic_display_set"
             toy.multi_led_control.set_leds({logic_display: plan.logic_display_brightness})
+            phase = "audio_volume_set"
             toy.set_audio_volume(plan.audio_volume)
             for position in plan.head_positions_deg:
+                phase = "head_position_set"
                 toy.set_head_position(position)
                 self._sleeper(0.2)
+            phase = "audio_play"
             toy.play_audio_file(audio, 0)
             self._sleeper(plan.audio_dwell_s)
-        finally:
+        except Exception as error:
+            failure = (phase, error)
+
+        cleanup: tuple[tuple[str, Callable[[], None]], ...] = (
+            ("audio_stop_restore", toy.stop_all_audio),
+            (
+                "audio_volume_restore",
+                lambda: (
+                    toy.set_audio_volume(original_volume) if original_volume is not None else None
+                ),
+            ),
+            (
+                "head_position_restore",
+                lambda: toy.set_head_position(original_head) if original_head is not None else None,
+            ),
+            ("logic_display_restore", lambda: toy.multi_led_control.set_leds({logic_display: 0})),
+        )
+        for cleanup_phase, operation in cleanup:
             try:
-                toy.stop_all_audio()
-            finally:
-                try:
-                    toy.set_audio_volume(original_volume)
-                finally:
-                    try:
-                        toy.set_head_position(original_head)
-                    finally:
-                        toy.multi_led_control.set_leds({logic_display: 0})
+                operation()
+            except Exception as error:
+                if failure is None:
+                    failure = (cleanup_phase, error)
+        if failure is not None:
+            failure_phase, original_failure = failure
+            raise StationaryExpressionError(
+                failure_phase, type(original_failure).__name__
+            ) from original_failure

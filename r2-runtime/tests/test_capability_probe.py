@@ -191,6 +191,16 @@ class CapabilityProbeTest(unittest.TestCase):
         self.assertNotIn("private exception detail", str(payload))
         self.assertNotIn("address", str(payload))
 
+    def test_hil_failure_evidence_accepts_stable_error_stage(self) -> None:
+        payload = build_hil_failure_evidence(
+            error_type="StationaryExpressionError",
+            error_stage="audio_volume_read",
+            owner_state="offline",
+            driver_connected=False,
+            driver_stopped=True,
+        )
+        self.assertEqual(payload["error_stage"], "audio_volume_read")
+
 
 if __name__ == "__main__":
     unittest.main()

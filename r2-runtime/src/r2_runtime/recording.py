@@ -10,11 +10,16 @@ from typing import Any, Mapping
 
 
 def build_hil_failure_evidence(
-    *, error_type: str, owner_state: str, driver_connected: bool, driver_stopped: bool
+    *,
+    error_type: str,
+    owner_state: str,
+    driver_connected: bool,
+    driver_stopped: bool,
+    error_stage: str | None = None,
 ) -> dict[str, object]:
     """Build sanitized terminal evidence without exception text or device identity."""
 
-    return {
+    evidence: dict[str, object] = {
         "schema_version": "1.0",
         "evidence_category": "HIL-stationary-failure",
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
@@ -26,6 +31,9 @@ def build_hil_failure_evidence(
         "movement_performed": False,
         "device_identity_persisted": False,
     }
+    if error_stage is not None:
+        evidence["error_stage"] = error_stage
+    return evidence
 
 
 def write_immutable_json(path: Path, payload: Mapping[str, Any]) -> str:

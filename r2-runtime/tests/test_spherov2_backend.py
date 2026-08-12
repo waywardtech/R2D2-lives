@@ -13,6 +13,7 @@ from r2_runtime.spherov2_backend import (
     HardwareActionNotAuthorized,
     Spherov2LibraryBackend,
     StationaryProbePolicy,
+    StationaryExpressionError,
     TracedRawMotorOffExecutor,
 )
 from r2_runtime.packet_trace import StopResponseTraceRecorder, classify_stop_response_trace
@@ -271,6 +272,32 @@ class Spherov2BackendTest(unittest.TestCase):
         with self.assertRaises(HardwareActionNotAuthorized):
             backend.perform_stationary_expression(plan)
         backend.disconnect()
+
+    def test_expression_eof_preserves_phase_restores_and_skips_futile_stop(self) -> None:
+        policy = StationaryProbePolicy(
+            allow_stationary_expressions=True,
+            allowed_audio_names=frozenset({"R2_HEY_1"}),
+        )
+        backend, toy, _, _ = self.make_backend(policy)
+        toy.get_audio_volume = lambda: (_ for _ in ()).throw(EOFError())  # type: ignore[method-assign]
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-TEST")
+        owner = BleOwner(driver)
+        owner.connect_for_stationary_probe()
+        plan = StationaryExpressionPlan("greeting", "R2_HEY_1", (0.0,))
+        with self.assertRaises(StationaryExpressionError) as caught:
+            owner.perform_stationary_expression(plan)
+        self.assertEqual(caught.exception.phase, "audio_volume_read")
+        self.assertEqual(caught.exception.error_type, "EOFError")
+        self.assertTrue(driver.transport_failed)
+        self.assertIn("audio_stop", toy.calls)
+        self.assertIn(("head_set", 0.0), toy.calls)
+        self.assertIn(("leds", {FakeLeds.LOGIC_DISPLAYS: 0}), toy.calls)
+        owner.disconnect("expression_transport_failed")
+        self.assertFalse(
+            any(call[0] == "raw_motors" for call in toy.calls if isinstance(call, tuple))
+        )
+        self.assertEqual(toy.calls[-1], "exit")
+        self.assertFalse(driver.transport_failed)
 
     def test_nearby_scan_returns_only_types_and_excludes_configured_r2(self) -> None:
         class R2Type(FakeToy):

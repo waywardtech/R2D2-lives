@@ -76,6 +76,7 @@ class Spherov2R2Driver:
     connected: bool = False
     stopped: bool = True
     stop_attempted_since_connect: bool = False
+    transport_failed: bool = False
 
     expected_library_version = "0.12.1"
 
@@ -106,6 +107,7 @@ class Spherov2R2Driver:
         self.connected = True
         self.stopped = True
         self.stop_attempted_since_connect = False
+        self.transport_failed = False
 
     def safe_hold(self) -> None:
         if not self.connected:
@@ -127,12 +129,22 @@ class Spherov2R2Driver:
     def perform_stationary_expression(self, plan: StationaryExpressionPlan) -> None:
         if not self.connected or not self.stopped:
             raise RuntimeError("stationary expression requires a connected, stopped R2")
-        self.backend.perform_stationary_expression(plan)
+        try:
+            self.backend.perform_stationary_expression(plan)
+        except (EOFError, ConnectionError):
+            self.transport_failed = True
+            self.stopped = True
+            raise
+        except Exception as error:
+            if isinstance(error.__cause__, (EOFError, ConnectionError)):
+                self.transport_failed = True
+                self.stopped = True
+            raise
 
     def disconnect(self) -> None:
         if self.connected:
             try:
-                if not self.stop_attempted_since_connect:
+                if not self.stop_attempted_since_connect and not self.transport_failed:
                     self.safe_hold()
             finally:
                 try:
@@ -141,6 +153,7 @@ class Spherov2R2Driver:
                     self.connected = False
                     self.stopped = True
                     self.stop_attempted_since_connect = False
+                    self.transport_failed = False
 
 
 @dataclass

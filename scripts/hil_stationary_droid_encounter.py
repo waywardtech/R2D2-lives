@@ -69,6 +69,7 @@ def main() -> None:
             owner_state=owner.state.value,
             driver_connected=driver.connected,
             driver_stopped=driver.stopped,
+            error_stage=getattr(error, "phase", None),
         )
         digest = write_immutable_json(args.output, failure)
         print(

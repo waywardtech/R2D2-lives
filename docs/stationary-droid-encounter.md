@@ -161,3 +161,17 @@ reach its completed marker: the child recorded a sanitized `EOFError`, reached
 The controller was powered off and soft-blocked afterward. This is a failed,
 non-retry HIL attempt and not a Gate P1 cycle. Operator observation of the
 physical expression and final droid state is still required.
+
+Offline inspection of pinned `spherov2.py` 0.12.1 confirmed that every expression
+primitive uses `_execute()` and waits up to ten seconds for a firmware response.
+The pre-fix adapter could then mask the first primitive error with a later
+restoration error and, after an EOF, attempt another response-waiting motor-OFF
+command before closing BLE. The corrected adapter records only a stable phase
+such as `head_position_read`, `logic_display_set`, or `audio_play`, preserves the
+first exception type, attempts every restoration step, and treats EOF/connection
+loss as a failed transport so disconnect closes the adapter without that futile
+wait. It does not claim the droid received a stop or restoration command.
+
+The existing attempt-3 journal predates this phase instrumentation, so its exact
+failing expression primitive remains unknown. The fix is simulation-tested and
+is not authorization for another hardware run.
