@@ -220,9 +220,17 @@ process_terminated = true
 controller_powered_off = true
 controller_soft_blocked = true
 movement_performed = false
-operator_observation_pending = true
+operator_observation_pending = false
 gate_cycle_passed = false
-result = "reaction-started-eof-failure-disconnect-stalled-awaiting-operator-observation"
+result = "no-expression-observed-eof-disconnect-stall-safe-observed-final-state-not-passing"
+operator_expression_observed = false
+operator_confirmed_base_movement = false
+operator_confirmed_leg_movement = false
+operator_confirmed_heading_change = false
+operator_confirmed_location_change = false
+operator_confirmed_final_stationary = true
+operator_confirmed_final_silent = true
+operator_confirmed_final_leds_off = true
 
 [stationary_droid_encounter_transport_fix_staging]
 prepared_date = "2026-08-12"

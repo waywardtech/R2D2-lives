@@ -160,7 +160,15 @@ reach its completed marker: the child recorded a sanitized `EOFError`, reached
 `disconnect_started`, and then the 40-second watchdog terminated the process.
 The controller was powered off and soft-blocked afterward. This is a failed,
 non-retry HIL attempt and not a Gate P1 cycle. Operator observation of the
-physical expression and final droid state is still required.
+physical expression and final droid state was still required when this evidence
+was captured.
+
+The operator subsequently reported that no sound, dome movement, or LED reaction
+was observed; the base, legs, heading, and location did not change; and R2 ended
+stationary, silent, with all LEDs off. This confirms the observed final physical
+state and absence of locomotion, but it does not prove that individual software
+restoration commands were acknowledged. The attempt remains a characterized
+failed HIL run and does not count toward Gate P1.
 
 Offline inspection of pinned `spherov2.py` 0.12.1 confirmed that every expression
 primitive uses `_execute()` and waits up to ten seconds for a firmware response.

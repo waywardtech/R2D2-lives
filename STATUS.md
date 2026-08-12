@@ -156,6 +156,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   to rollback-safe Pi staging `/home/pi/r2d2-hil-c9f344e`. Five file hashes and
   the import-only default refusal passed with Bluetooth soft-blocked. No scan,
   connection, droid command, or HIL retry occurred.
+- The operator closed attempt 3 observation: no sound, dome movement, or LED
+  reaction was seen/heard; base, legs, heading, and location did not change; R2
+  ended stationary, silent, with all LEDs off. This characterizes a safe observed
+  final state but not acknowledged restoration or a passing HIL cycle.
 
 ## Remaining gate items
 
@@ -223,17 +227,15 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 ## Hardware state
 
 - Real R2 movement authorized for next run: no
-- Last known droid state: disconnected, silent, and normal LEDs/off per operator confirmation
+- Last known droid state: disconnected, stationary, silent, and all LEDs off per operator confirmation
 - Capability profile: partial; firmware/identity/battery/advertised telemetry observed
 - Hardware evidence category: target-host import, HIL discovery, and failed stationary probe
 
 ## Exact next task
 
 Do not retry the live session under the prior authorization. The durable progress
-evidence characterized an `EOFError` during reaction 1 followed by a disconnect
-stall. Obtain the operator's direct observation of expression and final state.
-Commit and deploy the simulation-verified transport-failure fix with Bluetooth
-blocked is complete. Obtain the operator's direct observation of the attempt-3
-expression and final state before closing its evidence classification. Any future
-hardware run requires new explicit authorization and preflight. The stop-response
-bench remains blocked while charging.
+Attempt 3 is closed as a characterized failure: `EOFError` during reaction 1,
+disconnect stall, no expression or movement observed, and a stationary/silent/
+LEDs-off final state. Continue simulation-only response-policy diagnosis. Any
+future hardware run requires new explicit authorization and preflight. The
+stop-response bench remains blocked while charging.
