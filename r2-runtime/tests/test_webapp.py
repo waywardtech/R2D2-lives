@@ -37,6 +37,7 @@ class WebAppTest(unittest.TestCase):
         self.assertIn('Alias "/R2D2/"', config)
         self.assertIn("RedirectMatch 302 ^/R2D2$ /R2D2/", config)
         self.assertIn("Require ip", config)
+        self.assertIn("fc00::/7", config)
         self.assertIn("Content-Security-Policy", config)
         self.assertNotIn("ProxyPass", config)
 
