@@ -64,6 +64,9 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   motor OFF command observation, hashes/discards encoded bytes, correlates at
   most one response, rejects retries/tampering, and fails timeout closed as
   `stop_unconfirmed`. It is not connected to the hardware transport.
+- An opt-in, fake-vendor-tested observer seam now uses the pinned library's exact
+  encode/execute path without altering flags, timeout, or error semantics. The
+  default backend remains unchanged and no operator/HIL command enables the seam.
 
 ## Remaining gate items
 
@@ -125,7 +128,7 @@ stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disc
 
 ## Exact next task
 
-Design a reviewed transport-observer seam for the pinned library without changing
-packet flags or command behavior. Do not retry optional or motor actions while
+Add a separately disabled bench entry point with stricter preflight and immutable
+trace output, but do not execute it. Do not retry optional or motor actions while
 charging. Hardware execution remains blocked pending exact authorization and a
 demonstrated manufacturer-supported physical shutdown path.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from datetime import datetime, timezone
 from enum import IntEnum
 from types import SimpleNamespace
 import unittest
@@ -11,7 +12,10 @@ from r2_runtime.spherov2_backend import (
     HardwareActionNotAuthorized,
     Spherov2LibraryBackend,
     StationaryProbePolicy,
+    TracedRawMotorOffExecutor,
 )
+from r2_runtime.packet_trace import StopResponseTraceRecorder, classify_stop_response_trace
+from r2_runtime.session_recording import SessionClock
 
 
 class Version:
@@ -110,6 +114,39 @@ class FakeToy:
 
     def configure_collision_detection(self) -> None:
         raise AssertionError("inspection must not configure collision detection")
+
+
+class FakePacket:
+    def __init__(self, *, flags: int, did: int, cid: int, seq: int, err: object = None) -> None:
+        self.flags = flags
+        self.did = did
+        self.cid = cid
+        self.seq = seq
+        self.err = err
+
+    def build(self) -> bytes:
+        return bytes((self.flags, self.did, self.cid, self.seq))
+
+
+class FakeDriveCommand:
+    encoded_data: list[object] = []
+
+    @staticmethod
+    def _encode(toy: object, cid: int, proc: object, data: list[object]) -> FakePacket:
+        FakeDriveCommand.encoded_data = list(data)
+        return FakePacket(flags=10, did=22, cid=cid, seq=17)
+
+
+class FakeExecutingToy(FakeToy):
+    def _execute(self, packet: FakePacket) -> FakePacket:
+        self.calls.append(("execute", packet.did, packet.cid, packet.seq))
+        return FakePacket(
+            flags=1,
+            did=packet.did,
+            cid=packet.cid,
+            seq=packet.seq,
+            err=SimpleNamespace(name="success"),
+        )
 
 
 class FakeScanner:
@@ -215,6 +252,38 @@ class Spherov2BackendTest(unittest.TestCase):
         self.assertTrue(collision["configuration_supported"])
         self.assertEqual(toy.calls, ["enter"])
         backend.disconnect()
+
+    def test_bench_executor_observes_exact_vendor_command_without_changing_flags(self) -> None:
+        recorder = StopResponseTraceRecorder(
+            session_ref="session-0123456789abcdef",
+            clock=SessionClock("sim-clock-abcdef01", "deterministic", 0.0),
+            utc_now=lambda: datetime(2030, 1, 1, tzinfo=timezone.utc),
+            monotonic_ns=iter((1000, 2000)).__next__,
+        )
+        toy = FakeExecutingToy()
+        scanner = FakeScanner(toy)
+        modules = {
+            "spherov2.scanner": scanner,
+            "spherov2.toy.r2d2": SimpleNamespace(R2D2=type("R2D2", (), {})),
+            "spherov2.commands.drive": SimpleNamespace(
+                Drive=FakeDriveCommand, RawMotorModes=FakeRawMotorModes
+            ),
+        }
+        backend = Spherov2LibraryBackend(
+            module_loader=lambda name: modules[name],  # type: ignore[arg-type]
+            version_resolver=lambda _: "0.12.1",
+            stop_executor=TracedRawMotorOffExecutor(recorder),
+        )
+        backend.connect("D2-TEST")
+        backend.stop()
+        backend.disconnect()
+        self.assertEqual(FakeDriveCommand.encoded_data, [FakeRawMotorModes.OFF, 0, FakeRawMotorModes.OFF, 0])
+        self.assertIn(("execute", 22, 1, 17), toy.calls)
+        payload = recorder.finalize(
+            owner_state="offline", ble_connections=0, physical_state="normal"
+        )
+        self.assertEqual(classify_stop_response_trace(payload), "acknowledged_success")
+        self.assertEqual(payload["observations"][0]["flags"], 10)
 
 
 if __name__ == "__main__":

@@ -9,11 +9,54 @@ from __future__ import annotations
 from dataclasses import dataclass
 from importlib import import_module, metadata
 from types import ModuleType
-from typing import Callable, Mapping
+from typing import Callable, Mapping, Protocol
+
+from .packet_trace import StopResponseTraceRecorder
 
 
 class HardwareActionNotAuthorized(PermissionError):
     pass
+
+
+class StopExecutor(Protocol):
+    def __call__(self, toy: object, module_loader: Callable[[str], ModuleType]) -> None: ...
+
+
+def _public_raw_motor_off(toy: object, module_loader: Callable[[str], ModuleType]) -> None:
+    controls = module_loader("spherov2.controls")
+    off = controls.RawMotorModes.OFF
+    toy.drive_control.set_raw_motors(off, 0, off, 0)
+
+
+class TracedRawMotorOffExecutor:
+    """Bench-only observer over the pinned private encode/execute seam."""
+
+    def __init__(self, recorder: StopResponseTraceRecorder) -> None:
+        self.recorder = recorder
+
+    def __call__(self, toy: object, module_loader: Callable[[str], ModuleType]) -> None:
+        drive = module_loader("spherov2.commands.drive")
+        off = drive.RawMotorModes.OFF
+        packet = drive.Drive._encode(toy, 1, None, [off, 0, off, 0])
+        self.recorder.record(
+            direction="tx",
+            did=int(packet.did),
+            cid=int(packet.cid),
+            protocol_sequence=int(packet.seq),
+            flags=int(packet.flags),
+            encoded_packet=bytes(packet.build()),
+        )
+        response = toy._execute(packet)
+        error = getattr(response.err, "name", str(response.err)).lower()
+        self.recorder.record(
+            direction="rx",
+            did=int(response.did),
+            cid=int(response.cid),
+            protocol_sequence=int(response.seq),
+            flags=int(response.flags),
+            encoded_packet=bytes(response.build()),
+            error=error,
+        )
 
 
 @dataclass(frozen=True)
@@ -56,6 +99,7 @@ class Spherov2LibraryBackend:
         scan_timeout_s: float = 5.0,
         module_loader: Callable[[str], ModuleType] = import_module,
         version_resolver: Callable[[str], str] = _installed_version,
+        stop_executor: StopExecutor = _public_raw_motor_off,
     ) -> None:
         if not 0 < scan_timeout_s <= 30:
             raise ValueError("scan timeout must be in (0, 30] seconds")
@@ -63,6 +107,7 @@ class Spherov2LibraryBackend:
         self.scan_timeout_s = scan_timeout_s
         self._module_loader = module_loader
         self._version_resolver = version_resolver
+        self._stop_executor = stop_executor
         self._toy: object | None = None
 
     @property
@@ -96,9 +141,7 @@ class Spherov2LibraryBackend:
 
     def stop(self) -> None:
         toy = self._require_toy()
-        controls = self._module_loader("spherov2.controls")
-        off = controls.RawMotorModes.OFF
-        toy.drive_control.set_raw_motors(off, 0, off, 0)
+        self._stop_executor(toy, self._module_loader)
 
     def identity(self) -> Mapping[str, str]:
         toy = self._require_toy()

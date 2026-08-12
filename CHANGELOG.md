@@ -47,6 +47,8 @@
 - Add a simulation-only stop-response metadata recorder/classifier that accepts
   only one DID 22/CID 1 transmission, hashes and discards packet bytes, correlates
   one response, restricts decoded errors, and never promotes timeout to success.
+- Add an opt-in traced raw-motor-OFF executor over the pinned vendor encode/execute
+  seam while leaving the normal public stop path and packet semantics unchanged.
 
 ## 0.1.0 - 2026-08-11
 

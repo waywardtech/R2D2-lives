@@ -50,8 +50,16 @@ Pi after deriving and independently reviewing the sanitized artifact.
 artifact boundary in simulation. It accepts only DID 22/CID 1, prohibits a
 second transmitted command, retains packet length and SHA-256 rather than bytes,
 requires opaque session/clock identities, correlates the response sequence, and
-uses the finite protocol-v2 error vocabulary. It is not yet connected to the
-pinned library transport and does not authorize or execute this procedure.
+uses the finite protocol-v2 error vocabulary. The recorder alone does not
+authorize or execute this procedure.
+
+`TracedRawMotorOffExecutor` now provides the reviewed, opt-in vendor seam. The
+normal backend still uses the public `drive_control.set_raw_motors` path. Only an
+explicitly constructed executor calls the pinned `Drive._encode`/`toy._execute`
+pair, observes the encoded command before dispatch and the returned response
+afterward, and leaves the original flags, synchronous timeout, and error behavior
+unchanged. The seam has fake-vendor simulation coverage but is not wired into an
+operator command.
 
 ## Staged execution
 

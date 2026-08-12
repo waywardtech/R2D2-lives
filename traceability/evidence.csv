@@ -35,3 +35,4 @@ R2-001,P1,pass,simulation,r2-runtime/tests/test_session_recording.py,"Serialized
 R2-004,P1,pass,simulation,r2-runtime/tests/fixtures/sim-owner-lifecycle-session.json,"Reviewed stationary lifecycle fixture begins and ends offline with no movement or device identity"
 SAFE-004,P1,blocked,inspection,docs/r201-stop-response-bench.md,"Bench procedure requires exact authorization containment keep-out battery/thermal/link checks and a demonstrated manufacturer-supported physical shutdown before one OFF/0 command"
 SAFE-003,P1,pass,simulation,r2-runtime/tests/test_packet_trace.py,"Stop trace admits one DID 22/CID 1 TX and one correlated RX; retries payload fields time/sequence tampering and unsafe cleanup cannot produce success"
+R2-002,P1,in_progress,automated,r2-runtime/tests/test_spherov2_backend.py,"Opt-in traced executor observes the pinned exact OFF/0 encode/execute path without changing flags; default backend remains public and untraced"
