@@ -33,6 +33,10 @@
   excluding exception text, configured identity, and device addresses.
 - Add the first immutable real-R201 HIL report and enforce its SHA-256 during
   documentation checks; the stop-timeout cycle remains a failed gate result.
+- Record operator confirmation that R2 returned to normal after the optional
+  watchdog and prohibit further charging-state retries.
+- Document the upstream response-policy mismatch and block motion HIL rather
+  than treating a transmitted, unacknowledged stop packet as success.
 
 ## 0.1.0 - 2026-08-11
 

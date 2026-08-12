@@ -52,6 +52,8 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   hardware modules now import without SAP or peer-product source.
 - Exact-identity HIL observed firmware 7.0.101 and battery 3.77 V/ok; both
   zero-speed stop forms timed out, but fixed cleanup closed BLE without retry.
+- The operator confirmed R2 returned to its normal silent, LEDs-off state after
+  the optional-pass watchdog; no further charging-state actions were attempted.
 
 ## Remaining gate items
 
@@ -79,6 +81,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   3.13.5 and deployment must explicitly use 3.11. All actual firmware/BLE behavior remains unverified.
 - R201 firmware 7.0.101 does not acknowledge drive stop commands while charging.
   The failed cycle disconnects safely but cannot count as Gate P1 success.
+- Sphero's public packet protocol permits commands to omit a requested response,
+  while pinned `spherov2.py` 0.12.1 waits synchronously for every command. Source
+  inspection cannot distinguish a charging-state behavior from an unsupported
+  response assumption. Treating packet transmission as stop confirmation is
+  prohibited until a separately authorized bench trace resolves the ambiguity.
 
 ## Last verification
 
@@ -102,11 +109,13 @@ stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disc
 ## Hardware state
 
 - Real R2 movement authorized for next run: no
-- Last known droid state: disconnected after optional-pass watchdog; physical LED/audio state needs confirmation
+- Last known droid state: disconnected, silent, and normal LEDs/off per operator confirmation
 - Capability profile: partial; firmware/identity/battery/advertised telemetry observed
 - Hardware evidence category: target-host import, HIL discovery, and failed stationary probe
 
 ## Exact next task
 
-Confirm R2 returned to normal LED/audio state after the optional watchdog timeout.
-Do not retry optional or motor actions while charging. Movement remains prohibited.
+Add deterministic, sanitized session recording/replay coverage locally. Do not
+retry optional or motor actions while charging. Before any future motion HIL,
+resolve stop acknowledgement behavior in a separately authorized stationary
+bench trace and demonstrate a confirmed emergency-stop path.

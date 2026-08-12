@@ -77,8 +77,25 @@ It records `movement_performed: false`, failed `stop.latency`, and terminal stat
 
 One separately authorized LED/head-read/quiet-audio pass exceeded its watchdog
 before producing an artifact. The process was terminated, R2 was disconnected,
-and no retry was made. Operator confirmation of restored LED/audio state is
-required before any further optional action.
+and no retry was made. The operator subsequently confirmed normal silent and
+LEDs-off state. No further optional or motor action was attempted while charging.
+
+## Stop acknowledgement research
+
+The pinned upstream source sets `requests_response` on every protocol-v2 packet
+and `_execute` waits up to ten seconds for a matching response. Both drive stop
+forms use that same path. Sphero's public API documentation says commands may
+optionally request a response, but it does not establish that R201 firmware
+`7.0.101` intentionally omits drive acknowledgements or that charging is the
+cause. The upstream 0.12.1 history contains no drive-specific response-policy
+fix.
+
+The runtime therefore does not reinterpret a timeout as success and does not
+patch the private packet flags. A packet being written is not proof that the
+motors stopped. Future motion HIL is blocked until a separately authorized,
+stationary bench trace determines the command/response behavior and an
+independent emergency-stop path is demonstrated. This is source inspection plus
+one failed charging-state HIL observation, not verified stop behavior.
 
 ## Simulation
 
