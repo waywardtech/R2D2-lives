@@ -1,0 +1,7 @@
+{"detail": {}, "occurred_at": "2026-08-12T16:20:34.342610Z", "sequence": 1, "stage": "system_status_collected"}
+{"detail": {}, "occurred_at": "2026-08-12T16:20:34.355409Z", "sequence": 2, "stage": "connect_started"}
+{"detail": {}, "occurred_at": "2026-08-12T16:20:38.218294Z", "sequence": 3, "stage": "connect_completed"}
+{"detail": {}, "occurred_at": "2026-08-12T16:20:39.197741Z", "sequence": 4, "stage": "identity_checked"}
+{"detail": {"battery_safe": true}, "occurred_at": "2026-08-12T16:20:39.544132Z", "sequence": 5, "stage": "battery_checked"}
+{"detail": {}, "occurred_at": "2026-08-12T16:20:49.555295Z", "sequence": 6, "stage": "session_failed"}
+{"detail": {}, "occurred_at": "2026-08-12T16:20:49.572807Z", "sequence": 7, "stage": "disconnect_started"}

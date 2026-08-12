@@ -69,3 +69,21 @@ The HIL entry point intentionally is not documented as a copy-paste convenience
 command. Use the reviewed Pi launcher only for one explicitly authorized run,
 under a bounded external watchdog, and preserve its immutable JSON output and
 progress journal. Never retry automatically after a timeout or physical anomaly.
+
+## First deployment and HIL attempt
+
+Commits `eda49e6`, `7adeab4`, and the private-IPv6 allowlist correction
+`7ba7239` were deployed as immutable releases on 2026-08-12. Apache syntax,
+`/R2D2` redirect, hardened `/R2D2/` response, uncached status response, timer,
+and rollback directory all passed target-host checks. The active release is
+`7ba7239`; `7adeab4` remains available for rollback.
+
+The one authorized proof-of-life attempt used the exact `7adeab4` HIL staging.
+It connected, read identity, and passed the battery gate. Ten seconds later the
+journal recorded `session_failed` before either `head_checked` or
+`expression_started`, so no LED flash, sound, dome-set, drive, heading, leg, or
+animation primitive was issued. The child reported `EOFError` and software state
+`offline`/safe-held, but no `disconnect_completed` marker was written. The
+75-second external watchdog terminated the lingering process. Bluetooth was then
+powered off; no connection or HIL process remained. There was no retry. Direct
+operator observation of the physical droid state remains required.

@@ -245,3 +245,52 @@ droid_connected = false
 droid_command_sent = false
 movement_performed = false
 result = "transport-fix-deployed-disabled-awaiting-operator-observation"
+
+[r2_dashboard_deployment]
+deployed_date = "2026-08-12"
+active_commit = "7ba7239"
+initial_release_commit = "7adeab4"
+previous_release_preserved_for_rollback = true
+active_directory = "/opt/r2-runtime/releases/7ba7239"
+initial_directory = "/opt/r2-runtime/releases/7adeab4"
+archive_sha256 = "fce5d20bcd9e48299331c3dbc01286520e2054dca9408231cdb12ba492b74361"
+apache_syntax_ok = true
+https_base_redirect_status = 302
+https_page_status = 200
+https_status_status = 200
+private_lan_only = true
+status_timer_active = true
+controller_powered_off_during_deployment = true
+movement_performed = false
+result = "read-only-dashboard-live-with-failed-proof-status-published"
+
+[stationary_proof_of_life_attempt_1]
+attempted_date = "2026-08-12"
+commit = "7adeab4"
+target_directory = "/home/pi/r2d2-proof-7adeab4"
+operator_physical_preflight_confirmed = true
+authorization = "one stationary proof of life with bounded dome LED and audio only; no locomotion"
+pi_cpu_temperature_c = 35.537
+pi_throttling = "throttled=0x0"
+ntp_synchronized = true
+watchdog_duration_s = 75
+r2_connected = true
+identity_checked = true
+battery_safe = true
+head_checked = false
+expression_started = false
+expression_completed = false
+failure_type = "EOFError"
+child_failure_evidence_sha256 = "e9acf5000b769ac4ad0d237ef5b2cd20cfcb3207061f48a208719c1dc69959e2"
+progress_journal_sha256 = "9c8695a7fb2aaf7b17076504d4919e8196949ec2df6221b5b1c4601886958855"
+disconnect_completed_marker = false
+watchdog_exit_code = 124
+process_terminated = true
+controller_powered_off = true
+controller_discovering = false
+remaining_ble_connections = 0
+remaining_hil_processes = 0
+movement_performed = false
+operator_observation_pending = true
+gate_cycle_passed = false
+result = "failed-before-expression-disconnect-incomplete-watchdog-cleanup-no-retry"

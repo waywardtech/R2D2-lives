@@ -94,6 +94,11 @@
 - Add an iPhone-optimized, original X-wing-console-inspired PWA at `/R2D2/` with
   local dialogue/translation, animated annunciators/waveforms, uncached live
   status snapshots, LAN-only Apache hardening, and a sandboxed systemd refresher.
+- Deploy the read-only dashboard as immutable Pi releases, add private IPv6 LAN
+  access after live verification, and publish the first target-host status.
+- Preserve the single authorized proof-of-life failure: identity and battery
+  passed, `EOFError` occurred before expression start, disconnect completion was
+  not observed, the watchdog terminated the child, and no retry occurred.
 
 ## 0.1.0 - 2026-08-11
 

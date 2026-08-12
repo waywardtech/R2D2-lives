@@ -1,0 +1,79 @@
+{
+  "evidence_category": "stationary-proof-of-life-failure",
+  "final_state": "offline",
+  "movement_performed": false,
+  "schema_version": "1.0",
+  "seed": 493992579,
+  "status": {
+    "clock": {
+      "clock_id": "raspberrypi-monotonic-boot",
+      "sync_source": "ntp",
+      "synchronized": true,
+      "uncertainty_ms": null
+    },
+    "droid": {
+      "connection": "offline",
+      "expression": {
+        "error_stage": null,
+        "error_type": "EOFError",
+        "status": "failed"
+      },
+      "movement_performed": false,
+      "safe_hold": true
+    },
+    "issues": [
+      {
+        "code": "droid_expression_failed",
+        "message": "The latest R2 expression failed",
+        "severity": "critical"
+      }
+    ],
+    "measured_at": "2026-08-12T16:21:02.256915Z",
+    "monotonic_ns": 946616069098502,
+    "overall": "attention",
+    "pi": {
+      "ambient_temperature_c": null,
+      "ambient_temperature_status": "sensor_not_configured",
+      "audio_cards": "0 [vc4hdmi0       ]: vc4-hdmi - vc4-hdmi-0\n                      vc4-hdmi-0\n 1 [vc4hdmi1       ]: vc4-hdmi - vc4-hdmi-1\n                      vc4-hdmi-1\n 2 [Headphones     ]: bcm2835_headpho - bcm2835 Headphones\n                      bcm2835 Headphones",
+      "collector_process": {
+        "pid": 675161,
+        "state": "running"
+      },
+      "cpu_count": 4,
+      "cpu_temperature_c": 35.537,
+      "disk": {
+        "free_bytes": 49417928704,
+        "total_bytes": 125258715136,
+        "used_percent": 55.5
+      },
+      "hostname": "raspberrypi",
+      "kernel": "6.18.39+rpt-rpi-v8",
+      "load": {
+        "fifteen_min": 0.0517578125,
+        "five_min": 0.1396484375,
+        "one_min": 0.240234375
+      },
+      "machine": "aarch64",
+      "memory": {
+        "available_bytes": 3647102976,
+        "total_bytes": 3980189696,
+        "used_percent": 8.4
+      },
+      "network_interfaces": {
+        "eth0": "down",
+        "lo": "unknown",
+        "wlan0": "up"
+      },
+      "os": "Debian GNU/Linux 13 (trixie)",
+      "python": "3.11.2",
+      "services": {
+        "apache2": "active",
+        "bluetooth": "active",
+        "r2_dashboard_status": "unknown"
+      },
+      "throttling": "throttled=0x0",
+      "uptime_s": 946616.02
+    },
+    "schema_version": "1.0"
+  }
+}

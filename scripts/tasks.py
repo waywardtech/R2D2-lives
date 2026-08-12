@@ -131,6 +131,10 @@ def docs_check() -> None:
         ROOT / "evidence" / "hil" / "encounter-attempt-3-watchdog.json.sha256",
         ROOT / "evidence" / "hil" / "encounter-attempt-3-progress.jsonl",
         ROOT / "evidence" / "hil" / "encounter-attempt-3-progress.jsonl.sha256",
+        ROOT / "evidence" / "hil" / "proof-of-life-attempt-1-failure.json",
+        ROOT / "evidence" / "hil" / "proof-of-life-attempt-1-failure.json.sha256",
+        ROOT / "evidence" / "hil" / "proof-of-life-attempt-1-progress.jsonl",
+        ROOT / "evidence" / "hil" / "proof-of-life-attempt-1-progress.jsonl.sha256",
         ROOT / "specs" / "traceability" / "requirements.csv",
     ]
     missing = [str(path.relative_to(ROOT)) for path in required if not path.is_file()]
@@ -155,6 +159,8 @@ def docs_check() -> None:
         "encounter-attempt-3-failure.json",
         "encounter-attempt-3-watchdog.json",
         "encounter-attempt-3-progress.jsonl",
+        "proof-of-life-attempt-1-failure.json",
+        "proof-of-life-attempt-1-progress.jsonl",
     ):
         evidence_path = ROOT / "evidence" / "hil" / evidence_name
         expected_hash = (

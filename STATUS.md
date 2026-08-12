@@ -24,9 +24,9 @@ dashboard while keeping locomotion and every physical operation separately gated
 | R2-001 / single BLE owner | in_progress | `r2_runtime.ble_owner.BleOwner` | Simulation verified; real process/HIL pending |
 | R2-002, R2-003 / capability probe | in_progress | `evidence/hil/cycle-1-stop-timeout.json` | Firmware observed; stop and optional actions incomplete |
 | R2-004 / reconnect no-resume | pass | `test_link_loss_and_reconnect_do_not_resume` | Simulation evidence |
-| R2-008 / bounded expressions | in_progress | `proof-of-life-sim`, expression tests | Simulation passes; one authorized HIL run pending |
-| R2-012 / Safari PWA | in_progress | `r2-runtime/tests/test_webapp.py` | Read-only portrait dashboard complete; Pi/browser/auth/control gates pending |
-| R2-014 / distinct health | in_progress | `r2-runtime/tests/test_system_status.py` | Collector and issue rules pass; target-host snapshot pending |
+| R2-008 / bounded expressions | in_progress | proof-of-life simulation and failed HIL report | HIL failed before expression start; no primitive issued |
+| R2-012 / Safari PWA | in_progress | `https://raspberrypi.local/R2D2/` | Read-only portrait dashboard live; auth/control gates pending |
+| R2-014 / distinct health | pass | live dashboard status plus collector tests | Target-host Pi/R2 status and issue highlighting verified |
 | Gate P1 / five cycles | incomplete | five simulation cycles | Five real HIL cycles required |
 | Gate P1 / 30-minute session | incomplete | 1,800-second virtual soak | Real stationary HIL session required |
 | Gate P1 / bounded movement | incomplete | none | Explicit motion authorization and preflight required |
@@ -170,6 +170,16 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 - An original X-wing-console-inspired portrait PWA now provides local R2 binary/
   Basic dialogue, animated decorative waveforms, and uncached ten-second status
   snapshots. The page is read-only and has no hardware command endpoint.
+- Immutable Pi release `7ba7239` now serves `/R2D2/`; Apache syntax, private-LAN
+  access over IPv4/IPv6, security headers, base redirect, status response, and
+  the sandboxed ten-second refresher passed. Release `7adeab4` is retained for
+  rollback.
+- The one authorized proof-of-life HIL run connected and passed identity/battery
+  gates, then failed with `EOFError` before `head_checked` or
+  `expression_started`. No LED, audio, dome-set, drive, heading, leg, or animation
+  primitive was issued. Disconnect completion was not journaled; the external
+  watchdog terminated the process, Bluetooth was powered off, no connection or
+  HIL process remained, and no retry occurred. Operator observation is pending.
 
 ## Remaining gate items
 
@@ -207,15 +217,16 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 
 ```text
 python scripts/tasks.py bootstrap -> pass, 2026-08-11
-python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 46 source files
+python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 53 source files
 python scripts/tasks.py check -> pass; quality, generated-client drift, boundaries, and 2 isolated product suites
 python scripts/tasks.py contract -> pass; 8 contract tests
 python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, final safe_hold
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 103 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 114 primary suite tests plus isolated standalone repetitions
 python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
+python scripts/tasks.py proof-of-life-sim -> pass; seeded sound, LED flashes, bounded dome sweep, offline
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off
@@ -232,20 +243,22 @@ Pi encounter staging -> pass; 6 hashes/versions verified, default HIL refusal be
 Pi progress staging 8c5bae3 -> pass; 5 source hashes matched, offline recovery passed, Bluetooth blocked
 Pi watchdog staging 7c90a1f -> pass; 3 hashes matched, default refused, Bluetooth blocked
 stationary droid encounter attempt 1 -> expression observed; timed out, normal final state, not a passing cycle
+Pi dashboard deployment -> pass; active immutable release 7ba7239, HTTPS page/status and timer healthy
+stationary proof-of-life attempt 1 -> failed before expression start; watchdog cleanup, no retry
 ```
 
 ## Hardware state
 
 - Real R2 movement authorized for next run: no
-- One stationary proof-of-life expression authorized for next run: yes; current operator preflight confirmed
-- Last known droid state: disconnected, stationary, silent, and all LEDs off per operator confirmation
+- One stationary proof-of-life expression authorized for next run: no; authorization consumed
+- Last known droid state: controller powered off with no BLE connection or HIL process; direct physical observation pending
 - Capability profile: partial; firmware/identity/battery/advertised telemetry observed
 - Hardware evidence category: target-host import, HIL discovery, and failed stationary probe
 
 ## Exact next task
 
-Commit and stage the simulation-verified proof-of-life/dashboard release on the
-Pi, validate the Apache/systemd rollback deployment, then run exactly one bounded
-stationary proof of life under the fresh operator authorization and preflight.
-Do not retry after timeout or anomaly. Locomotion and the stop-response bench
-remain unauthorized while charging.
+Obtain the operator's direct observation of proof-of-life attempt 1: whether any
+sound, dome movement, or LED activity occurred; whether base, legs, heading, or
+location changed; and R2's final physical state. Do not retry. Continue the
+response-policy diagnosis in simulation only. Locomotion and the stop-response
+bench remain unauthorized while charging.
