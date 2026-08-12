@@ -64,6 +64,8 @@
   cleanup, and update checkout/setup-python to their Node 24 action releases.
 - Verify the corrected GitHub Actions simulation workflow passes on the hosted
   Python 3.11 runner with hardware-capable paths statically excluded.
+- Pin checkout and setup-python actions to immutable commits resolved from their
+  official v6 tags, and reject floating action tags in the CI safety guard.
 
 ## 0.1.0 - 2026-08-11
 

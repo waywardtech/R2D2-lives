@@ -86,6 +86,8 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   configured for a dependency-free workflow. The cache was removed and official
   checkout/setup actions were advanced to their Node 24 releases. The corrected
   hosted run passed all simulation-only jobs.
+- Hosted third-party actions are pinned to immutable commits resolved from the
+  official checkout/setup-python v6 tags; the CI guard rejects floating major tags.
 
 ## Remaining gate items
 

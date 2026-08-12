@@ -43,3 +43,4 @@ TEST-001,P1,pass,automated,.github/workflows/ci.yml,"Hosted Python 3.11 CI runs 
 SAFE-003,P1,pass,automated,scripts/verify_ci_safety.py,"CI guard rejects HIL entry points hardware identity/arm variables Bluetooth SSH sudo and self-hosted runners"
 TEST-001,P1,in_progress,hosted_ci,https://github.com/waywardtech/R2D2-lives/actions/runs/31550340841,"All steps ran but setup-python pip cache cleanup failed because dependency-free CI created no cache directory; corrected rerun pending"
 TEST-001,P1,pass,hosted_ci,https://github.com/waywardtech/R2D2-lives/actions/runs/31550425423,"Corrected Python 3.11 simulation CI passed boundaries contracts 64 tests deterministic smoke P1 simulation docs evidence and CI safety guard"
+SAFE-003,P1,pass,inspection,.github/workflows/ci.yml,"Official checkout and setup-python v6 tags resolved and pinned by full commit SHA; guard rejects floating action tags"

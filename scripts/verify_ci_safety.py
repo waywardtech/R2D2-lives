@@ -9,8 +9,8 @@ WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 
 REQUIRED = (
     "runs-on: ubuntu-latest",
-    "uses: actions/checkout@v6",
-    "uses: actions/setup-python@v6",
+    "uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6",
+    "uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6",
     "python-version: \"3.11\"",
     "python scripts/tasks.py test",
     "python scripts/tasks.py p1-sim",
@@ -26,6 +26,8 @@ BANNED = (
     "scp ",
     "sudo ",
     "cache: pip",
+    "uses: actions/checkout@v",
+    "uses: actions/setup-python@v",
 )
 
 
