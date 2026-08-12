@@ -128,6 +128,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   hashes matched; the offline absent-journal recovery returned
   `watchdog_timeout`/`no_progress`. Bluetooth stayed soft-blocked and no droid
   discovery, connection, command, or actuation occurred.
+- A separately armed external encounter watchdog now owns the 20-to-120-second
+  child bound. It refuses stale output paths, automatically converts a timeout
+  journal into immutable evidence, and states that BLE disconnect remains
+  unverified and operator confirmation is required after process termination.
+  Normal child exits pass through unchanged. This path is simulation-tested only.
 
 ## Remaining gate items
 
@@ -165,14 +170,14 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 
 ```text
 python scripts/tasks.py bootstrap -> pass, 2026-08-11
-python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 44 source files
+python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 46 source files
 python scripts/tasks.py check -> pass; quality, generated-client drift, boundaries, and 2 isolated product suites
 python scripts/tasks.py contract -> pass; 8 contract tests
 python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, final safe_hold
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 95 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 100 primary suite tests plus isolated standalone repetitions
 python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
@@ -200,7 +205,7 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 ## Exact next task
 
 Do not retry the live session under the prior authorization. The durable progress
-checkpoint is deployed and ready, but a new hardware run requires new explicit
-authorization and a fresh physical preflight. Until then, continue Phase 1 with
-simulation-only persistent-session watchdog and recovery coverage. The
-stop-response bench remains blocked while charging.
+checkpoint is deployed; the new external watchdog remains workstation-only until
+its full automated gate and hosted CI pass. A future hardware run still requires
+new explicit authorization and a fresh physical preflight. The stop-response
+bench remains blocked while charging.

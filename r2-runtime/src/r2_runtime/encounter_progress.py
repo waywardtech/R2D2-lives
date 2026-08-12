@@ -178,6 +178,9 @@ def build_encounter_watchdog_evidence(
         "marker_count": len(snapshot),
         "completed_reactions": completed_reactions,
         "journal_integrity": "verified" if journal_present else "absent",
+        "process_terminated": True,
+        "ble_disconnect_verified": False,
+        "operator_state_confirmation_required": True,
         "movement_performed": False,
         "device_identity_persisted": False,
     }

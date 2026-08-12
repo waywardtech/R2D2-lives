@@ -80,6 +80,9 @@
 - Validate encounter journals as legal state-machine prefixes and convert a
   watchdog-truncated or absent journal into immutable, deterministic,
   identity-free stall evidence without promoting it to a passing HIL cycle.
+- Add a separately armed external HIL watchdog that refuses reused evidence,
+  bounds and terminates one fixed encounter child, automatically classifies a
+  timeout, and never equates process termination with verified BLE cleanup.
 
 ## 0.1.0 - 2026-08-11
 

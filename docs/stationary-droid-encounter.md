@@ -69,6 +69,23 @@ evidence. Run it under an external process watchdog on the Pi because the pinned
 library synchronously waits for command responses and the charging firmware has
 previously timed out on the final motor-OFF acknowledgement.
 
+The reviewed external wrapper is also separately disabled. For a newly
+authorized run, the operator supplies
+`R2_ENCOUNTER_WATCHDOG_TOKEN=AUTHORIZE_WATCHDOG_STATIONARY_ENCOUNTER` and invokes:
+
+```text
+python scripts/hil_watch_stationary_droid_encounter.py --authorize-watchdog-run --timeout-seconds 40
+```
+
+It refuses reused journal/evidence paths before starting the child. A normal
+child exit is passed through without creating timeout evidence. On timeout it
+terminates the child, escalates to a kill only if the five-second termination
+grace also expires, validates the durable journal, and writes the immutable
+sanitized watchdog report automatically. The report explicitly leaves BLE
+disconnect unverified and requires operator state confirmation; process
+termination is not proof of safe physical cleanup. Controller-level cleanup and
+zero residual-connection verification remain operator steps.
+
 This is expression-capability evidence, not permission to advance Gate P1 or a
 claim that stock animations are safe.
 
@@ -102,7 +119,7 @@ After a watchdog terminates the process, classify the journal before any retry:
 python scripts/classify_encounter_watchdog.py --progress <progress.jsonl> --output <evidence.json>
 ```
 
-The offline command validates the exact journal state-machine prefix, sequence,
+The offline recovery command validates the exact journal state-machine prefix, sequence,
 stage-specific value types, reaction numbering, and terminal ordering. Invalid
 or tampered input fails without producing a report. A valid or absent journal
 produces immutable, deterministic timeout evidence containing only the last
