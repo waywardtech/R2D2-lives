@@ -75,6 +75,8 @@
   primitives; exclude unverified full animations and add a separately armed HIL run.
 - Add a Pi-only, single-R2 in-memory identity launcher; record the first live
   encounter as indeterminate after watchdog expiry and controller-level cleanup.
+- Add append-only, fsynced, privacy-safe encounter stage markers so watchdog
+  termination preserves the last completed scan/connect/battery/expression/cleanup stage.
 
 ## 0.1.0 - 2026-08-11
 

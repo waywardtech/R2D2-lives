@@ -61,6 +61,35 @@ class DroidEncounterSessionTest(unittest.TestCase):
             run_droid_encounter_session(owner, driver, DroidEncounterChat(), max_reactions=6)
         self.assertEqual(backend.calls, [])
 
+    def test_progress_identifies_every_completed_stage_without_identity(self) -> None:
+        backend, driver, owner = self.make_session()
+        markers: list[tuple[str, dict[str, object]]] = []
+        run_droid_encounter_session(
+            owner,
+            driver,
+            DroidEncounterChat(),
+            max_reactions=2,
+            stage_sink=lambda stage, detail: markers.append((stage, dict(detail))),
+        )
+        self.assertEqual(
+            [stage for stage, _ in markers],
+            [
+                "scan_started",
+                "scan_completed",
+                "connect_started",
+                "connect_completed",
+                "battery_checked",
+                "expression_started",
+                "expression_completed",
+                "expression_started",
+                "expression_completed",
+                "disconnect_started",
+                "disconnect_completed",
+                "session_completed",
+            ],
+        )
+        self.assertNotIn("identity", str(markers).lower())
+
 
 if __name__ == "__main__":
     unittest.main()

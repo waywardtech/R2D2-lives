@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "r2-runtime" / "src"))
 from r2_runtime.ble_owner import BleOwner
 from r2_runtime.drivers import Spherov2R2Driver
 from r2_runtime.encounter_session import run_droid_encounter_session
+from r2_runtime.encounter_progress import DurableEncounterProgress
 from r2_runtime.encounters import DroidEncounterChat, allowed_audio_names
 from r2_runtime.hil_preflight import validate_stationary_encounter_preflight
 from r2_runtime.recording import build_hil_failure_evidence, write_immutable_json
@@ -51,12 +52,16 @@ def main() -> None:
     backend = Spherov2LibraryBackend(policy=policy)
     driver = Spherov2R2Driver(backend=backend, configured_identity=preflight.identity)
     owner = BleOwner(driver)
+    progress_path = os.environ.get("R2_ENCOUNTER_PROGRESS_PATH")
+    progress = DurableEncounterProgress(Path(progress_path)) if progress_path else None
+    stage_sink = progress.record if progress is not None else None
     try:
         report = run_droid_encounter_session(
             owner,
             driver,
             DroidEncounterChat(seed=args.seed),
             max_reactions=preflight.max_reactions,
+            stage_sink=stage_sink,
         )
     except Exception as error:
         failure = build_hil_failure_evidence(

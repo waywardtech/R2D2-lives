@@ -85,3 +85,11 @@ expression was seen or heard and that R2 ended stationary, silent, and with its
 normal LED state. Because the confirmation did not distinguish head, LED, and
 audio primitives individually and no report was produced, this remains a timed-
 out characterized attempt rather than a passing HIL cycle.
+
+After this attempt, the session gained an append-only progress journal. Each
+stage is flushed and fsynced before the next vendor operation so an external
+watchdog still leaves the last completed stage. Records contain only sequence,
+stage, droid-class count, battery-safe boolean, and reaction number. Device
+identity, BLE address, exception detail, semantic/audio selection, and packet
+data are forbidden. This journal is simulation-tested but was not deployed for
+the first live attempt.

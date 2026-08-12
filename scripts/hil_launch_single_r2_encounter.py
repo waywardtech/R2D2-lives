@@ -20,6 +20,7 @@ def main() -> None:
         raise SystemExit(f"expected exactly one R2-D2 advertisement; observed {len(toys)}")
     os.environ["R2_DEVICE_IDENTITY"] = toys[0].name
     os.environ["R2_ENCOUNTER_ARM_TOKEN"] = "AUTHORIZE_STATIONARY_HEAD_AUDIO"
+    os.environ["R2_ENCOUNTER_PROGRESS_PATH"] = os.fspath(ROOT / "encounter-progress.jsonl")
     sys.argv = [
         "hil_stationary_droid_encounter.py",
         "--authorize-stationary-encounter",

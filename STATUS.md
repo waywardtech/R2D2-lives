@@ -113,6 +113,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   confirmed an expression was seen/heard and that R2 ended stationary, silent,
   and in its normal LED state. Individual primitive completion is not known, and
   the timed-out session does not count as a passing HIL cycle.
+- Durable append-only encounter progress now records privacy-safe, fsynced stage
+  markers around scan, connection, battery, every reaction, disconnect, failure,
+  and completion. It rejects identity, addresses, exception text, unknown fields,
+  and sequence tampering so future watchdog diagnosis does not depend on a final
+  report. This improvement is simulation-verified and has not been run on hardware.
 
 ## Remaining gate items
 
@@ -150,14 +155,14 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 
 ```text
 python scripts/tasks.py bootstrap -> pass, 2026-08-11
-python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 41 source files
+python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 42 source files
 python scripts/tasks.py check -> pass; quality, generated-client drift, boundaries, and 2 isolated product suites
 python scripts/tasks.py contract -> pass; 7 contract tests
 python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, final safe_hold
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 82 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 86 primary suite tests plus isolated standalone repetitions
 python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
@@ -182,6 +187,6 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 
 ## Exact next task
 
-Do not retry the live session. Add stage-level durable observability in
-simulation before considering another separately authorized HIL run. The
-stop-response bench remains blocked while charging.
+Do not retry the live session under the prior authorization. The next hardware
+run requires a new explicit authorization after deploying the durable progress
+checkpoint. The stop-response bench remains blocked while charging.
