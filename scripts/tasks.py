@@ -1,4 +1,4 @@
-"""Stable, dependency-free Phase 0 task entry points."""
+"""Stable Phase 0 task entry points."""
 
 from __future__ import annotations
 
@@ -10,7 +10,6 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT_SOURCES = (
@@ -41,7 +40,25 @@ def bootstrap() -> None:
     print("Python 3.11 available; Phase 0 has no third-party runtime dependencies.")
 
 
+def quality() -> None:
+    _run([sys.executable, "-m", "ruff", "format", "--check", "."])
+    _run([sys.executable, "-m", "ruff", "check", "."])
+    _run(
+        [
+            sys.executable,
+            "-m",
+            "mypy",
+            "protocol/src",
+            "r2-runtime/src",
+            "bat-space-modeler/src",
+            "integration-lab",
+            "scripts",
+        ]
+    )
+
+
 def check() -> None:
+    quality()
     ok = compileall.compile_dir(ROOT / "protocol", quiet=1)
     ok &= compileall.compile_dir(ROOT / "r2-runtime", quiet=1)
     ok &= compileall.compile_dir(ROOT / "bat-space-modeler", quiet=1)
@@ -53,7 +70,10 @@ def check() -> None:
 
 
 def contract() -> None:
-    _run([sys.executable, "-m", "unittest", "discover", "-s", "protocol/tests", "-v"], paths=(PROJECT_SOURCES[0],))
+    _run(
+        [sys.executable, "-m", "unittest", "discover", "-s", "protocol/tests", "-v"],
+        paths=(PROJECT_SOURCES[0],),
+    )
 
 
 def sim_smoke() -> None:
@@ -74,6 +94,7 @@ def test() -> None:
 def docs_check() -> None:
     required = [
         ROOT / "AGENTS.md",
+        ROOT / "requirements-dev.lock",
         ROOT / "STATUS.md",
         ROOT / "CHANGELOG.md",
         ROOT / "docs" / "phase-0-operator.md",
@@ -96,7 +117,9 @@ def docs_check() -> None:
     for phrase in ("Phase 0", "Simulation", "Real R2 movement authorized for next run: no"):
         if phrase not in status:
             raise SystemExit(f"STATUS.md missing required phrase: {phrase}")
-    json.loads((ROOT / "protocol" / "schema" / "sap-common.schema.json").read_text(encoding="utf-8"))
+    json.loads(
+        (ROOT / "protocol" / "schema" / "sap-common.schema.json").read_text(encoding="utf-8")
+    )
     hil_evidence = ROOT / "evidence" / "hil" / "cycle-1-stop-timeout.json"
     expected_hil_hash = (
         (ROOT / "evidence" / "hil" / "cycle-1-stop-timeout.json.sha256")
@@ -122,6 +145,7 @@ def docs_check() -> None:
 
 TASKS = {
     "bootstrap": bootstrap,
+    "quality": quality,
     "check": check,
     "contract": contract,
     "sim-smoke": sim_smoke,

@@ -14,9 +14,7 @@ class StopBenchSessionResult:
     battery_state: str
 
 
-def run_stop_bench_session(
-    owner: BleOwner, driver: Spherov2R2Driver
-) -> StopBenchSessionResult:
+def run_stop_bench_session(owner: BleOwner, driver: Spherov2R2Driver) -> StopBenchSessionResult:
     """Connect, inspect battery, then issue the owner's one disconnect stop."""
 
     error_type: str | None = None

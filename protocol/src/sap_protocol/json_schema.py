@@ -61,6 +61,8 @@ class SchemaValidator:
         value: Any = self.root
         for token in fragment.lstrip("/").split("/"):
             value = value[token.replace("~1", "/").replace("~0", "~")]
+        if not isinstance(value, dict):
+            raise ValidationError(f"schema reference is not an object: {reference}")
         return value
 
     def _matches(self, instance: Any, schema: Mapping[str, Any], path: str) -> bool:
@@ -139,4 +141,3 @@ class SchemaValidator:
                 raise ValueError
         except (ValueError, AttributeError) as exc:
             raise ValidationError(f"{path}: invalid {format_name}") from exc
-

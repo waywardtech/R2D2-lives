@@ -20,7 +20,9 @@ class SimulationRoundTripTest(unittest.TestCase):
             )
         )
 
-    def command(self, *, command_id: int = 100, key: str = "key", stale: bool = False) -> CommandRequest:
+    def command(
+        self, *, command_id: int = 100, key: str = "key", stale: bool = False
+    ) -> CommandRequest:
         delta = timedelta(seconds=-1 if stale else 30)
         return CommandRequest(
             command_id=str(UUID(int=command_id)),

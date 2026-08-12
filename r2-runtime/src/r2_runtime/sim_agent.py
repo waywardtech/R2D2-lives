@@ -41,12 +41,16 @@ class SimAgentServer:
 
     def create_session(self, request: SessionRequest) -> SessionResponse:
         common = tuple(sorted(set(request.protocol_versions) & {SAP_VERSION}))
-        rejected = tuple(cap for cap in request.required_capabilities if cap not in self.capabilities)
+        rejected = tuple(
+            cap for cap in request.required_capabilities if cap not in self.capabilities
+        )
         if not common or rejected:
             raise ValueError(f"sap.capability_missing:{','.join(rejected)}")
         session_id = self._next_uuid()
         self._sessions.add(session_id)
-        expires = datetime(2030, 1, 1, tzinfo=timezone.utc) + timedelta(seconds=request.requested_duration_s)
+        expires = datetime(2030, 1, 1, tzinfo=timezone.utc) + timedelta(
+            seconds=request.requested_duration_s
+        )
         return SessionResponse(
             session_id=session_id,
             selected_protocol_version=common[-1],
@@ -76,7 +80,9 @@ class SimAgentServer:
 
     def _terminal(self, request: CommandRequest, state: str, reason: str | None) -> CommandStatus:
         updated_at = "2030-01-01T00:00:00Z"
-        status = CommandStatus(request.command_id, state, updated_at, reason, {"safe_state": "safe_hold"})
+        status = CommandStatus(
+            request.command_id, state, updated_at, reason, {"safe_state": "safe_hold"}
+        )
         self._statuses[request.command_id] = status
         pose = {
             "frame_id": "urn:sap:frame:agent:simulation:r2:odom",

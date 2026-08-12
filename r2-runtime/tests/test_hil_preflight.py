@@ -88,11 +88,22 @@ class HilPreflightTest(unittest.TestCase):
             )
 
     def test_stop_bench_requires_external_arm_clock_and_identity(self) -> None:
-        args = bench_arguments(**{name: True for name in (
-            "authorize_stop_response_bench", "operator_present", "device_inspected",
-            "temperature_ok", "keepout_clear", "emergency_stop_ready",
-            "unplugged_from_charger", "physically_contained", "second_go_confirmed",
-        )})
+        args = bench_arguments(
+            **{
+                name: True
+                for name in (
+                    "authorize_stop_response_bench",
+                    "operator_present",
+                    "device_inspected",
+                    "temperature_ok",
+                    "keepout_clear",
+                    "emergency_stop_ready",
+                    "unplugged_from_charger",
+                    "physically_contained",
+                    "second_go_confirmed",
+                )
+            }
+        )
         environment = {
             "R2_DEVICE_IDENTITY": "private",
             "R2_STOP_BENCH_ARM_TOKEN": "AUTHORIZE_ONE_RAW_MOTOR_OFF",

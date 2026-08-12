@@ -20,4 +20,3 @@ class R2Config:
         if config.droid_driver != "sim":
             raise ValueError("Phase 0 permits only the simulation droid driver")
         return config
-

@@ -28,9 +28,7 @@ class StopBenchPreflight:
     clock_uncertainty_ms: float
 
 
-def validate_stationary_preflight(
-    args: argparse.Namespace, environment: Mapping[str, str]
-) -> str:
+def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
     missing = [name.replace("_", "-") for name in PREFLIGHT_FLAGS if not getattr(args, name)]

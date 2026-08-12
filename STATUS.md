@@ -91,6 +91,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 - Offline repository hygiene now scans tracked files for credential/private-key
   formats, BLE addresses, private advertised identities, and forbidden credential
   filenames, and verifies every locked hardware dependency has license notices.
+- An exact, hash-locked Ruff 0.15.22 and mypy 2.3.0 toolchain now runs in local
+  `check`/`test` and hosted CI. Formatting, lint, and strict typing pass across
+  36 source files; malformed JSON evidence, manifests, and schema references
+  now fail at their typed boundaries.
 
 ## Remaining gate items
 
@@ -128,14 +132,14 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 
 ```text
 python scripts/tasks.py bootstrap -> pass, 2026-08-11
-python scripts/tasks.py check -> pass; generated-client drift, boundaries, and 2 isolated product suites
+python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 36 source files
+python scripts/tasks.py check -> pass; quality, generated-client drift, boundaries, and 2 isolated product suites
 python scripts/tasks.py contract -> pass; 7 contract tests
 python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, final safe_hold
-python scripts/tasks.py test -> pass; 19 tests plus isolated standalone repetitions
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 64 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 67 primary suite tests plus isolated standalone repetitions
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off
@@ -143,6 +147,7 @@ stationary HIL discovery attempt 1 -> blocked; no R2 advertisement, no connectio
 stationary HIL discovery attempt 2 -> pass; one R2 and one BB-8 type-filtered, no connection/command
 stationary HIL probe attempt 1 -> failed; stop acknowledgement timeout, BLE disconnected, no movement
 GitHub Actions simulation-ci run 31550425423 -> pass; Python 3.11 hosted runner, no HIL/hardware path
+GitHub Actions simulation-ci run 31551031074 -> pass; repository hygiene and immutable action pins
 ```
 
 ## Hardware state

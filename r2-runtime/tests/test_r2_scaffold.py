@@ -6,7 +6,11 @@ from unittest.mock import patch
 
 from r2_runtime.config import R2Config
 from r2_runtime.drivers import HardwareUnavailableError, SimDroidDriver, Spherov2R2Driver
-from r2_runtime.spatial import NullSpatialProviderClient, SimSpatialProviderClient, select_spatial_provider
+from r2_runtime.spatial import (
+    NullSpatialProviderClient,
+    SimSpatialProviderClient,
+    select_spatial_provider,
+)
 
 
 class R2ScaffoldTest(unittest.TestCase):
@@ -14,12 +18,16 @@ class R2ScaffoldTest(unittest.TestCase):
         with patch.dict(os.environ, {}, clear=True):
             config = R2Config.from_env()
         self.assertEqual(config.droid_driver, "sim")
-        self.assertIsInstance(select_spatial_provider(config.spatial_provider), NullSpatialProviderClient)
+        self.assertIsInstance(
+            select_spatial_provider(config.spatial_provider), NullSpatialProviderClient
+        )
 
     def test_provider_is_selected_by_configuration(self) -> None:
         with patch.dict(os.environ, {"R2_SPATIAL_PROVIDER": "sim"}, clear=True):
             config = R2Config.from_env()
-        self.assertIsInstance(select_spatial_provider(config.spatial_provider), SimSpatialProviderClient)
+        self.assertIsInstance(
+            select_spatial_provider(config.spatial_provider), SimSpatialProviderClient
+        )
 
     def test_no_real_driver_can_be_selected(self) -> None:
         with patch.dict(os.environ, {"R2_DROID_DRIVER": "ble"}, clear=True):

@@ -43,4 +43,7 @@ def read_verified_json(path: Path, expected_sha256: str) -> dict[str, Any]:
     actual = hashlib.sha256(encoded).hexdigest()
     if actual != expected_sha256:
         raise ValueError("capability evidence hash mismatch")
-    return json.loads(encoded)
+    payload = json.loads(encoded)
+    if not isinstance(payload, dict):
+        raise ValueError("capability evidence root must be an object")
+    return payload

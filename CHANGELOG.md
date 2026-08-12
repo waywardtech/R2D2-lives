@@ -68,6 +68,8 @@
   official v6 tags, and reject floating action tags in the CI safety guard.
 - Add an offline tracked-file scan for secret/private-key formats, BLE/device
   identities, forbidden credential files, and locked dependency license coverage.
+- Add a cross-platform SHA-256-locked Ruff/mypy toolchain and require formatting,
+  lint, and strict typing in local checks and hosted CI; harden typed JSON roots.
 
 ## 0.1.0 - 2026-08-11
 

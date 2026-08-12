@@ -28,4 +28,3 @@ for project, peer in (("r2-runtime", "bat-space-modeler"), ("bat-space-modeler",
             check=True,
         )
         print(f"{project}: standalone tests passed with {peer} absent")
-

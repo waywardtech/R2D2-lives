@@ -7,8 +7,11 @@ dependencies = []
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = ["protocol/src/sap_protocol/generated.py"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/hil_*.py" = ["E402"] # Local source paths are installed before HIL-only imports.
 
 [tool.mypy]
 python_version = "3.11"
 strict = true
-

@@ -47,7 +47,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _clock_id() -> str:
-    boot_id = Path("/proc/sys/kernel/random/boot_id").read_text(encoding="ascii").strip().replace("-", "")
+    boot_id = (
+        Path("/proc/sys/kernel/random/boot_id").read_text(encoding="ascii").strip().replace("-", "")
+    )
     if len(boot_id) != 32 or any(character not in "0123456789abcdef" for character in boot_id):
         raise RuntimeError("opaque boot clock identity unavailable")
     return "clock-" + boot_id
@@ -97,7 +99,10 @@ def main() -> None:
         print(json.dumps({"terminal": "failed", "report_sha256": digest}, sort_keys=True))
         raise SystemExit(2)
 
-    print("R2 is disconnected. Verify normal physical state and zero unexpected wheel activity.", flush=True)
+    print(
+        "R2 is disconnected. Verify normal physical state and zero unexpected wheel activity.",
+        flush=True,
+    )
     confirmation = input("Type PHYSICAL_NORMAL exactly to finalize: ").strip()
     payload = recorder.finalize(
         owner_state=owner.state.value,
@@ -109,7 +114,12 @@ def main() -> None:
     )
     classification = classify_stop_response_trace(payload)
     digest = write_immutable_json(args.output, payload)
-    print(json.dumps({"classification": classification, "report_sha256": digest, "error_type": error_type}, sort_keys=True))
+    print(
+        json.dumps(
+            {"classification": classification, "report_sha256": digest, "error_type": error_type},
+            sort_keys=True,
+        )
+    )
     if classification != "acknowledged_success":
         raise SystemExit(2)
 

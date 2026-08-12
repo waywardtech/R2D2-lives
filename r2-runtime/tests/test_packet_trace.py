@@ -35,14 +35,25 @@ class PacketTraceTest(unittest.TestCase):
     def test_matching_success_is_sanitized_and_classified(self) -> None:
         recorder = self.make_recorder()
         recorder.record(
-            direction="tx", did=22, cid=1, protocol_sequence=7, flags=10,
+            direction="tx",
+            did=22,
+            cid=1,
+            protocol_sequence=7,
+            flags=10,
             encoded_packet=b"private outgoing bytes",
         )
         recorder.record(
-            direction="rx", did=22, cid=1, protocol_sequence=7, flags=1,
-            encoded_packet=b"private response bytes", error="success",
+            direction="rx",
+            did=22,
+            cid=1,
+            protocol_sequence=7,
+            flags=1,
+            encoded_packet=b"private response bytes",
+            error="success",
         )
-        payload = recorder.finalize(owner_state="offline", ble_connections=0, physical_state="normal")
+        payload = recorder.finalize(
+            owner_state="offline", ble_connections=0, physical_state="normal"
+        )
         self.assertEqual(classify_stop_response_trace(payload), "acknowledged_success")
         serialized = str(payload)
         self.assertNotIn("private outgoing bytes", serialized)
@@ -52,26 +63,43 @@ class PacketTraceTest(unittest.TestCase):
     def test_timeout_remains_unconfirmed_and_retry_is_rejected(self) -> None:
         recorder = self.make_recorder()
         arguments = dict(
-            direction="tx", did=22, cid=1, protocol_sequence=9, flags=10,
+            direction="tx",
+            did=22,
+            cid=1,
+            protocol_sequence=9,
+            flags=10,
             encoded_packet=b"one stop command",
         )
         recorder.record(**arguments)
         with self.assertRaisesRegex(ValueError, "retry is prohibited"):
             recorder.record(**arguments)
-        payload = recorder.finalize(owner_state="offline", ble_connections=0, physical_state="normal")
+        payload = recorder.finalize(
+            owner_state="offline", ble_connections=0, physical_state="normal"
+        )
         self.assertEqual(classify_stop_response_trace(payload), "stop_unconfirmed")
 
     def test_error_cleanup_and_tampering_classification(self) -> None:
         recorder = self.make_recorder()
         recorder.record(
-            direction="tx", did=22, cid=1, protocol_sequence=2, flags=10,
+            direction="tx",
+            did=22,
+            cid=1,
+            protocol_sequence=2,
+            flags=10,
             encoded_packet=b"command",
         )
         recorder.record(
-            direction="rx", did=22, cid=1, protocol_sequence=2, flags=1,
-            encoded_packet=b"error", error="command_failed",
+            direction="rx",
+            did=22,
+            cid=1,
+            protocol_sequence=2,
+            flags=1,
+            encoded_packet=b"error",
+            error="command_failed",
         )
-        payload = recorder.finalize(owner_state="offline", ble_connections=0, physical_state="normal")
+        payload = recorder.finalize(
+            owner_state="offline", ble_connections=0, physical_state="normal"
+        )
         self.assertEqual(classify_stop_response_trace(payload), "acknowledged_error")
         bad_cleanup = deepcopy(payload)
         bad_cleanup["cleanup"]["ble_connections"] = 1
@@ -88,7 +116,11 @@ class PacketTraceTest(unittest.TestCase):
     def test_non_stop_command_is_rejected_before_recording(self) -> None:
         with self.assertRaisesRegex(ValueError, "only raw-motor"):
             self.make_recorder().record(
-                direction="tx", did=22, cid=7, protocol_sequence=1, flags=10,
+                direction="tx",
+                did=22,
+                cid=7,
+                protocol_sequence=1,
+                flags=10,
                 encoded_packet=b"heading-bearing command",
             )
 

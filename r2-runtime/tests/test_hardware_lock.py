@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from r2_runtime.hardware_lock import parse_lock, verify_metadata
+from r2_runtime.hardware_lock import load_manifest, parse_lock, verify_metadata
 
 PROJECT = Path(__file__).resolve().parents[1]
 DEFAULT_LOCK = PROJECT / "requirements-hardware-pi.lock"
@@ -31,6 +31,13 @@ class HardwareLockTest(unittest.TestCase):
             path.write_text("bleak==0.21.1\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "invalid lock line"):
                 parse_lock(path)
+
+    def test_non_object_manifest_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "manifest.json"
+            path.write_text("[]", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "root must be an object"):
+                load_manifest(path)
 
 
 if __name__ == "__main__":

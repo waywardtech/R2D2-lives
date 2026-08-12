@@ -39,6 +39,8 @@ def parse_lock(path: Path) -> dict[str, tuple[str, str]]:
 
 def load_manifest(path: Path) -> dict[str, Any]:
     manifest = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict):
+        raise ValueError("hardware manifest root must be an object")
     if manifest.get("schema_version") != 1:
         raise ValueError("unsupported hardware manifest schema")
     target = manifest.get("target", {})

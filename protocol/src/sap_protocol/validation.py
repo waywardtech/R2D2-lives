@@ -39,7 +39,13 @@ def validate_clock(value: Mapping[str, Any]) -> None:
     if not value["clock_id"]:
         raise ValidationError("clock.clock_id: empty")
     if value["sync_source"] not in {
-        "none", "system", "ntp", "ptp", "shared_audio", "measured_offset", "simulation"
+        "none",
+        "system",
+        "ntp",
+        "ptp",
+        "shared_audio",
+        "measured_offset",
+        "simulation",
     }:
         raise ValidationError("clock.sync_source: unsupported")
     if not isinstance(value["uncertainty_ms"], (int, float)) or value["uncertainty_ms"] < 0:
@@ -67,4 +73,3 @@ def validate_pose(value: Mapping[str, Any]) -> None:
     covariance = value.get("covariance_6x6")
     if covariance is not None and len(covariance) != 36:
         raise ValidationError("pose.covariance_6x6: must contain 36 values")
-

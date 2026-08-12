@@ -203,7 +203,10 @@ class Spherov2BackendTest(unittest.TestCase):
         backend.connect("D2-TEST")
         before = list(toy.calls)
         for capability in ("led.low_brightness", "head.safe_range", "audio.quiet_preview"):
-            with self.subTest(capability=capability), self.assertRaises(HardwareActionNotAuthorized):
+            with (
+                self.subTest(capability=capability),
+                self.assertRaises(HardwareActionNotAuthorized),
+            ):
                 backend.exercise_stationary(capability)
         self.assertEqual(toy.calls, before)
         backend.disconnect()
@@ -277,7 +280,9 @@ class Spherov2BackendTest(unittest.TestCase):
         backend.connect("D2-TEST")
         backend.stop()
         backend.disconnect()
-        self.assertEqual(FakeDriveCommand.encoded_data, [FakeRawMotorModes.OFF, 0, FakeRawMotorModes.OFF, 0])
+        self.assertEqual(
+            FakeDriveCommand.encoded_data, [FakeRawMotorModes.OFF, 0, FakeRawMotorModes.OFF, 0]
+        )
         self.assertIn(("execute", 22, 1, 17), toy.calls)
         payload = recorder.finalize(
             owner_state="offline", ble_connections=0, physical_state="normal"

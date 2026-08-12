@@ -19,4 +19,3 @@ class ReasoningDispatcher(Protocol):
 
 class NotificationSink(Protocol):
     def notify(self, event_type: str, message: str) -> None: ...
-

@@ -58,9 +58,7 @@ def main() -> None:
     driver = Spherov2R2Driver(backend=backend, configured_identity=identity)
     owner = BleOwner(driver)
     try:
-        report = StationaryCapabilityProbe(owner, driver).run(
-            evidence_category="HIL-stationary"
-        )
+        report = StationaryCapabilityProbe(owner, driver).run(evidence_category="HIL-stationary")
     except Exception as error:
         failure = build_hil_failure_evidence(
             error_type=type(error).__name__,

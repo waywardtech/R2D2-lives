@@ -20,4 +20,3 @@ for project, patterns in RULES.items():
 if violations:
     raise SystemExit("cross-product dependency violation:\n" + "\n".join(violations))
 print("product boundary check passed")
-

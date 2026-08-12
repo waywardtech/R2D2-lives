@@ -21,7 +21,9 @@ from r2_runtime.sim_hardware import SimSpherov2Backend
 
 
 class CapabilityProbeTest(unittest.TestCase):
-    def make_probe(self) -> tuple[SimSpherov2Backend, Spherov2R2Driver, BleOwner, StationaryCapabilityProbe]:
+    def make_probe(
+        self,
+    ) -> tuple[SimSpherov2Backend, Spherov2R2Driver, BleOwner, StationaryCapabilityProbe]:
         backend = SimSpherov2Backend()
         driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
         owner = BleOwner(driver)
@@ -139,6 +141,14 @@ class CapabilityProbeTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "hash mismatch"):
                 read_verified_json(path, "0" * 64)
             self.assertEqual(digest, hashlib.sha256(path.read_bytes()).hexdigest())
+
+    def test_verified_replay_rejects_non_object_root(self) -> None:
+        with tempfile.TemporaryDirectory() as raw_temp:
+            path = Path(raw_temp) / "report.json"
+            path.write_text("[]", encoding="utf-8")
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "root must be an object"):
+                read_verified_json(path, digest)
 
     def test_canonical_replay_fixture_is_stationary_and_safe(self) -> None:
         path = Path(__file__).parent / "fixtures" / "sim-stationary-session.json"

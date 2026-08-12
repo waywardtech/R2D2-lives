@@ -44,4 +44,5 @@ SAFE-003,P1,pass,automated,scripts/verify_ci_safety.py,"CI guard rejects HIL ent
 TEST-001,P1,in_progress,hosted_ci,https://github.com/waywardtech/R2D2-lives/actions/runs/31550340841,"All steps ran but setup-python pip cache cleanup failed because dependency-free CI created no cache directory; corrected rerun pending"
 TEST-001,P1,pass,hosted_ci,https://github.com/waywardtech/R2D2-lives/actions/runs/31550425423,"Corrected Python 3.11 simulation CI passed boundaries contracts 64 tests deterministic smoke P1 simulation docs evidence and CI safety guard"
 SAFE-003,P1,pass,inspection,.github/workflows/ci.yml,"Official checkout and setup-python v6 tags resolved and pinned by full commit SHA; guard rejects floating action tags"
-TEST-001,P1,in_progress,automated,scripts/verify_repository_hygiene.py,"Tracked secret/private-key BLE/device identity and credential-filename scan passes; all six locked dependencies have license notices; hosted run pending"
+TEST-001,P1,pass,automated,scripts/verify_repository_hygiene.py,"Tracked secret/private-key BLE/device identity and credential-filename scan passes; all six locked dependencies have license notices; hosted run 31551031074 passed"
+TEST-001,P1,pass,automated,python scripts/tasks.py quality,"Hash-locked Ruff format/lint and strict mypy pass across 36 source files; quality is required by check and test"

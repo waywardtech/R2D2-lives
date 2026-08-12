@@ -78,9 +78,7 @@ class StationarySessionRecorder:
     ) -> None:
         if not _OPAQUE_SESSION_REF.fullmatch(session_ref):
             raise ValueError("session_ref must be an opaque session token")
-        for label, value in (
-            ("evidence_category", evidence_category),
-        ):
+        for label, value in (("evidence_category", evidence_category),):
             if not _SAFE_TOKEN.fullmatch(value):
                 raise ValueError(f"{label} must be a privacy-safe token")
         if not _OPAQUE_CLOCK_ID.fullmatch(clock.clock_id):
@@ -98,11 +96,7 @@ class StationarySessionRecorder:
 
     def record_owner_event(self, event: OwnerEvent) -> None:
         state = event.state.value
-        reason = (
-            event.reason
-            if event.reason in _RECORDED_REASONS
-            else "external_reason_redacted"
-        )
+        reason = event.reason if event.reason in _RECORDED_REASONS else "external_reason_redacted"
         now = self._utc_now()
         if now.tzinfo is None or now.utcoffset() != timezone.utc.utcoffset(now):
             raise ValueError("session UTC clock must return a UTC-aware datetime")
@@ -174,7 +168,11 @@ def replay_stationary_session(payload: Mapping[str, object]) -> tuple[RecordedOw
             raise ValueError("event time must be RFC 3339 UTC")
         datetime.fromisoformat(occurred_at.replace("Z", "+00:00"))
         monotonic_ns = raw.get("monotonic_ns")
-        if isinstance(monotonic_ns, bool) or not isinstance(monotonic_ns, int) or monotonic_ns < previous_monotonic:
+        if (
+            isinstance(monotonic_ns, bool)
+            or not isinstance(monotonic_ns, int)
+            or monotonic_ns < previous_monotonic
+        ):
             raise ValueError("event monotonic time regressed")
         previous_monotonic = monotonic_ns
         raw_clock = raw.get("clock")

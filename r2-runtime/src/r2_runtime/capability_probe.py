@@ -59,7 +59,9 @@ class StationaryCapabilityProbe:
         self.owner = owner
         self.driver = driver
 
-    def run(self, *, generated_at: str | None = None, evidence_category: str = "simulation") -> CapabilityReport:
+    def run(
+        self, *, generated_at: str | None = None, evidence_category: str = "simulation"
+    ) -> CapabilityReport:
         self.owner.connect_for_stationary_probe()
         evidence: dict[str, CapabilityEvidence] = {}
         identity: Mapping[str, str] = {}
@@ -71,10 +73,12 @@ class StationaryCapabilityProbe:
             battery = self.owner.serialized(self.driver.backend.battery)
             evidence["battery.state_voltage"] = CapabilityEvidence(observed_status, dict(battery))
             battery_state = str(battery.get("state", "unknown")).lower()
-            battery_blocks_actions = (
-                evidence_category != "simulation"
-                and battery_state not in {"ok", "charged", "charging", "not_charging"}
-            )
+            battery_blocks_actions = evidence_category != "simulation" and battery_state not in {
+                "ok",
+                "charged",
+                "charging",
+                "not_charging",
+            }
             for capability in STATIONARY_CAPABILITIES[2:]:
                 if battery_blocks_actions:
                     evidence[capability] = CapabilityEvidence(
@@ -83,13 +87,13 @@ class StationaryCapabilityProbe:
                     )
                     continue
                 try:
-                    detail = self.owner.serialized(
-                        lambda capability=capability: self.driver.backend.exercise_stationary(capability)
-                    )
+
+                    def exercise(capability_name: str = capability) -> Mapping[str, object]:
+                        return self.driver.backend.exercise_stationary(capability_name)
+
+                    detail = self.owner.serialized(exercise)
                 except PermissionError as exc:
-                    evidence[capability] = CapabilityEvidence(
-                        "untested", {"reason": str(exc)}
-                    )
+                    evidence[capability] = CapabilityEvidence("untested", {"reason": str(exc)})
                 else:
                     evidence[capability] = CapabilityEvidence(observed_status, dict(detail))
             for capability in MOVEMENT_CAPABILITIES:

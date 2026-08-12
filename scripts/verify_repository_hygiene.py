@@ -16,9 +16,7 @@ SECRET_PATTERNS = {
     "GitHub token": re.compile(r"gh[pousr]_[A-Za-z0-9]{30,}"),
     "OpenAI key": re.compile(r"sk-[A-Za-z0-9]{20,}"),
     "Slack token": re.compile(r"xox[baprs]-[A-Za-z0-9-]{20,}"),
-    "BLE MAC address": re.compile(
-        r"(?i)(?<![0-9a-f])(?:[0-9a-f]{2}:){5}[0-9a-f]{2}(?![0-9a-f])"
-    ),
+    "BLE MAC address": re.compile(r"(?i)(?<![0-9a-f])(?:[0-9a-f]{2}:){5}[0-9a-f]{2}(?![0-9a-f])"),
     "R2 advertised identity": re.compile(r"\bD2-[0-9A-F]{4}\b"),
     "BB advertised identity": re.compile(r"\bBB-[0-9A-F]{4}\b"),
 }
@@ -54,17 +52,11 @@ def _verify_tracked_text() -> None:
 
 def _verify_dependency_notices() -> None:
     manifest = json.loads(
-        (ROOT / "r2-runtime" / "hardware-wheelhouse.manifest.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "r2-runtime" / "hardware-wheelhouse.manifest.json").read_text(encoding="utf-8")
     )
-    notices = (ROOT / "r2-runtime" / "THIRD_PARTY_NOTICES.md").read_text(
-        encoding="utf-8"
-    ).lower()
+    notices = (ROOT / "r2-runtime" / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8").lower()
     missing = [
-        package
-        for package in manifest["required_packages"]
-        if package.lower() not in notices
+        package for package in manifest["required_packages"] if package.lower() not in notices
     ]
     if missing:
         raise SystemExit(f"third-party notices missing locked packages: {missing}")

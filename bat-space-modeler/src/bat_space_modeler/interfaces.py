@@ -23,4 +23,3 @@ class AcousticSolver(Protocol):
 
 class WorldModelStore(Protocol):
     def publish_revision(self, manifest: Mapping[str, object]) -> str: ...
-

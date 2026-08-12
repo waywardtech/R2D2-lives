@@ -43,4 +43,3 @@ class SimSpherov2Backend:
             raise AssertionError("stationary probe attempted movement capability")
         self.calls.append(capability)
         return {"result": "simulated", "seed": self.seed}
-

@@ -15,7 +15,8 @@ class HardwareUnavailableError(RuntimeError):
 class Spherov2Backend(Protocol):
     """Narrow reviewed surface over the pinned third-party BLE library."""
 
-    library_version: str
+    @property
+    def library_version(self) -> str: ...
 
     def connect(self, configured_identity: str) -> None: ...
     def disconnect(self) -> None: ...

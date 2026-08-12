@@ -10,9 +10,19 @@ present.
 
 ## Commands
 
-On systems with GNU Make, use `make bootstrap`, `make check`, `make contract`,
-`make sim-smoke`, `make test`, and `make docs-check`. On Windows without Make,
-run the equivalent `python scripts/tasks.py <task>` command.
+Create a Python 3.11 virtual environment and install the exact, hash-verified
+quality tools before running the complete suite:
+
+```text
+python -m venv .venv
+python -m pip install --require-hashes -r requirements-dev.lock
+```
+
+Activate the environment, then on systems with GNU Make use `make bootstrap`,
+`make quality`, `make check`, `make contract`, `make sim-smoke`, `make test`, and
+`make docs-check`. On Windows without Make, run the equivalent
+`python scripts/tasks.py <task>` command. `check` and `test` enforce Ruff format,
+Ruff lint, and strict mypy checks as well as generation and product boundaries.
 
 The simulation smoke prints the fixed seed, SAP identifiers, simulation clock
 quality, duplicate-suppression result, and final `safe_hold` state. A failed or
@@ -35,4 +45,3 @@ is removal of the scaffold files. No physical device state needs recovery.
 Evidence is automated contract testing and deterministic simulation only. It is
 not HIL, bench, real-room, or evidence of physical safety or acoustic accuracy.
 Real R2 movement remains unauthorized.
-

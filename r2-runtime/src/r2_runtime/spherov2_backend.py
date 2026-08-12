@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from importlib import import_module, metadata
 from types import ModuleType
-from typing import Callable, Mapping, Protocol
+from typing import Any, Callable, Mapping, Protocol
 
 from .packet_trace import StopResponseTraceRecorder
 
@@ -19,10 +19,10 @@ class HardwareActionNotAuthorized(PermissionError):
 
 
 class StopExecutor(Protocol):
-    def __call__(self, toy: object, module_loader: Callable[[str], ModuleType]) -> None: ...
+    def __call__(self, toy: Any, module_loader: Callable[[str], ModuleType]) -> None: ...
 
 
-def _public_raw_motor_off(toy: object, module_loader: Callable[[str], ModuleType]) -> None:
+def _public_raw_motor_off(toy: Any, module_loader: Callable[[str], ModuleType]) -> None:
     controls = module_loader("spherov2.controls")
     off = controls.RawMotorModes.OFF
     toy.drive_control.set_raw_motors(off, 0, off, 0)
@@ -34,7 +34,7 @@ class TracedRawMotorOffExecutor:
     def __init__(self, recorder: StopResponseTraceRecorder) -> None:
         self.recorder = recorder
 
-    def __call__(self, toy: object, module_loader: Callable[[str], ModuleType]) -> None:
+    def __call__(self, toy: Any, module_loader: Callable[[str], ModuleType]) -> None:
         drive = module_loader("spherov2.commands.drive")
         off = drive.RawMotorModes.OFF
         packet = drive.Drive._encode(toy, 1, None, [off, 0, off, 0])
@@ -108,13 +108,15 @@ class Spherov2LibraryBackend:
         self._module_loader = module_loader
         self._version_resolver = version_resolver
         self._stop_executor = stop_executor
-        self._toy: object | None = None
+        # The third-party package is deliberately absent from the simulation
+        # environment, so its dynamic object is confined to this adapter boundary.
+        self._toy: Any | None = None
 
     @property
     def library_version(self) -> str:
         return self._version_resolver("spherov2")
 
-    def _require_toy(self) -> object:
+    def _require_toy(self) -> Any:
         if self._toy is None:
             raise RuntimeError("spherov2 backend is not connected")
         return self._toy
@@ -177,7 +179,9 @@ class Spherov2LibraryBackend:
             return {"result": "exercised", "brightness": 8, "restored": True}
         if capability == "head.safe_range":
             if not self.policy.allow_head_read:
-                raise HardwareActionNotAuthorized("head-position query was not explicitly authorized")
+                raise HardwareActionNotAuthorized(
+                    "head-position query was not explicitly authorized"
+                )
             return {"result": "read_only", "head_position": float(toy.get_head_position())}
         if capability == "audio.quiet_preview":
             if not self.policy.allow_audio_preview:

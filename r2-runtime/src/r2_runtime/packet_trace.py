@@ -17,17 +17,40 @@ _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _OPAQUE_CLOCK_ID = re.compile(r"^(?:sim-)?clock-[0-9a-f]{8,64}$")
 _SYNC_SOURCES = {"deterministic", "ntp", "chrony", "unsynchronized"}
 _RESPONSE_ERRORS = {
-    "success", "bad_device_id", "bad_command_id", "not_yet_implemented",
-    "command_is_restricted", "bad_data_length", "command_failed",
-    "bad_parameter_value", "busy", "bad_target_id", "target_unavailable",
+    "success",
+    "bad_device_id",
+    "bad_command_id",
+    "not_yet_implemented",
+    "command_is_restricted",
+    "bad_data_length",
+    "command_failed",
+    "bad_parameter_value",
+    "busy",
+    "bad_target_id",
+    "target_unavailable",
 }
 _TRACE_KEYS = {
-    "schema_version", "evidence_category", "session_ref", "trace_kind",
-    "movement_performed", "observations", "cleanup",
+    "schema_version",
+    "evidence_category",
+    "session_ref",
+    "trace_kind",
+    "movement_performed",
+    "observations",
+    "cleanup",
 }
 _OBSERVATION_KEYS = {
-    "sequence", "occurred_at", "monotonic_ns", "clock", "direction", "did",
-    "cid", "protocol_sequence", "flags", "byte_count", "packet_sha256", "error",
+    "sequence",
+    "occurred_at",
+    "monotonic_ns",
+    "clock",
+    "direction",
+    "did",
+    "cid",
+    "protocol_sequence",
+    "flags",
+    "byte_count",
+    "packet_sha256",
+    "error",
 }
 _CLOCK_KEYS = {"clock_id", "sync_source", "uncertainty_ms"}
 _CLEANUP_KEYS = {"owner_state", "ble_connections", "physical_state"}
@@ -134,7 +157,11 @@ class StopResponseTraceRecorder:
     ) -> dict[str, object]:
         if owner_state not in {state.value for state in ConnectionState}:
             raise ValueError("invalid cleanup owner state")
-        if isinstance(ble_connections, bool) or not isinstance(ble_connections, int) or ble_connections < 0:
+        if (
+            isinstance(ble_connections, bool)
+            or not isinstance(ble_connections, int)
+            or ble_connections < 0
+        ):
             raise ValueError("invalid cleanup BLE connection count")
         if physical_state not in {"normal", "unconfirmed"}:
             raise ValueError("invalid cleanup physical state")
@@ -183,7 +210,9 @@ def classify_stop_response_trace(payload: Mapping[str, object]) -> str:
         if (item.get("did"), item.get("cid")) != (22, 1):
             raise ValueError("trace contains a non-stop command")
         current_protocol_sequence = item.get("protocol_sequence")
-        if isinstance(current_protocol_sequence, bool) or not isinstance(current_protocol_sequence, int):
+        if isinstance(current_protocol_sequence, bool) or not isinstance(
+            current_protocol_sequence, int
+        ):
             raise ValueError("invalid protocol sequence")
         if protocol_sequence is None:
             protocol_sequence = current_protocol_sequence
@@ -204,18 +233,28 @@ def classify_stop_response_trace(payload: Mapping[str, object]) -> str:
             raise ValueError("trace time must be RFC 3339 UTC")
         datetime.fromisoformat(occurred_at.replace("Z", "+00:00"))
         monotonic_ns = item.get("monotonic_ns")
-        if isinstance(monotonic_ns, bool) or not isinstance(monotonic_ns, int) or monotonic_ns < previous_monotonic:
+        if (
+            isinstance(monotonic_ns, bool)
+            or not isinstance(monotonic_ns, int)
+            or monotonic_ns < previous_monotonic
+        ):
             raise ValueError("trace monotonic time regressed")
         previous_monotonic = monotonic_ns
         raw_clock = item.get("clock")
         if not isinstance(raw_clock, Mapping) or set(raw_clock) != _CLOCK_KEYS:
             raise ValueError("invalid trace clock")
         uncertainty = raw_clock.get("uncertainty_ms")
-        if not isinstance(raw_clock.get("clock_id"), str) or not _OPAQUE_CLOCK_ID.fullmatch(raw_clock["clock_id"]):
+        if not isinstance(raw_clock.get("clock_id"), str) or not _OPAQUE_CLOCK_ID.fullmatch(
+            raw_clock["clock_id"]
+        ):
             raise ValueError("invalid trace clock identity")
         if raw_clock.get("sync_source") not in _SYNC_SOURCES:
             raise ValueError("invalid trace clock sync source")
-        if isinstance(uncertainty, bool) or not isinstance(uncertainty, (int, float)) or uncertainty < 0:
+        if (
+            isinstance(uncertainty, bool)
+            or not isinstance(uncertainty, (int, float))
+            or uncertainty < 0
+        ):
             raise ValueError("invalid trace clock uncertainty")
         error = item.get("error")
         if index == 1 and error is not None:

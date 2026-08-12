@@ -56,7 +56,9 @@ class ContractExamplesTest(unittest.TestCase):
     def test_all_canonical_examples_pass_their_declared_json_schema(self) -> None:
         for schema_path in sorted(EXAMPLES.glob("*.schema.json")):
             wrapper = json.loads(schema_path.read_text(encoding="utf-8"))
-            instance_path = schema_path.with_name(schema_path.name.removesuffix(".schema.json") + ".json")
+            instance_path = schema_path.with_name(
+                schema_path.name.removesuffix(".schema.json") + ".json"
+            )
             with self.subTest(example=instance_path.name):
                 self.validator.validate(self._load(instance_path.name), wrapper)
 
@@ -77,6 +79,11 @@ class ContractExamplesTest(unittest.TestCase):
         for instance, definition in cases:
             with self.subTest(definition=definition), self.assertRaises(ValidationError):
                 self.validator.validate(instance, {"$ref": f"#/$defs/{definition}"})
+
+    def test_schema_reference_to_scalar_is_rejected(self) -> None:
+        validator = SchemaValidator({"$defs": {"invalid": "not-an-object"}})
+        with self.assertRaisesRegex(ValidationError, "reference is not an object"):
+            validator.validate({}, {"$ref": "#/$defs/invalid"})
 
 
 if __name__ == "__main__":
