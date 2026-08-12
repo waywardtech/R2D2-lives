@@ -179,7 +179,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   `expression_started`. No LED, audio, dome-set, drive, heading, leg, or animation
   primitive was issued. Disconnect completion was not journaled; the external
   watchdog terminated the process, Bluetooth was powered off, no connection or
-  HIL process remained, and no retry occurred. Operator observation is pending.
+  HIL process remained, and no retry occurred. The operator subsequently
+  confirmed no sound, dome movement, or LED activity; no base, leg, heading, or
+  location change; and a stationary, silent final state with all LEDs off. This
+  closes direct physical observation but does not make the HIL cycle pass.
 
 ## Remaining gate items
 
@@ -245,20 +248,20 @@ Pi watchdog staging 7c90a1f -> pass; 3 hashes matched, default refused, Bluetoot
 stationary droid encounter attempt 1 -> expression observed; timed out, normal final state, not a passing cycle
 Pi dashboard deployment -> pass; active immutable release 7ba7239, HTTPS page/status and timer healthy
 stationary proof-of-life attempt 1 -> failed before expression start; watchdog cleanup, no retry
+proof-of-life attempt 1 operator observation -> no expression or locomotion observed; stationary, silent, LEDs off
 ```
 
 ## Hardware state
 
 - Real R2 movement authorized for next run: no
 - One stationary proof-of-life expression authorized for next run: no; authorization consumed
-- Last known droid state: controller powered off with no BLE connection or HIL process; direct physical observation pending
+- Last known droid state: operator-confirmed stationary and silent with all LEDs off; controller powered off with no BLE connection or HIL process
 - Capability profile: partial; firmware/identity/battery/advertised telemetry observed
 - Hardware evidence category: target-host import, HIL discovery, and failed stationary probe
 
 ## Exact next task
 
-Obtain the operator's direct observation of proof-of-life attempt 1: whether any
-sound, dome movement, or LED activity occurred; whether base, legs, heading, or
-location changed; and R2's final physical state. Do not retry. Continue the
-response-policy diagnosis in simulation only. Locomotion and the stop-response
-bench remain unauthorized while charging.
+Continue the response-policy diagnosis in simulation only. Do not retry the
+failed proof-of-life attempt without a new, exact authorization and physical
+preflight. Locomotion and the stop-response bench remain unauthorized while
+charging.

@@ -1,0 +1,16 @@
+{
+  "attempt": "proof-of-life-attempt-1",
+  "base_moved": false,
+  "dome_movement_observed": false,
+  "evidence_category": "operator demonstration",
+  "final_led_state": "off",
+  "final_physical_state": "stationary",
+  "final_sound_state": "silent",
+  "heading_changed": false,
+  "led_activity_observed": false,
+  "legs_moved": false,
+  "location_changed": false,
+  "observed_at": "2026-08-12T16:29:33.606Z",
+  "schema_version": "1.0",
+  "sound_observed": false
+}

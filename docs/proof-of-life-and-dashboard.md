@@ -86,4 +86,8 @@ animation primitive was issued. The child reported `EOFError` and software state
 `offline`/safe-held, but no `disconnect_completed` marker was written. The
 75-second external watchdog terminated the lingering process. Bluetooth was then
 powered off; no connection or HIL process remained. There was no retry. Direct
-operator observation of the physical droid state remains required.
+operator observation subsequently confirmed that no sound, dome movement, or
+LED activity occurred; the base, legs, heading, and location did not change; and
+R2 ended stationary, silent, with all LEDs off. The attempt remains a failed HIL
+cycle because the intended expression was not performed and disconnect
+completion was not journaled.
