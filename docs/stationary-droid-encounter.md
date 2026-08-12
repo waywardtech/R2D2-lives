@@ -71,3 +71,13 @@ previously timed out on the final motor-OFF acknowledgement.
 
 This is expression-capability evidence, not permission to advance Gate P1 or a
 claim that stock animations are safe.
+
+### First live attempt
+
+On 2026-08-11 the operator confirmed the physical preflight. The target wheel
+hashes and Pi CPU temperature (40.407°C) passed. A 40-second external watchdog
+expired after the session established an R2 BLE link but before it produced an
+immutable report. Python was terminated and the residual link was removed by
+powering off and soft-blocking the controller, with zero connections afterward.
+No retry was made. Primitive completion remains indeterminate until the operator
+reports what was directly seen and heard.

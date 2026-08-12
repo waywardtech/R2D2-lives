@@ -73,6 +73,8 @@
 - Add privacy-safe nearby-droid classification and a chat-guided deterministic
   stationary expression compiler using bounded R2 head, LED, and stock sound
   primitives; exclude unverified full animations and add a separately armed HIL run.
+- Add a Pi-only, single-R2 in-memory identity launcher; record the first live
+  encounter as indeterminate after watchdog expiry and controller-level cleanup.
 
 ## 0.1.0 - 2026-08-11
 

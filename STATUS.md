@@ -105,6 +105,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   six-wheel hardware profile was re-verified and installed offline into isolated
   Pi staging `/home/pi/r2d2-hil-ed76384`; all locked versions match and the
   staged encounter command refuses by default before Bluetooth access.
+- The first confirmed live encounter attempt passed physical/machine preflight
+  but its 40-second watchdog expired without a report. Python terminated; one
+  residual BLE link was dropped by powering off/soft-blocking the controller,
+  leaving zero connections. No retry was made. Whether head/audio primitives
+  visibly completed is indeterminate pending the operator's direct observation.
 
 ## Remaining gate items
 
@@ -142,7 +147,7 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 
 ```text
 python scripts/tasks.py bootstrap -> pass, 2026-08-11
-python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 40 source files
+python scripts/tasks.py quality -> pass; Ruff format/lint and strict mypy, 41 source files
 python scripts/tasks.py check -> pass; quality, generated-client drift, boundaries, and 2 isolated product suites
 python scripts/tasks.py contract -> pass; 7 contract tests
 python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, final safe_hold
@@ -162,6 +167,7 @@ GitHub Actions simulation-ci run 31551031074 -> pass; repository hygiene and imm
 GitHub Actions simulation-ci run 31551472563 -> pass; hash-locked quality tools, 67 tests, simulations, docs
 GitHub Actions simulation-ci run 31552293911 -> pass; 82 tests and stationary droid-encounter simulation
 Pi encounter staging -> pass; 6 hashes/versions verified, default HIL refusal before BLE
+stationary droid encounter attempt 1 -> indeterminate; watchdog timeout, controller cleanup, zero BLE
 ```
 
 ## Hardware state
@@ -173,7 +179,7 @@ Pi encounter staging -> pass; 6 hashes/versions verified, default HIL refusal be
 
 ## Exact next task
 
-After the operator confirms the stationary-expression physical preflight, run
-the charging-safe nearby-droid spectator test under a process watchdog. The
-separate stop-response bench still awaits an off-charger, physically contained
-window and exact authorization; do not run that motor test while charging.
+Record the operator's direct observation of R2 during/after the timed-out
+stationary encounter; do not retry the live session. Then add stage-level
+observability in simulation before considering another separately authorized
+HIL run. The stop-response bench remains blocked while charging.
