@@ -208,6 +208,9 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 - The R2 dashboard now renders English translations directly, without the
   redundant `Translation:` label or enclosing quotation marks; its offline
   cache revision was advanced so installed PWAs receive the presentation change.
+- R2 English translation lines are now twice the base size, heavy-weight, set in
+  a futuristic Latin font stack, and prefixed by a same-size right-facing
+  triangle. Responsive wrapping and a new PWA cache revision ship the change.
 
 ## Remaining gate items
 

@@ -56,7 +56,9 @@ the archive classifies it as free for everyone, forever.
 
 English translation lines are displayed directly, without a `Translation:`
 prefix or enclosing quotation marks, so the available console space is devoted
-to the translated dialogue.
+to the translated dialogue. R2 translations use a heavy futuristic Latin font
+stack at twice the base dialogue size and begin with a same-size right-pointing
+triangle; long lines remain responsive and wrap within the transcript.
 
 The console occupies the available browser viewport without page scrolling;
 individual transcript and telemetry bays scroll only when their content needs

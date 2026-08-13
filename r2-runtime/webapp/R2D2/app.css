@@ -16,7 +16,7 @@
   --muted: #779092;
   --green: #65d3a1;
   --console-font: "Clynese Hand", "Arial Narrow", system-ui, sans-serif;
-  --translation-font: "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  --translation-font: "Bank Gothic", "Eurostile Extended", "Copperplate", "Arial Black", system-ui, sans-serif;
   font-family: var(--console-font);
 }
 
@@ -157,7 +157,23 @@ h3 { color: var(--orange); font-size: clamp(11px, 1vw, 15px); border-bottom: 2px
 .message p { margin: 5px 0 0; }
 .binary { color: var(--amber); font: 900 clamp(15px, 1.35vw, 21px) var(--console-font); text-shadow: 0 0 8px #ff5b1f88; }
 .translation { color: #d4e5e6; font-size: clamp(15px, 1.25vw, 20px); font-weight: 800; line-height: 1.25; }
-.message.droid .translation { font-family: var(--translation-font); }
+.message.droid .translation {
+  font-family: var(--translation-font);
+  font-size: clamp(30px, 2.5vw, 40px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: .025em;
+  overflow-wrap: anywhere;
+}
+.message.droid .translation::before {
+  content: "\25B6";
+  display: inline-block;
+  margin-right: .28em;
+  color: var(--orange);
+  font-size: 1em;
+  line-height: 1;
+  text-shadow: 0 0 8px #ff5b1f88;
+}
 
 .composer { display: grid; grid-template-columns: 1fr auto; gap: 8px; border-top: 1px solid #26383a; padding-top: 12px; }
 .composer input { min-width: 0; border: 2px solid #435759; background: #071012; color: white; border-radius: 0; padding: clamp(9px, 1vh, 13px); font-size: clamp(15px, 1.3vw, 20px); font-weight: 900; outline: none; }
