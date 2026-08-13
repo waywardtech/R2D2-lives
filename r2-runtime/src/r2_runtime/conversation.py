@@ -187,7 +187,7 @@ class LocalConversationDispatcher:
         if any(phrase in normalized for phrase in ("who are you", "tell me about yourself")):
             return (
                 "bweep-deet - brrr-woo!",
-                "R2-D2. Astromech, problem-solver, and exceptionally patient companionâ€”despite the evidence around me.",
+                "R2-D2. Astromech, problem-solver, and exceptionally patient companion--despite the evidence around me.",
             )
         if any(phrase in normalized for phrase in ("how are you", "how do you feel", "your mood")):
             overall = str(status.get("overall", "unavailable"))
@@ -216,7 +216,7 @@ class LocalConversationDispatcher:
         if normalized in {"yes", "yes.", "no", "no.", "okay", "ok"}:
             return (
                 "deet? - bwoo",
-                "Notedâ€”but give me one more detail so I know what you're confirming.",
+                "Noted--but give me one more detail so I know what you're confirming.",
             )
         return (
             "beep-brrt · woo-deet?",
