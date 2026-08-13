@@ -46,6 +46,9 @@ class ConversationTest(unittest.TestCase):
             for number in range(MAX_TURNS + 3):
                 store.record(session_id, f"user {number}", f"reply {number}")
             self.assertEqual(store.turn_count(session_id), MAX_TURNS)
+            history = store.recent_history(session_id, limit=2)
+            self.assertEqual(len(history), 4)
+            self.assertEqual([item["role"] for item in history], ["user", "assistant"] * 2)
             store.close()
 
     def test_messages_are_printable_and_bounded(self) -> None:

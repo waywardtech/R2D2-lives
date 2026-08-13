@@ -99,6 +99,20 @@ class ConversationStore:
             ).scalar_one()
         return int(value)
 
+    def recent_history(self, session_id: str, limit: int = 8) -> list[dict[str, str]]:
+        if not 1 <= limit <= 12:
+            raise ValueError("history limit must be in [1, 12]")
+        with self.engine.connect() as connection:
+            rows = connection.execute(
+                text(
+                    "SELECT role, text FROM turns WHERE session_id = :session "
+                    "ORDER BY sequence DESC, CASE role WHEN 'assistant' THEN 1 ELSE 0 END DESC "
+                    "LIMIT :limit"
+                ),
+                {"session": session_id, "limit": limit * 2},
+            ).all()
+        return [{"role": str(row.role), "content": str(row.text)} for row in reversed(rows)]
+
     def close(self) -> None:
         self.engine.dispose()
 

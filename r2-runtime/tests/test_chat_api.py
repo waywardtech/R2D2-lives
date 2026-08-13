@@ -35,3 +35,14 @@ class ChatApiTest(unittest.TestCase):
             ChatRequest.model_validate({"message": "hello", "motor": "drive"})
         with self.assertRaises(ValueError):
             ChatRequest(message="x" * 281)
+
+    def test_partial_model_configuration_fails_startup(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            environment = {
+                "R2_CHAT_DATABASE": str(Path(directory) / "continuity.sqlite3"),
+                "R2_CHAT_MODEL_ENDPOINT": "https://models.example/v1/chat/completions",
+                "R2_CHAT_MODEL": "",
+                "R2_CHAT_API_KEY_FILE": "",
+            }
+            with patch.dict(os.environ, environment, clear=True), self.assertRaises(RuntimeError):
+                create_app()

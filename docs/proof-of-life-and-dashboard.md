@@ -76,6 +76,21 @@ Sources: [`R2-D2 Databank`](https://www.starwars.com/databank/r2-d2),
 [`Iconic Star Wars Sound Effects`](https://www.starwars.com/news/5-iconic-star-wars-sound-effects-and-how-they-were-made-starwars-com), and
 [`The Clone Wars Rewatch: Secret Weapons`](https://www.starwars.com/news/the-clone-wars-rewatch-secret-weapons).
 
+An optional provider-neutral, OpenAI-compatible text adapter can extend the
+conversation while preserving the same non-actuating boundary. It receives at
+most eight recent turn pairs and a bounded sanitized status snapshot, has no
+tools, and may return only an electronic vocalization plus a Basic display
+translation. Invalid output, transport failure, or timeout falls back to the
+deterministic local personality. The configured endpoint must use HTTPS (or
+loopback HTTP for a local model), and redirects are rejected. Endpoint, model,
+and credential-file settings are all-or-none so configuration mistakes fail
+visibly at startup. The API credential remains outside source control; a
+systemd credential can expose its runtime path through
+`R2_CHAT_API_KEY_FILE`, alongside `R2_CHAT_MODEL_ENDPOINT` and
+`R2_CHAT_MODEL` in a local service drop-in. No model provider or credential is
+configured on the Pi in the current release, so live chat continues in local
+mode.
+
 The first live conversational rollout is Pi release `9e7cfda`. The sandboxed
 `r2-chat` service passed loopback health and public HTTPS chat checks, rejected a
 movement request conversationally, reported `physical_action: false`, applied

@@ -242,6 +242,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   electronic whistles/beeps, with readable Basic shown only as a display
   translation. His dry, mouthy, resourceful and occasionally stubborn edge is
   retained without inventing canon memories.
+- A provider-neutral OpenAI-compatible reasoning adapter is simulation-tested.
+  It has no tools or physical authority, accepts only a strict two-field text
+  response, bounds history/status context, rejects redirects and insecure
+  endpoints, and falls back locally on response or transport faults. The Pi has
+  no configured model credential, so its live service remains in local mode.
 - Pi release `9e7cfda` deployed the chat service under the sandboxed `r2-chat`
   account. Apache proxy syntax, `/health`, HTTPS chat, movement refusal, Alembic
   revision `0001_chat_continuity`, and two-turn preferred-name recall all passed;
@@ -291,7 +296,7 @@ python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, 
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 114 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 117 primary suite tests plus isolated standalone repetitions
 python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
 python scripts/tasks.py proof-of-life-sim -> pass; seeded sound, LED flashes, bounded dome sweep, offline
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels

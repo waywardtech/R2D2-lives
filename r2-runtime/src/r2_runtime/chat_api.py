@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .conversation import ConversationStore, LocalConversationDispatcher, validate_message
 from .chat_migrations import upgrade_chat_database
+from .model_conversation import SafeModelConversationDispatcher
 
 
 class ChatRequest(BaseModel):
@@ -48,7 +49,20 @@ def create_app() -> FastAPI:
     )
     upgrade_chat_database(database)
     store = ConversationStore(database)
-    dispatcher = LocalConversationDispatcher()
+    dispatcher: LocalConversationDispatcher | SafeModelConversationDispatcher
+    endpoint = os.environ.get("R2_CHAT_MODEL_ENDPOINT")
+    model = os.environ.get("R2_CHAT_MODEL")
+    credential_path = os.environ.get("R2_CHAT_API_KEY_FILE")
+    if any((endpoint, model, credential_path)) and not all((endpoint, model, credential_path)):
+        raise RuntimeError("model endpoint, model, and credential file must be configured together")
+    if endpoint and model and credential_path:
+        dispatcher = SafeModelConversationDispatcher(
+            endpoint=endpoint,
+            model=model,
+            api_key=Path(credential_path).read_text(encoding="utf-8").strip(),
+        )
+    else:
+        dispatcher = LocalConversationDispatcher()
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
@@ -66,7 +80,8 @@ def create_app() -> FastAPI:
 
     @app.get("/health")
     def health() -> dict[str, object]:
-        return {"status": "ready", "mode": "local", "physical_control": False}
+        mode = "model-ready" if isinstance(dispatcher, SafeModelConversationDispatcher) else "local"
+        return {"status": "ready", "mode": mode, "physical_control": False}
 
     @app.post("/chat", response_model=ChatResponse)
     def chat(request: ChatRequest) -> ChatResponse:
@@ -75,13 +90,19 @@ def create_app() -> FastAPI:
         except ValueError as error:
             raise HTTPException(status_code=422, detail=str(error)) from error
         session_id = store.ensure_session(request.session_id)
-        binary, translation = dispatcher.reply(message, session_id, store, _status(status_path))
+        status = _status(status_path)
+        if isinstance(dispatcher, SafeModelConversationDispatcher):
+            binary, translation, mode = dispatcher.reply_result(message, session_id, store, status)
+        else:
+            binary, translation = dispatcher.reply(message, session_id, store, status)
+            mode = "local"
         turn = store.record(session_id, message, translation)
         return ChatResponse(
             session_id=session_id,
             turn=turn,
             binary=binary,
             translation=translation,
+            mode=mode,
         )
 
     return app
