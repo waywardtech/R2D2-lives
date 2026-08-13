@@ -232,6 +232,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   passed and immutable evidence SHA-256 is
   `105d76da6497bb3a526fc5c9c44e29ff5ad93d45235507b69a65603a129eda41`;
   it records `movement_performed: false` and `firmware_behavior: unverified`.
+- A deterministic stop-response trace matrix now covers acknowledged success,
+  firmware error, timeout, cleanup failure, and response-sequence mismatch.
+  Every outcome fails closed as designed, output is seed-stable and identity-
+  free, and the runner imports neither BLE nor vendor hardware code.
 - A loopback-only FastAPI conversation service now backs dashboard chat through
   Apache. Strict Pydantic boundaries, a 280-character cap, SQLAlchemy 2 plus an
   Alembic migration, 40-turn-pair retention, opaque browser sessions, explicit-
@@ -315,9 +319,10 @@ python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, 
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 119 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 120 primary suite tests plus isolated standalone repetitions
 python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
 python scripts/tasks.py proof-of-life-sim -> pass; seeded sound, LED flashes, bounded dome sweep, offline
+python scripts/tasks.py stop-trace-sim -> pass; 5 deterministic non-BLE classifier outcomes
 python scripts/verify_hardware_lock.py --wheelhouse <temp> -> pass; 6 Linux/aarch64 wheels
 SSH target-host check -> pass; Python 3.11.2, Debian 13/aarch64, 6 isolated imports, no BLE
 SSH Pi readiness audit -> pass; BlueZ 5.82 active, NTP synchronized, controller powered off
@@ -352,7 +357,9 @@ proof-of-life attempt 1 operator observation -> no expression or locomotion obse
 
 ## Exact next task
 
-Continue the response-policy diagnosis in simulation only. Do not retry the
-failed proof-of-life attempt without a new, exact authorization and physical
-preflight. Locomotion and the stop-response bench remain unauthorized while
-charging.
+The response-policy diagnosis has reached its hardware boundary: static source
+audit and the complete deterministic trace-classifier matrix pass. The next
+question--whether firmware 7.0.101 acknowledges the one OFF/0 raw-motor packet--
+requires the separately authorized physical stop-response bench, exact preflight,
+and a demonstrated immediate shutdown method. Do not run it while charging or
+reuse earlier proof-of-life authorization. Locomotion remains unauthorized.

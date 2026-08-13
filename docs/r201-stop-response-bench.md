@@ -123,3 +123,15 @@ failure. A failed or timed-out stage ends the hardware sequence without retry.
 
 Only `acknowledged_success` resolves the response-path question. It still does
 not establish moving stop latency, stopping distance, or collision prevention.
+
+## Deterministic trace matrix
+
+`python scripts/tasks.py stop-trace-sim` exercises the complete evidence
+classifier without importing Bluetooth or vendor hardware modules. Seed
+`20260811` produces stable cases for acknowledged success, an acknowledged
+firmware error, response timeout, cleanup failure, and response-sequence
+mismatch. Timeout remains `stop_unconfirmed`, cleanup failure remains
+`invalid_test`, and mismatched evidence is rejected rather than interpreted.
+The output explicitly reports `hardware_accessed: false` and
+`movement_performed: false`. This closes the simulation classifier gate only;
+firmware behavior still requires the separately authorized physical bench.

@@ -92,6 +92,10 @@ def proof_of_life_sim() -> None:
     _run([sys.executable, "integration-lab/proof_of_life.py"])
 
 
+def stop_trace_sim() -> None:
+    _run([sys.executable, "integration-lab/stop_response_matrix.py"])
+
+
 def test() -> None:
     check()
     contract()
@@ -199,6 +203,7 @@ TASKS = {
     "p1-sim": p1_sim,
     "encounter-sim": encounter_sim,
     "proof-of-life-sim": proof_of_life_sim,
+    "stop-trace-sim": stop_trace_sim,
     "test": test,
     "docs-check": docs_check,
 }
