@@ -80,6 +80,15 @@ before producing an artifact. The process was terminated, R2 was disconnected,
 and no retry was made. The operator subsequently confirmed normal silent and
 LEDs-off state. No further optional or motor action was attempted while charging.
 
+After the BLE cleanup fix, a separately authorized phase-instrumented attempt
+completed identity, battery, and the low-brightness LED calls, then timed out on
+the read-only dome-position query. It failed closed and did not reach audio.
+The sanitized artifact is
+`evidence/hil/stationary-capability-ec3785f-head-timeout.json`, SHA-256
+`79957047c0839c66363c9c40a1ac83f521f897d0b11a444853cbb5a0e04376ab`.
+This classifies `head.safe_range` as failed for firmware `7.0.101`; audio remains
+untested and visible LED operation still requires operator observation.
+
 ## Stop acknowledgement research
 
 The pinned upstream source sets `requests_response` on every protocol-v2 packet

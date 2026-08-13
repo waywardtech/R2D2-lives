@@ -1,0 +1,13 @@
+{
+  "device_identity_persisted": false,
+  "driver_connected": false,
+  "driver_stopped": true,
+  "error_stage": "head.safe_range",
+  "error_type": "TimeoutError",
+  "evidence_category": "HIL-stationary-failure",
+  "generated_at": "2026-08-13T17:32:51.208151Z",
+  "movement_performed": false,
+  "owner_state": "offline",
+  "schema_version": "1.0",
+  "terminal": "failed"
+}

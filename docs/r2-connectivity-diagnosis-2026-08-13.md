@@ -64,3 +64,13 @@ The supervising operator subsequently reported no sound, LED activity, or
 movement during the attempt. That observation proves the visible/audible
 expression did not complete, but the pre-fix artifact is insufficient to
 distinguish an early query timeout from a timeout on the first LED command.
+
+A fresh preflight and one instrumented rerun isolated the failure to
+`head.safe_range`: the R201 firmware did not acknowledge the read-only dome
+position query before the client timeout. Identity, battery, and both halves of
+the low-brightness LED preview completed before that phase. Audio was not
+attempted. The run failed closed without retry, reported no locomotion, and
+ended disconnected/stopped with both Pi services active. Until a different
+reviewed strategy is available, the dome-position query is classified failed
+for firmware `7.0.101`; audio remains untested, and LED protocol completion is
+not a substitute for operator confirmation that light was visible.
