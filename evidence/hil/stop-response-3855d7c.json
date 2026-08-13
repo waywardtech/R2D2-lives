@@ -1,0 +1,32 @@
+{
+  "cleanup": {
+    "ble_connections": 0,
+    "owner_state": "offline",
+    "physical_state": "unconfirmed"
+  },
+  "evidence_category": "hil-stationary",
+  "movement_performed": false,
+  "observations": [
+    {
+      "byte_count": 11,
+      "cid": 1,
+      "clock": {
+        "clock_id": "clock-405b0918fc974262b5eb1caf7483ca8d",
+        "sync_source": "ntp",
+        "uncertainty_ms": 100.0
+      },
+      "did": 22,
+      "direction": "tx",
+      "error": null,
+      "flags": 10,
+      "monotonic_ns": 1032435283870236,
+      "occurred_at": "2026-08-13T16:11:21.471663Z",
+      "packet_sha256": "8a1a78174bf3fd154feb80d486514668f41b97a373f333d0015d36ab6addf900",
+      "protocol_sequence": 2,
+      "sequence": 1
+    }
+  ],
+  "schema_version": "1.0",
+  "session_ref": "session-7cacd64ade47e55d5e40d38b58bf15c2",
+  "trace_kind": "r201.raw_motor_off_response"
+}
