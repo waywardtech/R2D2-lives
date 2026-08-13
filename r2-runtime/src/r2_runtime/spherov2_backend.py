@@ -70,6 +70,52 @@ class TracedRawMotorOffExecutor:
         )
 
 
+class ResilientBleakAdapter:
+    """Pinned-adapter wrapper that cannot strand its non-daemon event-loop thread."""
+
+    @staticmethod
+    def _vendor() -> type[Any]:
+        module = import_module("spherov2.adapter.bleak_adapter")
+        return module.BleakAdapter  # type: ignore[no-any-return]
+
+    @classmethod
+    def scan_toys(cls, timeout: float = 5.0) -> Any:
+        return cls._vendor().scan_toys(timeout)
+
+    @classmethod
+    def scan_toy(cls, name: str, timeout: float = 5.0) -> Any:
+        return cls._vendor().scan_toy(name, timeout)
+
+    def __init__(self, address: object) -> None:
+        self._delegate = self._vendor()(address)
+
+    def set_callback(self, uuid: str, callback: Callable[..., object]) -> None:
+        self._delegate.set_callback(uuid, callback)
+
+    def write(self, uuid: str, data: bytes | bytearray) -> None:
+        self._delegate.write(uuid, data)
+
+    def close(self, disconnect: bool = True) -> None:
+        adapter = self._delegate
+        disconnect_error: Exception | None = None
+        try:
+            if disconnect:
+                adapter._BleakAdapter__execute(adapter._BleakAdapter__device.disconnect())
+        except (EOFError, ConnectionError, OSError) as error:
+            disconnect_error = error
+        finally:
+            event_loop = adapter._BleakAdapter__event_loop
+            thread = adapter._BleakAdapter__thread
+            event_loop.call_soon_threadsafe(event_loop.stop)
+            thread.join(timeout=2.0)
+            if thread.is_alive():
+                raise TimeoutError("BLE adapter event-loop thread did not stop")
+            if not event_loop.is_closed():
+                event_loop.close()
+        if disconnect_error is not None and adapter._BleakAdapter__device.is_connected:
+            raise disconnect_error
+
+
 @dataclass(frozen=True)
 class StationaryProbePolicy:
     allow_led_preview: bool = False
@@ -145,6 +191,7 @@ class Spherov2LibraryBackend:
             toy_name=configured_identity,
             toy_types=(r2_module.R2D2,),
             timeout=self.scan_timeout_s,
+            adapter=ResilientBleakAdapter,
         )
         if getattr(toy, "name", None) != configured_identity:
             raise RuntimeError("discovered droid identity did not exactly match configuration")

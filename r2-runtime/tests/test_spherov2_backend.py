@@ -15,6 +15,7 @@ from r2_runtime.spherov2_backend import (
     StationaryProbePolicy,
     StationaryExpressionError,
     TracedRawMotorOffExecutor,
+    ResilientBleakAdapter,
 )
 from r2_runtime.packet_trace import StopResponseTraceRecorder, classify_stop_response_trace
 from r2_runtime.session_recording import SessionClock
@@ -400,6 +401,51 @@ class Spherov2BackendTest(unittest.TestCase):
         )
         self.assertEqual(classify_stop_response_trace(payload), "acknowledged_success")
         self.assertEqual(payload["observations"][0]["flags"], 10)
+
+    def test_resilient_adapter_closes_worker_after_already_disconnected_eof(self) -> None:
+        class Device:
+            is_connected = False
+
+            def disconnect(self) -> object:
+                return object()
+
+        class EventLoop:
+            closed = False
+            stopped = False
+
+            def call_soon_threadsafe(self, callback: object) -> None:
+                self.stopped = True
+
+            def stop(self) -> None:
+                self.stopped = True
+
+            def is_closed(self) -> bool:
+                return self.closed
+
+            def close(self) -> None:
+                self.closed = True
+
+        class Thread:
+            joined = False
+
+            def join(self, timeout: float) -> None:
+                self.joined = timeout == 2.0
+
+            def is_alive(self) -> bool:
+                return False
+
+        delegate = SimpleNamespace(
+            _BleakAdapter__device=Device(),
+            _BleakAdapter__event_loop=EventLoop(),
+            _BleakAdapter__thread=Thread(),
+            _BleakAdapter__execute=lambda _value: (_ for _ in ()).throw(EOFError()),
+        )
+        adapter = ResilientBleakAdapter.__new__(ResilientBleakAdapter)
+        adapter._delegate = delegate
+        adapter.close()
+        self.assertTrue(delegate._BleakAdapter__event_loop.stopped)
+        self.assertTrue(delegate._BleakAdapter__event_loop.closed)
+        self.assertTrue(delegate._BleakAdapter__thread.joined)
 
 
 if __name__ == "__main__":
