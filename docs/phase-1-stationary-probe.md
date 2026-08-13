@@ -101,6 +101,13 @@ activity across the instrumented head/LED and audio-only attempts. Accordingly,
 LED remains unverified (a returned command is not physical proof), dome read is
 failed, and quiet audio is failed before playback on this firmware.
 
+The missing stock wake step was subsequently corrected behind a default-off,
+separately authorized policy. Release `35e799d` completed a wake-plus-bounded-LED
+session, including final safe-hold and clean disconnect. The immutable report is
+`evidence/hil/wake-led-35e799d-success.json`, SHA-256
+`cfe1919787874168a3a065cfb244e38e3d6c7b23be34cda710556566f12987e5`.
+Protocol completion is verified; visible LED proof awaits operator observation.
+
 ## Stop acknowledgement research
 
 The pinned upstream source sets `requests_response` on every protocol-v2 packet

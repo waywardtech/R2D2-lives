@@ -101,3 +101,10 @@ animatronic, and audio behavior remained dormant. Wake-on-connect is now a
 separately authorized, default-off HIL policy. The LED preview also has a bounded
 1.5-second dwell so operator observation can distinguish a physical light from
 a command that is switched off immediately.
+
+Release `35e799d` then completed one authorized wake-plus-LED session without
+error. Firmware `7.0.101` acknowledged wake, identity, battery at 4.13 V, the
+bounded LED-on/LED-off sequence, and the final safe-hold before a clean
+disconnect. This is the first successful end-to-end stationary actuation
+session; physical proof of visible light remains pending the supervising
+operator's observation.

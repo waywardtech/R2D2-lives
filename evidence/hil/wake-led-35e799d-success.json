@@ -1,0 +1,98 @@
+{
+  "capabilities": {
+    "audio.quiet_preview": {
+      "detail": {
+        "reason": "audio preview was not explicitly authorized"
+      },
+      "status": "untested"
+    },
+    "battery.state_voltage": {
+      "detail": {
+        "provenance": "r201_firmware_query",
+        "state": "ok",
+        "voltage_v": 4.13
+      },
+      "status": "observed"
+    },
+    "collision.configuration": {
+      "detail": {
+        "configuration_supported": true,
+        "result": "advertised_only"
+      },
+      "status": "observed"
+    },
+    "drive.bounded": {
+      "detail": {
+        "reason": "requires separately authorized motion HIL"
+      },
+      "status": "untested"
+    },
+    "head.safe_range": {
+      "detail": {
+        "reason": "head-position query was not explicitly authorized"
+      },
+      "status": "untested"
+    },
+    "identity.system_info": {
+      "detail": {
+        "board_revision": "3",
+        "bootloader": "4.1.18",
+        "firmware": "7.0.101",
+        "model": "R2-D2 R201",
+        "processor": "bytearray(b'Nordic')",
+        "system": "bytearray(b'ROW')"
+      },
+      "status": "observed"
+    },
+    "led.low_brightness": {
+      "detail": {
+        "brightness": 8,
+        "restored": true,
+        "result": "exercised"
+      },
+      "status": "observed"
+    },
+    "locator.motion_calibration": {
+      "detail": {
+        "reason": "requires separately authorized motion HIL"
+      },
+      "status": "untested"
+    },
+    "stop.latency": {
+      "detail": {
+        "reason": "requires separately authorized motion HIL"
+      },
+      "status": "untested"
+    },
+    "telemetry.stationary": {
+      "detail": {
+        "result": "advertised_only",
+        "streams": [
+          "accel_one",
+          "accelerometer",
+          "attitude",
+          "core_time",
+          "gyroscope",
+          "locator",
+          "quaternion",
+          "r2_head_angle",
+          "speed",
+          "velocity"
+        ]
+      },
+      "status": "observed"
+    }
+  },
+  "device_ref": "sha256:275886bae470849ca3796342f2b473846da043d693e4f39445c7390d59d35807",
+  "evidence_category": "HIL-stationary",
+  "final_state": "safe_hold",
+  "firmware": {
+    "firmware": "7.0.101",
+    "model": "R2-D2 R201",
+    "system": "bytearray(b'ROW')"
+  },
+  "generated_at": "2026-08-13T17:44:16.214456Z",
+  "library_baseline": "0.12.1",
+  "movement_performed": false,
+  "schema_version": "1.0"
+}
