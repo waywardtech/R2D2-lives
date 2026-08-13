@@ -242,6 +242,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   electronic whistles/beeps, with readable Basic shown only as a display
   translation. His dry, mouthy, resourceful and occasionally stubborn edge is
   retained without inventing canon memories.
+- Pi release `9e7cfda` deployed the chat service under the sandboxed `r2-chat`
+  account. Apache proxy syntax, `/health`, HTTPS chat, movement refusal, Alembic
+  revision `0001_chat_continuity`, and two-turn preferred-name recall all passed;
+  every response reported `physical_action: false`. The dashboard remained HTTP
+  200 and Bluetooth remained inactive and soft-blocked.
 
 ## Remaining gate items
 
@@ -307,6 +312,7 @@ Pi watchdog staging 7c90a1f -> pass; 3 hashes matched, default refused, Bluetoot
 stationary droid encounter attempt 1 -> expression observed; timed out, normal final state, not a passing cycle
 Pi dashboard deployment -> pass; active immutable release 7ba7239, HTTPS page/status and timer healthy
 Pi static response-policy audit -> pass; client wait policy verified, firmware behavior unverified, no BLE
+Pi conversation service -> pass; HTTPS local chat, migration, continuity, movement refusal, no physical action
 stationary proof-of-life attempt 1 -> failed before expression start; watchdog cleanup, no retry
 proof-of-life attempt 1 operator observation -> no expression or locomotion observed; stationary, silent, LEDs off
 ```

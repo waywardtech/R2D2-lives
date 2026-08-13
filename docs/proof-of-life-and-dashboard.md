@@ -76,6 +76,13 @@ Sources: [`R2-D2 Databank`](https://www.starwars.com/databank/r2-d2),
 [`Iconic Star Wars Sound Effects`](https://www.starwars.com/news/5-iconic-star-wars-sound-effects-and-how-they-were-made-starwars-com), and
 [`The Clone Wars Rewatch: Secret Weapons`](https://www.starwars.com/news/the-clone-wars-rewatch-secret-weapons).
 
+The first live conversational rollout is Pi release `9e7cfda`. The sandboxed
+`r2-chat` service passed loopback health and public HTTPS chat checks, rejected a
+movement request conversationally, reported `physical_action: false`, applied
+Alembic revision `0001_chat_continuity`, and recalled the explicitly supplied
+name `Luke` on the second turn of one opaque session. Apache and the dashboard
+remained healthy; Bluetooth was inactive and soft-blocked for the entire rollout.
+
 Console text uses the freely licensed Clynese Hand face from the AurekFonts
 Archive. R2's English translation remains in a conventional condensed Latin
 face for immediate readability. The bundled font is attributed to AurekFonts;
