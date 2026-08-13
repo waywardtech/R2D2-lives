@@ -108,6 +108,12 @@ session, including final safe-hold and clean disconnect. The immutable report is
 `cfe1919787874168a3a065cfb244e38e3d6c7b23be34cda710556566f12987e5`.
 Protocol completion is verified; visible LED proof awaits operator observation.
 
+The operator observed R2 wake, transition into three-leg mode, flash its dome
+LEDs, return to two-leg stance, and leave the LEDs off. No locomotion occurred.
+This passes the observed proof-of-life gate for wake and LEDs. It simultaneously
+classifies wake as bounded stance actuation, so future use requires explicit
+physical authorization and cannot be added to ordinary BLE connection setup.
+
 ## Stop acknowledgement research
 
 The pinned upstream source sets `requests_response` on every protocol-v2 packet

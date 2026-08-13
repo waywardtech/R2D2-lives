@@ -118,6 +118,8 @@ class ResilientBleakAdapter:
 
 @dataclass(frozen=True)
 class StationaryProbePolicy:
+    # R201 wake physically cycles the leg stance; this is not link-only setup.
+    # Keep default-off and enable only after explicit bounded stance authorization.
     allow_wake_on_connect: bool = False
     allow_led_preview: bool = False
     led_preview_dwell_s: float = 1.5

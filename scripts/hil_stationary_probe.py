@@ -34,7 +34,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--temperature-ok", action="store_true")
     parser.add_argument("--keepout-clear", action="store_true")
     parser.add_argument("--emergency-stop-ready", action="store_true")
-    parser.add_argument("--allow-wake-on-connect", action="store_true")
+    parser.add_argument(
+        "--allow-wake-on-connect",
+        action="store_true",
+        help="authorize R201 wake, including its physical three-leg/two-leg stance cycle",
+    )
     parser.add_argument("--allow-led-preview", action="store_true")
     parser.add_argument("--allow-head-read", action="store_true")
     parser.add_argument("--allow-audio-preview", action="store_true")

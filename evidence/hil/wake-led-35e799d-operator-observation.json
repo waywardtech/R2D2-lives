@@ -1,0 +1,16 @@
+{
+  "attempt": "wake-led-35e799d",
+  "dome_led_flash_observed": true,
+  "final_led_state": "off",
+  "final_stance": "two_leg",
+  "generated_at": "2026-08-13T17:48:20.893Z",
+  "locomotion_observed": false,
+  "observation_source": "operator",
+  "proof_of_life_observed": true,
+  "schema_version": "1.0",
+  "stance_sequence_observed": [
+    "wake",
+    "three_leg",
+    "two_leg"
+  ]
+}

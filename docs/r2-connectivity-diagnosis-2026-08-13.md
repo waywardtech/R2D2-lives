@@ -108,3 +108,11 @@ bounded LED-on/LED-off sequence, and the final safe-hold before a clean
 disconnect. This is the first successful end-to-end stationary actuation
 session; physical proof of visible light remains pending the supervising
 operator's observation.
+
+The supervising operator confirmed physical proof of life: R2 woke, changed to
+three-leg mode, flashed its dome LEDs, returned to two-leg stance, and finished
+with LEDs off. No locomotion was observed. This proves the wake and visible LED
+path on the tested hardware, but also proves `wake()` is physical stance
+actuation on this R201 rather than a link-only initialization step. It must stay
+default-off and requires explicit authorization for bounded stance movement;
+passive connection, status, and telemetry paths must not invoke it.
