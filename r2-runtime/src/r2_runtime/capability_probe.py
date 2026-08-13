@@ -23,6 +23,22 @@ STATIONARY_CAPABILITIES = (
 MOVEMENT_CAPABILITIES = ("drive.bounded", "stop.latency", "locator.motion_calibration")
 
 
+class CapabilityProbeError(RuntimeError):
+    """Sanitized probe phase failure with separately retained cleanup status."""
+
+    def __init__(
+        self,
+        phase: str,
+        error_type: str,
+        *,
+        cleanup_error_type: str | None = None,
+    ) -> None:
+        super().__init__(f"stationary capability probe failed during {phase}")
+        self.phase = phase
+        self.error_type = error_type
+        self.cleanup_error_type = cleanup_error_type
+
+
 @dataclass(frozen=True)
 class CapabilityEvidence:
     status: str
@@ -62,14 +78,19 @@ class StationaryCapabilityProbe:
     def run(
         self, *, generated_at: str | None = None, evidence_category: str = "simulation"
     ) -> CapabilityReport:
-        self.owner.connect_for_stationary_probe()
         evidence: dict[str, CapabilityEvidence] = {}
         identity: Mapping[str, str] = {}
         final_state = "safe_hold"
+        phase = "connect"
+        primary_failure: tuple[str, Exception] | None = None
+        disconnect_failure: Exception | None = None
         try:
+            self.owner.connect_for_stationary_probe()
+            phase = "identity.system_info"
             identity = self.owner.serialized(self.driver.backend.identity)
             observed_status = "simulated" if evidence_category == "simulation" else "observed"
             evidence["identity.system_info"] = CapabilityEvidence(observed_status, dict(identity))
+            phase = "battery.state_voltage"
             battery = self.owner.serialized(self.driver.backend.battery)
             evidence["battery.state_voltage"] = CapabilityEvidence(observed_status, dict(battery))
             battery_state = str(battery.get("state", "unknown")).lower()
@@ -87,6 +108,7 @@ class StationaryCapabilityProbe:
                     )
                     continue
                 try:
+                    phase = capability
 
                     def exercise(capability_name: str = capability) -> Mapping[str, object]:
                         return self.driver.backend.exercise_stationary(capability_name)
@@ -101,6 +123,7 @@ class StationaryCapabilityProbe:
                     "untested", {"reason": "requires separately authorized motion HIL"}
                 )
             try:
+                phase = "stop.latency"
                 self.driver.safe_hold()
             except TimeoutError:
                 evidence["stop.latency"] = CapabilityEvidence(
@@ -113,8 +136,26 @@ class StationaryCapabilityProbe:
                 final_state = "disconnected_stop_unconfirmed"
             else:
                 self.owner.mark_ready()
+        except Exception as error:
+            primary_failure = (phase, error)
         finally:
-            self.owner.disconnect("stationary_probe_complete")
+            try:
+                self.owner.disconnect("stationary_probe_complete")
+            except Exception as error:
+                disconnect_failure = error
+        if primary_failure is not None:
+            failure_phase, original_failure = primary_failure
+            raise CapabilityProbeError(
+                failure_phase,
+                type(original_failure).__name__,
+                cleanup_error_type=(
+                    type(disconnect_failure).__name__ if disconnect_failure is not None else None
+                ),
+            ) from original_failure
+        if disconnect_failure is not None:
+            raise CapabilityProbeError(
+                "disconnect", type(disconnect_failure).__name__
+            ) from disconnect_failure
         timestamp = generated_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         return CapabilityReport(
             schema_version="1.0",

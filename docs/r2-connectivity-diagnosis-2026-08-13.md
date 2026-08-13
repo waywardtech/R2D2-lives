@@ -44,3 +44,18 @@ the one authorized OFF/0 bench recorded a transmitted request but no matching
 response. That command-specific result remains `stop_unconfirmed` after the
 exception-precedence correction and must not be described as successful stop
 acknowledgement.
+
+## Stationary capability follow-up
+
+One authorized stationary capability probe was attempted from release
+`18d52e9`. The passive scanner was stopped for exclusive BLE ownership and
+restored afterward. The probe terminated with `TimeoutError`, reported no
+locomotion, and left the driver disconnected and stopped. The Pi reported
+36.5 C after the run and both `r2-ble` and `r2-chat` were active.
+
+The pre-fix failure artifact could not identify whether the timeout occurred
+during connection, identity, battery, LED, head, audio, or stop. The probe now
+wraps failures with a stable sanitized capability phase while preserving a
+separate disconnect-cleanup error type. Tests cover a primary capability
+timeout combined with a cleanup failure, ensure the primary phase wins, and
+ensure private exception text is not persisted. No retry was performed.

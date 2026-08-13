@@ -61,10 +61,11 @@ def main() -> None:
         report = StationaryCapabilityProbe(owner, driver).run(evidence_category="HIL-stationary")
     except Exception as error:
         failure = build_hil_failure_evidence(
-            error_type=type(error).__name__,
+            error_type=getattr(error, "error_type", type(error).__name__),
             owner_state=owner.state.value,
             driver_connected=driver.connected,
             driver_stopped=driver.stopped,
+            error_stage=getattr(error, "phase", None),
         )
         digest = write_immutable_json(args.output, failure)
         print(

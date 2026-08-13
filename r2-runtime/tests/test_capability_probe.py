@@ -6,7 +6,11 @@ import tempfile
 import unittest
 
 from r2_runtime.ble_owner import BleOwner, ConnectionState
-from r2_runtime.capability_probe import MOVEMENT_CAPABILITIES, StationaryCapabilityProbe
+from r2_runtime.capability_probe import (
+    MOVEMENT_CAPABILITIES,
+    CapabilityProbeError,
+    StationaryCapabilityProbe,
+)
 from r2_runtime.drivers import (
     HardwareUnavailableError,
     Spherov2R2Driver,
@@ -200,6 +204,29 @@ class CapabilityProbeTest(unittest.TestCase):
             driver_stopped=True,
         )
         self.assertEqual(payload["error_stage"], "audio_volume_read")
+
+    def test_probe_preserves_capability_phase_when_disconnect_also_fails(self) -> None:
+        class DoubleFailureBackend(SimSpherov2Backend):
+            def exercise_stationary(self, capability: str) -> dict[str, object]:
+                if capability == "head.safe_range":
+                    raise TimeoutError("private primary detail")
+                return dict(super().exercise_stationary(capability))
+
+            def disconnect(self) -> None:
+                self.calls.append("disconnect_failed")
+                self.connected = False
+                raise EOFError("private cleanup detail")
+
+        backend = DoubleFailureBackend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        owner = BleOwner(driver)
+        with self.assertRaises(CapabilityProbeError) as caught:
+            StationaryCapabilityProbe(owner, driver).run(evidence_category="HIL-stationary")
+        self.assertEqual(caught.exception.phase, "head.safe_range")
+        self.assertEqual(caught.exception.error_type, "TimeoutError")
+        self.assertEqual(caught.exception.cleanup_error_type, "EOFError")
+        self.assertEqual(owner.state, ConnectionState.OFFLINE)
+        self.assertNotIn("private", str(caught.exception))
 
 
 if __name__ == "__main__":
