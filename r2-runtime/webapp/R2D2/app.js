@@ -143,13 +143,40 @@ document.querySelectorAll("[data-prompt]").forEach((button) => {
   });
 });
 
+function metricLevel(label, value) {
+  const numeric = Number.parseFloat(value);
+  if (Number.isFinite(numeric)) {
+    if (/temp/i.test(label)) return Math.max(0, Math.min(1, numeric / 85));
+    if (/load/i.test(label)) return Math.max(0, Math.min(1, numeric / 4));
+    if (/voltage/i.test(label)) return Math.max(0, Math.min(1, (numeric - 3) / 1.3));
+    if (/memory|disk/i.test(label)) return Math.max(0, Math.min(1, numeric / 100));
+    return Math.max(0.08, Math.min(1, numeric / 100));
+  }
+  const normalized = compact(value).toLowerCase();
+  if (/critical|failed|movement|offline|blocked|no$/.test(normalized)) return 0.16;
+  if (/warning|attention|unknown|unavailable|inactive/.test(normalized)) return 0.42;
+  if (/yes|passed|active|online|ready|safe|none|synchronized|nominal/.test(normalized)) return 0.88;
+  return 0.58;
+}
+
 function row(label, value) {
   const wrapper = document.createElement("div");
   const term = document.createElement("dt");
   const detail = document.createElement("dd");
+  const meter = document.createElement("span");
+  const level = metricLevel(label, value);
   term.textContent = label;
   detail.textContent = compact(value);
-  wrapper.append(term, detail);
+  meter.className = "led-scale";
+  meter.style.setProperty("--level", String(level));
+  meter.dataset.level = level < .3 ? "low" : level < .7 ? "mid" : "high";
+  meter.setAttribute("role", "meter");
+  meter.setAttribute("aria-label", `${label} level`);
+  meter.setAttribute("aria-valuemin", "0");
+  meter.setAttribute("aria-valuemax", "100");
+  meter.setAttribute("aria-valuenow", String(Math.round(level * 100)));
+  for (let index = 0; index < 12; index += 1) meter.append(document.createElement("i"));
+  wrapper.append(term, detail, meter);
   return wrapper;
 }
 
@@ -196,6 +223,7 @@ function renderStatus(status) {
   document.querySelector("#overall").textContent = overall.toUpperCase();
   document.querySelector("#measured").textContent = status.measured_at ? `UTC ${status.measured_at}` : "NO TIMESTAMP";
   document.querySelector("#alert-strip").dataset.level = overall;
+  signalState.output = Math.max(signalState.output, Math.min(.72, .08 + (status.issues || []).length * .12));
 }
 
 async function loadStatus() {

@@ -201,9 +201,26 @@ h3 { color: var(--orange); font-size: clamp(11px, 1vw, 15px); border-bottom: 2px
 .issue.info { border-color: #3a7078; color: #8ba5a8; }
 .status-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .status-columns dl { margin: 0; }
-.status-columns dl div { border-bottom: 1px solid #172426; padding: clamp(4px, .55vh, 7px) 0; }
+.status-columns dl div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 7px; border-bottom: 1px solid #172426; padding: clamp(4px, .55vh, 7px) 0; }
 .status-columns dt { color: #829a9c; font: 900 clamp(9px, .75vw, 11px) var(--console-font); letter-spacing: .08em; text-transform: uppercase; }
 .status-columns dd { margin: 2px 0 0; color: #d0e0e1; font: 900 clamp(11px, .9vw, 14px) var(--console-font); overflow-wrap: anywhere; }
+.led-scale { --level: .5; grid-column: 1 / -1; display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; height: 5px; margin-top: 2px; }
+.led-scale i { border-radius: 99px; background: #24100b; box-shadow: inset 0 0 2px #000; opacity: .24; }
+.led-scale i:nth-child(1) { opacity: min(1, calc(var(--level) * 12)); }
+.led-scale i:nth-child(2) { opacity: clamp(.24, calc((var(--level) * 12) - 1), 1); }
+.led-scale i:nth-child(3) { opacity: clamp(.24, calc((var(--level) * 12) - 2), 1); }
+.led-scale i:nth-child(4) { opacity: clamp(.24, calc((var(--level) * 12) - 3), 1); }
+.led-scale i:nth-child(5) { opacity: clamp(.24, calc((var(--level) * 12) - 4), 1); }
+.led-scale i:nth-child(6) { opacity: clamp(.24, calc((var(--level) * 12) - 5), 1); }
+.led-scale i:nth-child(7) { opacity: clamp(.24, calc((var(--level) * 12) - 6), 1); }
+.led-scale i:nth-child(8) { opacity: clamp(.24, calc((var(--level) * 12) - 7), 1); }
+.led-scale i:nth-child(9) { opacity: clamp(.24, calc((var(--level) * 12) - 8), 1); }
+.led-scale i:nth-child(10) { opacity: clamp(.24, calc((var(--level) * 12) - 9), 1); }
+.led-scale i:nth-child(11) { opacity: clamp(.24, calc((var(--level) * 12) - 10), 1); }
+.led-scale i:nth-child(12) { opacity: clamp(.24, calc((var(--level) * 12) - 11), 1); }
+.led-scale[data-level="high"] i { background: var(--green); box-shadow: 0 0 4px #65d3a188; }
+.led-scale[data-level="mid"] i { background: var(--amber); box-shadow: 0 0 4px #ffb43b88; }
+.led-scale[data-level="low"] i { background: var(--orange); box-shadow: 0 0 4px #ff5a1f88; }
 
 .console-foot { min-height: 0; display: flex; gap: 26px; align-items: center; padding: 6px 14px; background: linear-gradient(#111719, #050708); border-radius: 3px 3px 10px 10px; }
 .console-foot div { display: grid; gap: 2px; }

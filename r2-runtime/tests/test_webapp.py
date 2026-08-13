@@ -76,8 +76,13 @@ class WebAppTest(unittest.TestCase):
         self.assertIn("setLinkMode(reply.mode)", javascript)
         self.assertIn('setLinkMode("browser-fallback")', javascript)
         self.assertIn(
-            'const CACHE = "r2-link-v7"', (WEBAPP / "service-worker.js").read_text(encoding="utf-8")
+            'const CACHE = "r2-link-v8"', (WEBAPP / "service-worker.js").read_text(encoding="utf-8")
         )
+        self.assertIn('meter.className = "led-scale"', javascript)
+        self.assertIn('meter.setAttribute("role", "meter")', javascript)
+        self.assertIn("metricLevel(label, value)", javascript)
+        self.assertIn(".led-scale", stylesheet)
+        self.assertIn("window.setInterval(loadStatus, 10000)", javascript)
         for forbidden in ("/drive", "/move", "/heading", "/proof-of-life"):
             self.assertNotIn(forbidden, javascript)
 

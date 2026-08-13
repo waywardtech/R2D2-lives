@@ -1,4 +1,4 @@
-const CACHE = "r2-link-v7";
+const CACHE = "r2-link-v8";
 const STATIC = ["./", "app.css", "app.js", "manifest.webmanifest", "fonts/Clynese_Hand.otf", "og.png"];
 
 self.addEventListener("install", (event) => {
