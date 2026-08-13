@@ -80,7 +80,7 @@ def main() -> None:
         clock=SessionClock(
             _clock_id(), preflight.clock_sync_source, preflight.clock_uncertainty_ms
         ),
-        evidence_category="HIL-stationary",
+        evidence_category="hil-stationary",
     )
     backend = Spherov2LibraryBackend(stop_executor=TracedRawMotorOffExecutor(recorder))
     driver = Spherov2R2Driver(backend=backend, configured_identity=preflight.identity)

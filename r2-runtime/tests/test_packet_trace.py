@@ -124,6 +124,20 @@ class PacketTraceTest(unittest.TestCase):
                 encoded_packet=b"heading-bearing command",
             )
 
+    def test_hil_evidence_category_uses_sanitized_lowercase_vocabulary(self) -> None:
+        recorder = StopResponseTraceRecorder(
+            session_ref="session-abcdef0123456789",
+            clock=SessionClock("sim-clock-abcdef01", "deterministic", 0.0),
+            evidence_category="hil-stationary",
+        )
+        self.assertEqual(recorder.evidence_category, "hil-stationary")
+        with self.assertRaisesRegex(ValueError, "invalid evidence category"):
+            StopResponseTraceRecorder(
+                session_ref="session-abcdef0123456789",
+                clock=SessionClock("sim-clock-abcdef01", "deterministic", 0.0),
+                evidence_category="HIL-stationary",
+            )
+
     def test_physical_confirmation_preserves_expected_timeout_classification(self) -> None:
         self.assertEqual(
             physical_state_for_trace(operator_confirmed=True, error_type="TimeoutError"),
