@@ -252,6 +252,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   revision `0001_chat_continuity`, and two-turn preferred-name recall all passed;
   every response reported `physical_action: false`. The dashboard remained HTTP
   200 and Bluetooth remained inactive and soft-blocked.
+- Pi release `e0c54fe` deployed the optional safe model adapter without enabling
+  a provider or installing a credential. Loopback health and public HTTPS chat
+  passed in `local` mode with `physical_action: false`; the dashboard returned
+  HTTP 200, `r2-chat` remained active, and Bluetooth remained inactive and
+  soft-blocked. No droid discovery, connection, or command occurred.
 
 ## Remaining gate items
 
@@ -318,6 +323,7 @@ stationary droid encounter attempt 1 -> expression observed; timed out, normal f
 Pi dashboard deployment -> pass; active immutable release 7ba7239, HTTPS page/status and timer healthy
 Pi static response-policy audit -> pass; client wait policy verified, firmware behavior unverified, no BLE
 Pi conversation service -> pass; HTTPS local chat, migration, continuity, movement refusal, no physical action
+Pi safe model-adapter rollout -> pass; release e0c54fe, local mode, no credential, Bluetooth inactive/blocked
 stationary proof-of-life attempt 1 -> failed before expression start; watchdog cleanup, no retry
 proof-of-life attempt 1 operator observation -> no expression or locomotion observed; stationary, silent, LEDs off
 ```

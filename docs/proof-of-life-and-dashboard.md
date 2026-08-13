@@ -98,6 +98,12 @@ Alembic revision `0001_chat_continuity`, and recalled the explicitly supplied
 name `Luke` on the second turn of one opaque session. Apache and the dashboard
 remained healthy; Bluetooth was inactive and soft-blocked for the entire rollout.
 
+Pi release `e0c54fe` adds the optional model adapter but deliberately leaves it
+unconfigured. Live loopback health and public HTTPS chat remained in `local`
+mode and reported `physical_action: false`; the dashboard returned HTTP 200.
+Bluetooth remained inactive and soft-blocked, and the service environment
+contained no model endpoint, model name, or credential-file setting.
+
 Console text uses the freely licensed Clynese Hand face from the AurekFonts
 Archive. R2's English translation remains in a conventional condensed Latin
 face for immediate readability. The bundled font is attributed to AurekFonts;
