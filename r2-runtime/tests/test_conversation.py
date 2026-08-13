@@ -56,3 +56,33 @@ class ConversationTest(unittest.TestCase):
         for bad in ("", "x" * 281, "unsafe\x00text"):
             with self.assertRaises(ValueError):
                 validate_message(bad)
+
+    def test_local_personality_and_contextual_repair(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = self.make_store(directory)
+            dispatcher = LocalConversationDispatcher()
+            session_id = store.ensure_session(None)
+            _, identity = dispatcher.reply("Who are you?", session_id, store, {})
+            self.assertIn("R2-D2", identity)
+            store.record(session_id, "Who are you?", identity)
+            _, recalled = dispatcher.reply("What did I say?", session_id, store, {})
+            self.assertIn("Who are you?", recalled)
+            _, thanks = dispatcher.reply("Thank you", session_id, store, {})
+            self.assertIn("operation", thanks)
+            _, clarification = dispatcher.reply("yes", session_id, store, {})
+            self.assertIn("detail", clarification)
+            store.close()
+
+    def test_status_issues_are_bounded_and_movement_substrings_do_not_false_match(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = self.make_store(directory)
+            dispatcher = LocalConversationDispatcher()
+            session_id = store.ensure_session(None)
+            issues = [{"summary": f"issue {number}"} for number in range(5)]
+            _, reply = dispatcher.reply("Any problems?", session_id, store, {"issues": issues})
+            self.assertIn("5 reported", reply)
+            self.assertIn("issue 2", reply)
+            self.assertNotIn("issue 3", reply)
+            _, conversation = dispatcher.reply("This is a moving story", session_id, store, {})
+            self.assertNotIn("cannot command movement", conversation)
+            store.close()

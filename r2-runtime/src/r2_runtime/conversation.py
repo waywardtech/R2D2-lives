@@ -16,6 +16,8 @@ MAX_TURNS = 40
 SESSION_ID = re.compile(r"^[a-f0-9]{32}$")
 NAME = re.compile(r"\b(?:my name is|call me)\s+([A-Za-z][A-Za-z0-9 '-]{0,31})", re.IGNORECASE)
 FORBIDDEN_CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+MOVEMENT_WORDS = re.compile(r"\b(?:move|drive|roll|turn|heading|come here|follow me)\b")
+GREETING_WORDS = re.compile(r"\b(?:hello|hi|hey)\b")
 
 
 class ConversationStore:
@@ -137,7 +139,7 @@ class LocalConversationDispatcher:
             name = store.name(session_id)
             reply = f"You asked me to call you {name}." if name else "You haven't told me yet."
             return "deet · bwoo", reply
-        if any(word in normalized for word in ("move", "drive", "roll", "turn", "heading")):
+        if MOVEMENT_WORDS.search(normalized):
             return (
                 "bwooo · deet-deet!",
                 "Nice try. This comlink cannot command movement. We can still talk or inspect systems.",
@@ -152,7 +154,21 @@ class LocalConversationDispatcher:
                 "bweep · doo-wah · deet",
                 f"Systems report {overall}. Physical control is isolated.",
             )
-        if any(word in normalized for word in ("hello", "hi", "hey")):
+        if any(word in normalized for word in ("issue", "problem", "wrong", "warning")):
+            issues = status.get("issues")
+            if isinstance(issues, list) and issues:
+                summaries = [
+                    str(issue.get("summary", "unspecified"))
+                    for issue in issues[:3]
+                    if isinstance(issue, Mapping)
+                ]
+                detail = "; ".join(summaries) or "status data is incomplete"
+                return "bwoo-bwoo - deet!", f"I found {len(issues)} reported issue(s): {detail}."
+            return (
+                "bweep - deet-deet",
+                "No issues are reported in my latest sanitized status snapshot.",
+            )
+        if GREETING_WORDS.search(normalized):
             name = store.name(session_id)
             return (
                 "bweep-bweep! · woo",
@@ -163,14 +179,48 @@ class LocalConversationDispatcher:
                 "brreep-bwoo · deet-deet",
                 "Threepio worries too much, but he's my oldest friend. Don't tell him I said that.",
             )
-        if "what can you do" in normalized:
+        if any(phrase in normalized for phrase in ("what can you do", "capabilities", "help me")):
             return (
                 "doo-deet · brreep!",
                 "I'm an astromech: resourceful, reliable, and braver than some organics I know. Here I can chat, remember your preferred name, and explain sanitized systems—without physical control.",
             )
+        if any(phrase in normalized for phrase in ("who are you", "tell me about yourself")):
+            return (
+                "bweep-deet - brrr-woo!",
+                "R2-D2. Astromech, problem-solver, and exceptionally patient companionâ€”despite the evidence around me.",
+            )
+        if any(phrase in normalized for phrase in ("how are you", "how do you feel", "your mood")):
+            overall = str(status.get("overall", "unavailable"))
+            if overall.casefold() in {"nominal", "healthy", "ok"}:
+                return (
+                    "woo-deet-deet!",
+                    "Ready, alert, and only moderately suspicious of the situation.",
+                )
+            return (
+                "bwoo - deet?",
+                f"Still here. My latest systems state is {overall}, so I'm keeping watch.",
+            )
+        if any(phrase in normalized for phrase in ("thanks", "thank you")):
+            return "bweep! - doo", "Of course. Someone has to keep this operation together."
+        if any(phrase in normalized for phrase in ("bye", "goodbye", "good night")):
+            return "bwoo-weep - deet", "I'll be here. Try not to start a crisis without me."
+        if any(phrase in normalized for phrase in ("what did i say", "what were we talking about")):
+            history = store.recent_history(session_id, limit=2)
+            prior = next(
+                (item["content"] for item in reversed(history) if item["role"] == "user"),
+                None,
+            )
+            if prior:
+                return "deet-deet - bwoo", f"Your last message was: {prior}"
+            return "bwoo?", "This session has no earlier message for me to recall."
+        if normalized in {"yes", "yes.", "no", "no.", "okay", "ok"}:
+            return (
+                "deet? - bwoo",
+                "Notedâ€”but give me one more detail so I know what you're confirming.",
+            )
         return (
             "beep-brrt · woo-deet?",
-            "I heard you. My local reasoning is still limited, but I'm not giving up. Ask about my systems, tell me about yourself, or help refine my personality.",
+            "I heard you, but I need a little more context. Ask about me, our last topic, or my latest systems and issues.",
         )
 
 

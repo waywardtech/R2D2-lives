@@ -91,6 +91,13 @@ systemd credential can expose its runtime path through
 configured on the Pi in the current release, so live chat continues in local
 mode.
 
+The deterministic local mode supports preferred-name and recent-topic recall,
+identity and capability questions, mood, greetings, thanks, farewells, battery,
+system health, and bounded issue summaries. Ambiguous yes/no replies request one
+more detail instead of fabricating context. Movement language remains an
+explicit refusal, and word-boundary matching prevents unrelated words from
+being mistaken for commands.
+
 The first live conversational rollout is Pi release `9e7cfda`. The sandboxed
 `r2-chat` service passed loopback health and public HTTPS chat checks, rejected a
 movement request conversationally, reported `physical_action: false`, applied
