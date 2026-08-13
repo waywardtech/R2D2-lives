@@ -74,3 +74,13 @@ ended disconnected/stopped with both Pi services active. Until a different
 reviewed strategy is available, the dome-position query is classified failed
 for firmware `7.0.101`; audio remains untested, and LED protocol completion is
 not a substitute for operator confirmation that light was visible.
+
+An independently authorized audio-only session omitted LED and dome commands.
+It failed with `IndexError` inside `audio.quiet_preview` before playback. Static
+inspection of pinned `spherov2.py` 0.12.1 shows `get_audio_volume()` indexing
+byte zero of the firmware response without validating its length, so this error
+means DID 26/CID 9 returned an empty data payload. No sound was commanded after
+that invalid response. The adapter now reports nested preview phases such as
+`audio_volume_read`, preserves cleanup errors separately, and avoids restore
+calls when no original volume was obtained. Audio remains failed/unverified for
+this firmware rather than being retried with another sound ID.

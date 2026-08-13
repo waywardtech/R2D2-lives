@@ -276,13 +276,36 @@ class Spherov2LibraryBackend:
         if capability == "audio.quiet_preview":
             if not self.policy.allow_audio_preview:
                 raise HardwareActionNotAuthorized("audio preview was not explicitly authorized")
-            previous = int(toy.get_audio_volume())
+            phase = "audio_volume_read"
+            previous: int | None = None
+            primary_error: Exception | None = None
             try:
+                previous = int(toy.get_audio_volume())
+                phase = "audio_volume_set"
                 toy.set_audio_volume(self.policy.audio_volume)
+                phase = "audio_play"
                 toy.play_audio_file(self.policy.audio_id, 0)
-            finally:
-                toy.stop_all_audio()
-                toy.set_audio_volume(previous)
+            except Exception as error:
+                primary_error = error
+            cleanup_error: Exception | None = None
+            if previous is not None:
+                for cleanup_phase, cleanup in (
+                    ("audio_stop_restore", toy.stop_all_audio),
+                    ("audio_volume_restore", lambda: toy.set_audio_volume(previous)),
+                ):
+                    try:
+                        cleanup()
+                    except Exception as error:
+                        if cleanup_error is None:
+                            cleanup_error = StationaryExpressionError(
+                                cleanup_phase, type(error).__name__
+                            )
+            if primary_error is not None:
+                raise StationaryExpressionError(
+                    phase, type(primary_error).__name__
+                ) from primary_error
+            if cleanup_error is not None:
+                raise cleanup_error
             return {
                 "result": "exercised",
                 "audio_id": self.policy.audio_id,

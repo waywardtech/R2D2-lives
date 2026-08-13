@@ -145,9 +145,11 @@ class StationaryCapabilityProbe:
                 disconnect_failure = error
         if primary_failure is not None:
             failure_phase, original_failure = primary_failure
+            if hasattr(original_failure, "phase"):
+                failure_phase = f"{failure_phase}.{original_failure.phase}"
             raise CapabilityProbeError(
                 failure_phase,
-                type(original_failure).__name__,
+                getattr(original_failure, "error_type", type(original_failure).__name__),
                 cleanup_error_type=(
                     type(disconnect_failure).__name__ if disconnect_failure is not None else None
                 ),

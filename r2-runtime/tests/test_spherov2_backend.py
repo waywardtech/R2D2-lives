@@ -247,6 +247,18 @@ class Spherov2BackendTest(unittest.TestCase):
         )
         backend.disconnect()
 
+    def test_audio_preview_reports_empty_volume_response_phase(self) -> None:
+        policy = StationaryProbePolicy(allow_audio_preview=True, audio_id=1704)
+        backend, toy, _, _ = self.make_backend(policy)
+        backend.connect("D2-TEST")
+        toy.get_audio_volume = lambda: (_ for _ in ()).throw(IndexError())  # type: ignore[method-assign]
+        with self.assertRaises(StationaryExpressionError) as caught:
+            backend.exercise_stationary("audio.quiet_preview")
+        self.assertEqual(caught.exception.phase, "audio_volume_read")
+        self.assertEqual(caught.exception.error_type, "IndexError")
+        self.assertNotIn("audio_stop", toy.calls)
+        backend.disconnect()
+
     def test_stationary_expression_uses_only_head_audio_and_led_then_restores(self) -> None:
         policy = StationaryProbePolicy(
             allow_stationary_expressions=True,

@@ -228,6 +228,24 @@ class CapabilityProbeTest(unittest.TestCase):
         self.assertEqual(owner.state, ConnectionState.OFFLINE)
         self.assertNotIn("private", str(caught.exception))
 
+    def test_probe_includes_sanitized_nested_backend_phase(self) -> None:
+        class AudioFailureBackend(SimSpherov2Backend):
+            def exercise_stationary(self, capability: str) -> dict[str, object]:
+                if capability == "audio.quiet_preview":
+                    from r2_runtime.spherov2_backend import StationaryExpressionError
+
+                    raise StationaryExpressionError("audio_volume_read", "IndexError")
+                return dict(super().exercise_stationary(capability))
+
+        backend = AudioFailureBackend()
+        driver = Spherov2R2Driver(backend=backend, configured_identity="D2-SIMULATED")
+        with self.assertRaises(CapabilityProbeError) as caught:
+            StationaryCapabilityProbe(BleOwner(driver), driver).run(
+                evidence_category="HIL-stationary"
+            )
+        self.assertEqual(caught.exception.phase, "audio.quiet_preview.audio_volume_read")
+        self.assertEqual(caught.exception.error_type, "IndexError")
+
 
 if __name__ == "__main__":
     unittest.main()

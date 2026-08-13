@@ -89,6 +89,13 @@ The sanitized artifact is
 This classifies `head.safe_range` as failed for firmware `7.0.101`; audio remains
 untested and visible LED operation still requires operator observation.
 
+A subsequent audio-only attempt failed before playback while decoding the
+firmware's empty response to the audio-volume query (DID 26/CID 9). The pinned
+client indexed the absent first data byte and raised `IndexError`. No alternative
+audio ID was tried because playback was never reached. The sanitized artifact is
+`evidence/hil/stationary-audio-ec3785f-volume-response.json`, SHA-256
+`b399ea3436bd346c9ac92f7a2c5876a99025e9d1922c7d327a582ac42fc9797b`.
+
 ## Stop acknowledgement research
 
 The pinned upstream source sets `requests_response` on every protocol-v2 packet
