@@ -54,6 +54,10 @@ Archive. R2's English translation remains in a conventional condensed Latin
 face for immediate readability. The bundled font is attributed to AurekFonts;
 the archive classifies it as free for everyone, forever.
 
+English translation lines are displayed directly, without a `Translation:`
+prefix or enclosing quotation marks, so the available console space is devoted
+to the translated dialogue.
+
 The console occupies the available browser viewport without page scrolling;
 individual transcript and telemetry bays scroll only when their content needs
 it. Its live scopes visualize status-derived mood, optional foreground

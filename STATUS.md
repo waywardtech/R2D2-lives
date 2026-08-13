@@ -205,6 +205,9 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   classifies the exact stalled boundary, terminates/kills a hung child, requires
   operator state confirmation, and never retries. This path is simulation-tested
   only and remains disabled by default.
+- The R2 dashboard now renders English translations directly, without the
+  redundant `Translation:` label or enclosing quotation marks; its offline
+  cache revision was advanced so installed PWAs receive the presentation change.
 
 ## Remaining gate items
 

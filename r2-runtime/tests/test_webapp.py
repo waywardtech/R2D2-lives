@@ -31,6 +31,8 @@ class WebAppTest(unittest.TestCase):
         self.assertNotIn('"status.json"', worker.split("const STATIC", 1)[1].split(";", 1)[0])
 
     def test_clynese_console_font_keeps_r2_english_translation_readable(self) -> None:
+        html = (WEBAPP / "index.html").read_text(encoding="utf-8")
+        javascript = (WEBAPP / "app.js").read_text(encoding="utf-8")
         stylesheet = (WEBAPP / "app.css").read_text(encoding="utf-8")
         worker = (WEBAPP / "service-worker.js").read_text(encoding="utf-8")
         font = WEBAPP / "fonts" / "Clynese_Hand.otf"
@@ -39,6 +41,9 @@ class WebAppTest(unittest.TestCase):
         self.assertIn(".message.droid .translation", stylesheet)
         self.assertIn("var(--translation-font)", stylesheet)
         self.assertIn('"fonts/Clynese_Hand.otf"', worker)
+        self.assertNotIn("Translation:", html)
+        self.assertNotIn("Translation:", javascript)
+        self.assertIn("translated.textContent = translation;", javascript)
 
     def test_viewport_scopes_and_module_matrix_are_live_but_non_actuating(self) -> None:
         html = (WEBAPP / "index.html").read_text(encoding="utf-8")

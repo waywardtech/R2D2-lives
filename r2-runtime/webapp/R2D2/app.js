@@ -55,7 +55,7 @@ function addMessage(kind, primary, translation = "") {
   if (translation) {
     const translated = document.createElement("p");
     translated.className = "translation";
-    translated.textContent = `Translation: “${translation}”`;
+    translated.textContent = translation;
     article.append(translated);
   }
   transcript.append(article);
