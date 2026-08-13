@@ -59,3 +59,8 @@ wraps failures with a stable sanitized capability phase while preserving a
 separate disconnect-cleanup error type. Tests cover a primary capability
 timeout combined with a cleanup failure, ensure the primary phase wins, and
 ensure private exception text is not persisted. No retry was performed.
+
+The supervising operator subsequently reported no sound, LED activity, or
+movement during the attempt. That observation proves the visible/audible
+expression did not complete, but the pre-fix artifact is insufficient to
+distinguish an early query timeout from a timeout on the first LED command.

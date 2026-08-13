@@ -1,0 +1,10 @@
+{
+  "attempt": "stationary-capability-18d52e9",
+  "droid_motion_observed": false,
+  "generated_at": "2026-08-13T17:27:35.563Z",
+  "led_activity_observed": false,
+  "locomotion_observed": false,
+  "observation_source": "operator",
+  "schema_version": "1.0",
+  "sound_observed": false
+}
