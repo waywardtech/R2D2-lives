@@ -12,6 +12,7 @@ from .drivers import Spherov2R2Driver
 class StopBenchSessionResult:
     error_type: str | None
     battery_state: str
+    cleanup_error_type: str | None
 
 
 def run_stop_bench_session(owner: BleOwner, driver: Spherov2R2Driver) -> StopBenchSessionResult:
@@ -33,4 +34,8 @@ def run_stop_bench_session(owner: BleOwner, driver: Spherov2R2Driver) -> StopBen
                 owner.disconnect("stationary_probe_complete")
             except Exception as error:
                 error_type = error_type or type(error).__name__
-    return StopBenchSessionResult(error_type=error_type, battery_state=battery_state)
+    return StopBenchSessionResult(
+        error_type=error_type,
+        battery_state=battery_state,
+        cleanup_error_type=driver.last_disconnect_cleanup_error_type,
+    )

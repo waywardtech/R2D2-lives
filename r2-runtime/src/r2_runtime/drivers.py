@@ -77,6 +77,7 @@ class Spherov2R2Driver:
     stopped: bool = True
     stop_attempted_since_connect: bool = False
     transport_failed: bool = False
+    last_disconnect_cleanup_error_type: str | None = None
 
     expected_library_version = "0.12.1"
 
@@ -108,6 +109,7 @@ class Spherov2R2Driver:
         self.stopped = True
         self.stop_attempted_since_connect = False
         self.transport_failed = False
+        self.last_disconnect_cleanup_error_type = None
 
     def safe_hold(self) -> None:
         if not self.connected:
@@ -142,18 +144,27 @@ class Spherov2R2Driver:
             raise
 
     def disconnect(self) -> None:
+        primary_error: Exception | None = None
         if self.connected:
             try:
                 if not self.stop_attempted_since_connect and not self.transport_failed:
-                    self.safe_hold()
-            finally:
+                    try:
+                        self.safe_hold()
+                    except Exception as error:
+                        primary_error = error
                 try:
                     self.backend.disconnect()
-                finally:
-                    self.connected = False
-                    self.stopped = True
-                    self.stop_attempted_since_connect = False
-                    self.transport_failed = False
+                except Exception as error:
+                    self.last_disconnect_cleanup_error_type = type(error).__name__
+                    if primary_error is None:
+                        primary_error = error
+            finally:
+                self.connected = False
+                self.stopped = True
+                self.stop_attempted_since_connect = False
+                self.transport_failed = False
+        if primary_error is not None:
+            raise primary_error
 
 
 @dataclass

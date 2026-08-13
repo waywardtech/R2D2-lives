@@ -116,7 +116,12 @@ def main() -> None:
     digest = write_immutable_json(args.output, payload)
     print(
         json.dumps(
-            {"classification": classification, "report_sha256": digest, "error_type": error_type},
+            {
+                "classification": classification,
+                "report_sha256": digest,
+                "error_type": error_type,
+                "cleanup_error_type": session_result.cleanup_error_type,
+            },
             sort_keys=True,
         )
     )

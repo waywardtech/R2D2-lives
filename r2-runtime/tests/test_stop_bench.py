@@ -23,6 +23,7 @@ class StopBenchSessionTest(unittest.TestCase):
         result = self.run_with(backend)
         self.assertIsNone(result.error_type)
         self.assertEqual(result.battery_state, "ok")
+        self.assertIsNone(result.cleanup_error_type)
         self.assertEqual(backend.calls.count("stop"), 1)
         self.assertEqual(backend.calls[-2:], ["stop", "disconnect"])
 
@@ -37,6 +38,20 @@ class StopBenchSessionTest(unittest.TestCase):
         self.assertEqual(result.error_type, "TimeoutError")
         self.assertEqual(backend.calls.count("stop_timeout"), 1)
         self.assertEqual(backend.calls[-1], "disconnect")
+
+    def test_stop_timeout_is_not_overwritten_by_disconnect_eof(self) -> None:
+        class DoubleFailureBackend(SimSpherov2Backend):
+            def stop(self) -> None:
+                self.calls.append("stop_timeout")
+                raise TimeoutError("injected response timeout")
+
+            def disconnect(self) -> None:
+                self.calls.append("disconnect_eof")
+                raise EOFError("injected close failure")
+
+        result = self.run_with(DoubleFailureBackend())
+        self.assertEqual(result.error_type, "TimeoutError")
+        self.assertEqual(result.cleanup_error_type, "EOFError")
 
     def test_unsafe_battery_still_disconnects_once_and_remains_invalid(self) -> None:
         class UnsafeBatteryBackend(SimSpherov2Backend):
