@@ -10,7 +10,7 @@ WorkingDirectory=/opt/r2-runtime/current
 Environment=PYTHONPATH=/opt/r2-runtime/current/r2-runtime/src
 Environment=R2_CHAT_DATABASE=/var/lib/r2-runtime/chat/continuity.sqlite3
 Environment=R2_STATUS_PATH=/var/lib/r2-runtime/dashboard/status.json
-ExecStart=/opt/r2-runtime/chat-venv/bin/uvicorn r2_runtime.chat_api:create_app --factory --host 127.0.0.1 --port 8765 --no-access-log
+ExecStart=/opt/r2-runtime/chat-venv/bin/python -m uvicorn r2_runtime.chat_api:create_app --factory --host 127.0.0.1 --port 8765 --no-access-log
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=true

@@ -58,6 +58,10 @@ unknown fields and messages outside 1-280 printable characters. The service has
 no hardware driver, BLE dependency, command tool, arbitrary URL, or shell
 surface; movement language receives a conversational refusal. If the service is
 unavailable, the browser visibly activates its earlier local reply table.
+The target's separately installed Python 3.11 lacks Debian `ensurepip` support,
+so deployment creates an isolated `venv --without-pip` and installs the exact
+hash-locked aarch64 wheels into that environment's site-packages with the system
+installer's `--target` mode; system Python packages remain untouched.
 
 The initial personality profile is grounded in Lucasfilm's official R2-D2
 Databank description: reliable, versatile, brave, helpful, and enduringly loyal,
