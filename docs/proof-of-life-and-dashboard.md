@@ -98,6 +98,14 @@ more detail instead of fabricating context. Movement language remains an
 explicit refusal, and word-boundary matching prevents unrelated words from
 being mistaken for commands.
 
+The chat header identifies each response source as model, local, safe fallback,
+or browser fallback. A compact horizontal prompt rail provides one-tap identity,
+mood, issue, and recent-topic checks without reducing the viewport fit. The
+browser accepts API dialogue only when the response explicitly reports
+`physical_action: false`; any missing or contrary value is rejected and visibly
+degrades to the non-actuating browser fallback. PWA cache revision v7 publishes
+these controls.
+
 The first live conversational rollout is Pi release `9e7cfda`. The sandboxed
 `r2-chat` service passed loopback health and public HTTPS chat checks, rejected a
 movement request conversationally, reported `physical_action: false`, applied

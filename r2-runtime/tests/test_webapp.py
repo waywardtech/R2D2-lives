@@ -22,6 +22,7 @@ class WebAppTest(unittest.TestCase):
         self.assertIn('fetch("api/chat"', javascript)
         self.assertIn('method: "POST"', javascript)
         self.assertIn('window.localStorage.setItem("r2-chat-session"', javascript)
+        self.assertIn("reply.physical_action !== false", javascript)
         for forbidden in ("/drive", "/move", "/heading", "/proof-of-life"):
             self.assertNotIn(forbidden, javascript)
 
@@ -70,6 +71,13 @@ class WebAppTest(unittest.TestCase):
         self.assertIn("navigator.mediaDevices.getUserMedia", javascript)
         self.assertIn('pulseModules("status")', javascript)
         self.assertIn("signalState.output", javascript)
+        self.assertIn('data-prompt="Who are you?"', html)
+        self.assertIn('data-prompt="What did I say?"', html)
+        self.assertIn("setLinkMode(reply.mode)", javascript)
+        self.assertIn('setLinkMode("browser-fallback")', javascript)
+        self.assertIn(
+            'const CACHE = "r2-link-v7"', (WEBAPP / "service-worker.js").read_text(encoding="utf-8")
+        )
         for forbidden in ("/drive", "/move", "/heading", "/proof-of-life"):
             self.assertNotIn(forbidden, javascript)
 

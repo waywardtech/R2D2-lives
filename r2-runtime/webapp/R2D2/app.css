@@ -148,6 +148,12 @@ h2 { color: var(--ice); font-size: clamp(19px, 1.8vw, 28px); line-height: 1; }
 h3 { color: var(--orange); font-size: clamp(11px, 1vw, 15px); border-bottom: 2px solid #26383a; padding-bottom: 5px; }
 .live-chip { display: flex; gap: 6px; align-items: center; color: var(--green); font: 10px var(--console-font); }
 .live-chip i, .alert-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+.live-chip[data-mode="local-fallback"], .live-chip[data-mode="browser-fallback"] { color: var(--amber); }
+
+.prompt-rail { display: flex; gap: 5px; padding: 7px 0 0; overflow-x: auto; scrollbar-width: none; }
+.prompt-rail::-webkit-scrollbar { display: none; }
+.prompt-rail button { flex: 0 0 auto; border: 1px solid #573022; background: #170b08; color: var(--orange); padding: 4px 7px; font: 900 8px var(--console-font); letter-spacing: .1em; cursor: pointer; }
+.prompt-rail button:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
 
 .transcript { flex: 1; min-height: 0; overflow-y: auto; padding: clamp(8px, 1.2vh, 15px) 4px; scrollbar-color: #435557 #071012; }
 .message { max-width: 92%; margin: 0 0 10px; border-left: 3px solid var(--orange); padding: 8px 10px; background: #0b1517; font-weight: 900; }

@@ -9,6 +9,18 @@ let microphoneStream = null;
 let microphoneFrame = null;
 let chatSessionId = window.localStorage.getItem("r2-chat-session");
 
+function setLinkMode(mode) {
+  const chip = document.querySelector("#link-chip");
+  const labels = {
+    model: "MODEL",
+    local: "LOCAL",
+    "local-fallback": "SAFE FALLBACK",
+    "browser-fallback": "BROWSER FALLBACK",
+  };
+  chip.dataset.mode = mode;
+  chip.querySelector("span").textContent = labels[mode] || "UNKNOWN";
+}
+
 function pulseModules(moduleName) {
   const matrix = document.querySelector("#module-matrix");
   matrix.dataset.module = moduleName;
@@ -100,7 +112,8 @@ async function requestConversation(message) {
   const reply = await response.json();
   chatSessionId = reply.session_id;
   window.localStorage.setItem("r2-chat-session", chatSessionId);
-  return [reply.binary, reply.translation];
+  if (reply.physical_action !== false) throw new Error("unsafe chat response rejected");
+  return { binary: reply.binary, translation: reply.translation, mode: reply.mode };
 }
 
 chatForm.addEventListener("submit", async (event) => {
@@ -113,12 +126,21 @@ chatForm.addEventListener("submit", async (event) => {
   else setMood(0.44, "CURIOUS");
   messageInput.value = "";
   try {
-    const [binary, translation] = await requestConversation(text);
-    addMessage("droid", binary, translation);
+    const reply = await requestConversation(text);
+    setLinkMode(reply.mode);
+    addMessage("droid", reply.binary, reply.translation);
   } catch (_error) {
     const [binary, translation] = droidReply(text);
+    setLinkMode("browser-fallback");
     window.setTimeout(() => addMessage("droid", binary, `${translation} Local service unavailable; browser fallback active.`), 260);
   }
+});
+
+document.querySelectorAll("[data-prompt]").forEach((button) => {
+  button.addEventListener("click", () => {
+    messageInput.value = button.dataset.prompt;
+    chatForm.requestSubmit();
+  });
 });
 
 function row(label, value) {

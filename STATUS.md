@@ -252,6 +252,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   last-topic recall, and explicit repair for ambiguous yes/no replies. Keyword
   matching uses word boundaries so ordinary words cannot accidentally resemble
   movement or greeting commands; physical control remains absent.
+- The PWA now shows whether a reply came from the model, local policy, safe
+  model fallback, or browser fallback. One-tap identity, mood, issue, and recall
+  prompts support operator dialogue testing, and the browser rejects any API
+  response not explicitly marked `physical_action: false`. Cache revision v7
+  delivers the UI change to installed clients.
 - Pi release `9e7cfda` deployed the chat service under the sandboxed `r2-chat`
   account. Apache proxy syntax, `/health`, HTTPS chat, movement refusal, Alembic
   revision `0001_chat_continuity`, and two-turn preferred-name recall all passed;
