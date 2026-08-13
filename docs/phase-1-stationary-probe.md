@@ -107,6 +107,13 @@ ID. The immutable JSON result deliberately reports firmware behavior as
 access or movement. Source or version drift fails closed instead of producing a
 partial conclusion.
 
+The first target-host run used immutable release `045d251` and the installed
+0.12.1 source while Bluetooth was inactive and soft-blocked. All client-side
+checks passed and the identity-free JSON artifact hash is
+`23259f9268173b2a47601b00900a8aee302bb12c95b3e432c7b0c729f76b8418`.
+This strengthens the client diagnosis only; it does not resolve whether R201
+firmware acknowledges the command.
+
 ## Simulation
 
 Run `python scripts/tasks.py p1-sim` (or `make p1-sim`). Output includes seed

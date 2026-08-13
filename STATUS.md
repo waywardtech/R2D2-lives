@@ -216,6 +216,12 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   ten-second timeout without importing the package or accessing BLE. It hashes
   reviewed sources, fails closed on drift, and keeps firmware behavior explicitly
   unverified pending the separately authorized bench trace.
+- Pi release `045d251` ran that audit against the installed pinned source with
+  Bluetooth inactive and soft-blocked. Immutable target evidence at
+  `/var/lib/r2-runtime/evidence/response-policy-045d251.json` has SHA-256
+  `23259f9268173b2a47601b00900a8aee302bb12c95b3e432c7b0c729f76b8418`;
+  every client-side invariant passed, no BLE was accessed, and firmware response
+  behavior remains unverified.
 
 ## Remaining gate items
 
@@ -280,6 +286,7 @@ Pi progress staging 8c5bae3 -> pass; 5 source hashes matched, offline recovery p
 Pi watchdog staging 7c90a1f -> pass; 3 hashes matched, default refused, Bluetooth blocked
 stationary droid encounter attempt 1 -> expression observed; timed out, normal final state, not a passing cycle
 Pi dashboard deployment -> pass; active immutable release 7ba7239, HTTPS page/status and timer healthy
+Pi static response-policy audit -> pass; client wait policy verified, firmware behavior unverified, no BLE
 stationary proof-of-life attempt 1 -> failed before expression start; watchdog cleanup, no retry
 proof-of-life attempt 1 operator observation -> no expression or locomotion observed; stationary, silent, LEDs off
 ```
