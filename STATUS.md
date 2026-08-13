@@ -267,6 +267,10 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   passed in `local` mode with `physical_action: false`; the dashboard returned
   HTTP 200, `r2-chat` remained active, and Bluetooth remained inactive and
   soft-blocked. No droid discovery, connection, or command occurred.
+- Pi release `ccd552a` deployed the response-source chip and one-tap dialogue
+  tests. The served HTML, JavaScript, and cache v7 were verified over HTTPS; a
+  live issue query returned `mode: local` and `physical_action: false`.
+  Bluetooth remained inactive and soft-blocked, with no droid access.
 
 ## Remaining gate items
 
