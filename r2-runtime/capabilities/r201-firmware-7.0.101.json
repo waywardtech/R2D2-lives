@@ -1,0 +1,103 @@
+{
+  "capabilities": {
+    "audio.quiet_preview": {
+      "claim": "Untested after the required wake sequence; the pre-wake volume query returned an empty payload before playback.",
+      "evidence": [],
+      "state": "untested",
+      "supersedes": [
+        "evidence/hil/stationary-audio-ec3785f-volume-response.json"
+      ]
+    },
+    "battery.state_voltage": {
+      "claim": "Firmware battery state and voltage queries succeeded repeatedly, including after wake.",
+      "evidence": [
+        "evidence/hil/wake-led-35e799d-success.json"
+      ],
+      "state": "verified",
+      "supersedes": []
+    },
+    "ble.connect_disconnect": {
+      "claim": "Five fresh cycles and a 30-minute stationary session completed with clean disconnects.",
+      "evidence": [
+        "docs/r2-connectivity-diagnosis-2026-08-13.md"
+      ],
+      "state": "verified",
+      "supersedes": []
+    },
+    "collision.configuration": {
+      "claim": "The pinned adapter advertises collision configuration; the actual firmware behavior has not been exercised.",
+      "evidence": [],
+      "state": "unverified",
+      "supersedes": []
+    },
+    "drive.bounded_calibration": {
+      "claim": "No bounded locomotion calibration has been performed.",
+      "evidence": [],
+      "state": "untested",
+      "supersedes": []
+    },
+    "emergency_stop.physical": {
+      "claim": "No moving emergency-stop effectiveness test has been performed.",
+      "evidence": [],
+      "state": "untested",
+      "supersedes": []
+    },
+    "head.position_read": {
+      "claim": "Untested after the required wake sequence; the pre-wake read timed out.",
+      "evidence": [],
+      "state": "untested",
+      "supersedes": [
+        "evidence/hil/stationary-capability-ec3785f-head-timeout.json"
+      ]
+    },
+    "led.dome_logic_display": {
+      "claim": "The bounded dome LED sequence completed after wake and was physically observed.",
+      "evidence": [
+        "evidence/hil/wake-led-35e799d-success.json",
+        "evidence/hil/wake-led-35e799d-operator-observation.json"
+      ],
+      "state": "verified",
+      "supersedes": [
+        "evidence/hil/stationary-capability-followup-operator-observation.json"
+      ]
+    },
+    "stop.command_acknowledgement": {
+      "claim": "The final OFF/0 safe-hold command received a response after wake; physical stopping effectiveness was not measured.",
+      "evidence": [
+        "evidence/hil/wake-led-35e799d-success.json"
+      ],
+      "state": "verified",
+      "supersedes": [
+        "evidence/hil/stop-response-3855d7c.json"
+      ]
+    },
+    "stop.physical_effectiveness": {
+      "claim": "Stopping time and distance have not been measured from locomotion.",
+      "evidence": [],
+      "state": "untested",
+      "supersedes": []
+    },
+    "telemetry.stationary": {
+      "claim": "Sensor streams are advertised by the adapter but have not been exercised on this firmware.",
+      "evidence": [],
+      "state": "unverified",
+      "supersedes": []
+    },
+    "wake.stance_cycle": {
+      "claim": "Wake was acknowledged and physically observed cycling three-leg to two-leg stance without locomotion.",
+      "evidence": [
+        "evidence/hil/wake-led-35e799d-success.json",
+        "evidence/hil/wake-led-35e799d-operator-observation.json"
+      ],
+      "state": "verified",
+      "supersedes": []
+    }
+  },
+  "device_ref": "sha256:275886bae470849ca3796342f2b473846da043d693e4f39445c7390d59d35807",
+  "firmware": "7.0.101",
+  "gate_p1_complete": false,
+  "generated_at": "2026-08-13T17:44:16.214456Z",
+  "library_baseline": "0.12.1",
+  "model": "R2-D2 R201",
+  "schema_version": "1.0"
+}
