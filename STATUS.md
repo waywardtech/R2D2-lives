@@ -236,6 +236,9 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   firmware error, timeout, cleanup failure, and response-sequence mismatch.
   Every outcome fails closed as designed, output is seed-stable and identity-
   free, and the runner imports neither BLE nor vendor hardware code.
+- Pi release `6613c70` reproduced all five deterministic trace outcomes using
+  Python 3.11 with `hardware_accessed: false` and `movement_performed: false`.
+  Bluetooth stayed inactive and soft-blocked throughout the target-host run.
 - A loopback-only FastAPI conversation service now backs dashboard chat through
   Apache. Strict Pydantic boundaries, a 280-character cap, SQLAlchemy 2 plus an
   Alembic migration, 40-turn-pair retention, opaque browser sessions, explicit-
@@ -343,6 +346,7 @@ Pi dashboard deployment -> pass; active immutable release 7ba7239, HTTPS page/st
 Pi static response-policy audit -> pass; client wait policy verified, firmware behavior unverified, no BLE
 Pi conversation service -> pass; HTTPS local chat, migration, continuity, movement refusal, no physical action
 Pi safe model-adapter rollout -> pass; release e0c54fe, local mode, no credential, Bluetooth inactive/blocked
+Pi stop-response trace simulation -> pass; release 6613c70, 5 outcomes, Bluetooth inactive/blocked
 stationary proof-of-life attempt 1 -> failed before expression start; watchdog cleanup, no retry
 proof-of-life attempt 1 operator observation -> no expression or locomotion observed; stationary, silent, LEDs off
 ```
