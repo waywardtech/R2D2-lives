@@ -114,6 +114,9 @@ class FakeToy:
         self.calls.append("audio_get_volume")
         return 40
 
+    def wake(self) -> None:
+        self.calls.append("wake")
+
     def set_audio_volume(self, volume: int) -> None:
         self.calls.append(("audio_volume", volume))
 
@@ -226,6 +229,18 @@ class Spherov2BackendTest(unittest.TestCase):
         self.assertEqual(toy.calls, before)
         backend.disconnect()
 
+    def test_wake_on_connect_is_separately_authorized_and_default_off(self) -> None:
+        backend, toy, _, _ = self.make_backend()
+        backend.connect("D2-TEST")
+        self.assertNotIn("wake", toy.calls)
+        backend.disconnect()
+
+        policy = StationaryProbePolicy(allow_wake_on_connect=True)
+        backend, toy, _, _ = self.make_backend(policy)
+        backend.connect("D2-TEST")
+        self.assertEqual(toy.calls[:2], ["enter", "wake"])
+        backend.disconnect()
+
     def test_authorized_previews_restore_led_and_audio_state(self) -> None:
         policy = StationaryProbePolicy(
             allow_led_preview=True,
@@ -244,6 +259,21 @@ class Spherov2BackendTest(unittest.TestCase):
         self.assertEqual(
             toy.calls[-4:],
             [("audio_volume", 8), ("audio_play", 1704, 0), "audio_stop", ("audio_volume", 40)],
+        )
+        backend.disconnect()
+
+    def test_led_preview_has_bounded_visible_dwell(self) -> None:
+        policy = StationaryProbePolicy(allow_led_preview=True, led_preview_dwell_s=1.25)
+        backend, toy, _, _ = self.make_backend(policy)
+        dwells: list[float] = []
+        backend._sleeper = dwells.append
+        backend.connect("D2-TEST")
+        result = backend.exercise_stationary("led.low_brightness")
+        self.assertEqual(dwells, [1.25])
+        self.assertEqual(result["restored"], True)
+        self.assertEqual(
+            [call for call in toy.calls if isinstance(call, tuple) and call[0] == "leds"],
+            [("leds", {FakeLeds.LOGIC_DISPLAYS: 8}), ("leds", {FakeLeds.LOGIC_DISPLAYS: 0})],
         )
         backend.disconnect()
 

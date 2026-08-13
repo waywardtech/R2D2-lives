@@ -90,3 +90,14 @@ during either instrumented follow-up. Therefore `led.low_brightness` is not
 verified despite protocol-level completion, `head.safe_range` is failed, and
 `audio.quiet_preview` is failed before playback. None of these commands should
 be automatically retried or advertised as working proof-of-life behavior.
+
+## Wake-sequence correction
+
+Static comparison with the pinned library's stock high-level path found that it
+calls `wake()` immediately after entering the toy connection context. The R2
+backend previously performed the BLE handshake but never sent that wake command.
+This explains how system and battery queries could succeed while visible,
+animatronic, and audio behavior remained dormant. Wake-on-connect is now a
+separately authorized, default-off HIL policy. The LED preview also has a bounded
+1.5-second dwell so operator observation can distinguish a physical light from
+a command that is switched off immediately.

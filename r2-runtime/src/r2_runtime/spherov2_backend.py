@@ -118,7 +118,9 @@ class ResilientBleakAdapter:
 
 @dataclass(frozen=True)
 class StationaryProbePolicy:
+    allow_wake_on_connect: bool = False
     allow_led_preview: bool = False
+    led_preview_dwell_s: float = 1.5
     allow_head_read: bool = False
     allow_audio_preview: bool = False
     audio_id: int | None = None
@@ -127,6 +129,8 @@ class StationaryProbePolicy:
     allowed_audio_names: frozenset[str] = frozenset()
 
     def __post_init__(self) -> None:
+        if not 0.1 <= self.led_preview_dwell_s <= 2.0:
+            raise ValueError("LED preview dwell must be in [0.1, 2.0] seconds")
         if not 0 <= self.audio_volume <= 16:
             raise ValueError("quiet audio preview volume must be in [0, 16]")
         if self.allow_audio_preview and self.audio_id is None:
@@ -196,6 +200,12 @@ class Spherov2LibraryBackend:
         if getattr(toy, "name", None) != configured_identity:
             raise RuntimeError("discovered droid identity did not exactly match configuration")
         toy.__enter__()
+        if self.policy.allow_wake_on_connect:
+            try:
+                toy.wake()
+            except Exception:
+                toy.__exit__(None, None, None)
+                raise
         self._toy = toy
 
     def discover_nearby_droids(self, configured_identity: str) -> tuple[str, ...]:
@@ -264,6 +274,7 @@ class Spherov2LibraryBackend:
             led = toy.LEDs.LOGIC_DISPLAYS
             try:
                 toy.multi_led_control.set_leds({led: 8})
+                self._sleeper(self.policy.led_preview_dwell_s)
             finally:
                 toy.multi_led_control.set_leds({led: 0})
             return {"result": "exercised", "brightness": 8, "restored": True}
