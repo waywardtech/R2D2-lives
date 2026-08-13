@@ -96,6 +96,11 @@ audio ID was tried because playback was never reached. The sanitized artifact is
 `evidence/hil/stationary-audio-ec3785f-volume-response.json`, SHA-256
 `b399ea3436bd346c9ac92f7a2c5876a99025e9d1922c7d327a582ac42fc9797b`.
 
+The supervising operator reported no sound, dome movement, locomotion, or LED
+activity across the instrumented head/LED and audio-only attempts. Accordingly,
+LED remains unverified (a returned command is not physical proof), dome read is
+failed, and quiet audio is failed before playback on this firmware.
+
 ## Stop acknowledgement research
 
 The pinned upstream source sets `requests_response` on every protocol-v2 packet

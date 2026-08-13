@@ -84,3 +84,9 @@ that invalid response. The adapter now reports nested preview phases such as
 `audio_volume_read`, preserves cleanup errors separately, and avoids restore
 calls when no original volume was obtained. Audio remains failed/unverified for
 this firmware rather than being retried with another sound ID.
+
+The operator observed no sound, dome movement, locomotion, or LED activity
+during either instrumented follow-up. Therefore `led.low_brightness` is not
+verified despite protocol-level completion, `head.safe_range` is failed, and
+`audio.quiet_preview` is failed before playback. None of these commands should
+be automatically retried or advertised as working proof-of-life behavior.

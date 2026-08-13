@@ -1,0 +1,13 @@
+{
+  "attempts": [
+    "stationary-capability-ec3785f",
+    "stationary-audio-ec3785f"
+  ],
+  "dome_movement_observed": false,
+  "generated_at": "2026-08-13T17:38:31.991Z",
+  "led_activity_observed": false,
+  "locomotion_observed": false,
+  "observation_source": "operator",
+  "schema_version": "1.0",
+  "sound_observed": false
+}
