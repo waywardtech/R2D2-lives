@@ -114,6 +114,13 @@ checks passed and the identity-free JSON artifact hash is
 This strengthens the client diagnosis only; it does not resolve whether R201
 firmware acknowledges the command.
 
+The audit also produces a stationary-command matrix for both battery queries,
+dome read/set, audio play/volume/stop, and the 16/32-bit LED setters used beneath
+the proof-of-life adapter. Each reviewed command is tied to its exact DID/CID and
+must use the common response-requesting `_execute` path. This shows that a
+missing response can stall any audited expression phase for the same client-side
+ten-second bound; it still does not establish why firmware omitted a response.
+
 ## Simulation
 
 Run `python scripts/tasks.py p1-sim` (or `make p1-sim`). Output includes seed

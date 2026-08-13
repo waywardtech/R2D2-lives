@@ -31,6 +31,28 @@ class Drive:
     def set_raw_motors(toy, left_mode, left_speed, right_mode, right_speed, proc=None):
         toy._execute(Drive._encode(toy, 1, proc, [left_mode, left_speed, right_mode, right_speed]))
 """
+ANIMATRONIC = """
+class Animatronic:
+    _did = 23
+    def set_head_position(toy, value): toy._execute(Animatronic._encode(toy, 15, None, [value]))
+    def get_head_position(toy): return toy._execute(Animatronic._encode(toy, 20, None))
+"""
+IO = """
+class IO:
+    _did = 26
+    def play_audio_file(toy, value): toy._execute(IO._encode(toy, 7, None, [value]))
+    def set_audio_volume(toy, value): toy._execute(IO._encode(toy, 8, None, [value]))
+    def get_audio_volume(toy): return toy._execute(IO._encode(toy, 9, None))
+    def stop_all_audio(toy): toy._execute(IO._encode(toy, 10, None))
+    def set_all_leds_with_16_bit_mask(toy, value): toy._execute(IO._encode(toy, 14, None, [value]))
+    def set_all_leds_with_32_bit_mask(toy, value): toy._execute(IO._encode(toy, 26, None, [value]))
+"""
+POWER = """
+class Power:
+    _did = 19
+    def get_battery_voltage(toy): return toy._execute(Power._encode(toy, 3, None))
+    def get_battery_voltage_state(toy): return toy._execute(Power._encode(toy, 23, None))
+"""
 
 
 class ResponsePolicyAuditTest(unittest.TestCase):
@@ -40,6 +62,9 @@ class ResponsePolicyAuditTest(unittest.TestCase):
             "controls/v2.py": PACKET,
             "toy/__init__.py": TOY,
             "commands/drive.py": DRIVE,
+            "commands/animatronic.py": ANIMATRONIC,
+            "commands/io.py": IO,
+            "commands/power.py": POWER,
         }.items():
             path = package / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -52,11 +77,28 @@ class ResponsePolicyAuditTest(unittest.TestCase):
                 self.make_package(Path(directory)), distribution_version="0.12.1"
             )
         self.assertEqual(
-            payload["conclusion"], "client_requires_matching_response_for_raw_motor_command"
+            payload["conclusion"], "client_requires_matching_response_for_audited_commands"
         )
         self.assertEqual(payload["firmware_behavior"], "unverified")
         self.assertEqual(payload["checks"]["wait_timeout_seconds"], 10.0)
         self.assertFalse(payload["movement_performed"])
+        self.assertEqual(len(payload["stationary_commands"]), 10)
+        self.assertEqual(
+            {item["name"] for item in payload["stationary_commands"]},
+            {
+                "battery_voltage",
+                "battery_state",
+                "head_set",
+                "head_get",
+                "audio_play",
+                "audio_volume_set",
+                "audio_volume_get",
+                "audio_stop",
+                "led_set_16",
+                "led_set_32",
+            },
+        )
+        self.assertTrue(all(item["requests_response"] for item in payload["stationary_commands"]))
         self.assertNotIn("package_root", json.dumps(payload))
 
     def test_version_source_drift_and_existing_output_fail_closed(self) -> None:

@@ -222,6 +222,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   `23259f9268173b2a47601b00900a8aee302bb12c95b3e432c7b0c729f76b8418`;
   every client-side invariant passed, no BLE was accessed, and firmware response
   behavior remains unverified.
+- The offline audit now covers a ten-entry stationary matrix: two battery
+  queries, dome read/set, audio play/volume read/volume set/stop, and 16/32-bit
+  LED setters. Every exact DID/CID path must pass through the same requested-
+  response, matching-ID, ten-second client wait; this characterizes possible
+  proof-of-life stall boundaries without attributing a cause to firmware.
 
 ## Remaining gate items
 

@@ -13,7 +13,23 @@ _SOURCES = {
     "packet_manager": Path("controls/v2.py"),
     "toy_transport": Path("toy/__init__.py"),
     "drive_commands": Path("commands/drive.py"),
+    "animatronic_commands": Path("commands/animatronic.py"),
+    "io_commands": Path("commands/io.py"),
+    "power_commands": Path("commands/power.py"),
 }
+
+_STATIONARY_COMMANDS = (
+    ("battery_voltage", "power_commands", "Power", "get_battery_voltage", 19, 3),
+    ("battery_state", "power_commands", "Power", "get_battery_voltage_state", 19, 23),
+    ("head_set", "animatronic_commands", "Animatronic", "set_head_position", 23, 15),
+    ("head_get", "animatronic_commands", "Animatronic", "get_head_position", 23, 20),
+    ("audio_play", "io_commands", "IO", "play_audio_file", 26, 7),
+    ("audio_volume_set", "io_commands", "IO", "set_audio_volume", 26, 8),
+    ("audio_volume_get", "io_commands", "IO", "get_audio_volume", 26, 9),
+    ("audio_stop", "io_commands", "IO", "stop_all_audio", 26, 10),
+    ("led_set_16", "io_commands", "IO", "set_all_leds_with_16_bit_mask", 26, 14),
+    ("led_set_32", "io_commands", "IO", "set_all_leds_with_32_bit_mask", 26, 26),
+)
 
 
 def _function(tree: ast.AST, class_name: str, function_name: str) -> ast.FunctionDef:
@@ -30,6 +46,27 @@ def _source(function: ast.FunctionDef, text: str) -> str:
     if segment is None:
         raise ValueError("could not isolate expected source boundary")
     return segment
+
+
+def _command_matrix(trees: dict[str, ast.Module], texts: dict[str, str]) -> list[dict[str, Any]]:
+    matrix: list[dict[str, Any]] = []
+    for name, label, class_name, function_name, did, cid in _STATIONARY_COMMANDS:
+        source = _source(_function(trees[label], class_name, function_name), texts[label])
+        if f"_did = {did}" not in texts[label]:
+            raise ValueError(f"unexpected DID for stationary command {name}")
+        if "toy._execute(" not in source or f"._encode(toy, {cid}," not in source:
+            raise ValueError(f"unexpected execute/CID path for stationary command {name}")
+        matrix.append(
+            {
+                "name": name,
+                "did": did,
+                "cid": cid,
+                "uses_execute": True,
+                "requests_response": True,
+                "wait_timeout_seconds": 10.0,
+            }
+        )
+    return matrix
 
 
 def audit_response_policy(package_root: Path, *, distribution_version: str) -> dict[str, Any]:
@@ -70,6 +107,7 @@ def audit_response_policy(package_root: Path, *, distribution_version: str) -> d
     }
     if not all(value is not None and value is not False for value in checks.values()):
         raise ValueError("pinned response-policy source shape did not match reviewed invariants")
+    stationary_commands = _command_matrix(trees, texts)
     return {
         "schema_version": 1,
         "audit_kind": "spherov2.client_response_policy",
@@ -78,7 +116,8 @@ def audit_response_policy(package_root: Path, *, distribution_version: str) -> d
         "method": "static_ast_no_import_no_ble",
         "source_sha256": hashes,
         "checks": checks,
-        "conclusion": "client_requires_matching_response_for_raw_motor_command",
+        "stationary_commands": stationary_commands,
+        "conclusion": "client_requires_matching_response_for_audited_commands",
         "firmware_behavior": "unverified",
         "movement_performed": False,
     }
