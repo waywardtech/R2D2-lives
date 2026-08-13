@@ -120,6 +120,10 @@ the proof-of-life adapter. Each reviewed command is tied to its exact DID/CID an
 must use the common response-requesting `_execute` path. This shows that a
 missing response can stall any audited expression phase for the same client-side
 ten-second bound; it still does not establish why firmware omitted a response.
+The expanded target-host artifact from release `9ae1835` passed all ten entries
+with SHA-256
+`105d76da6497bb3a526fc5c9c44e29ff5ad93d45235507b69a65603a129eda41`;
+Bluetooth remained inactive and soft-blocked throughout the static inspection.
 
 ## Simulation
 

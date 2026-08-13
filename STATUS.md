@@ -227,6 +227,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   LED setters. Every exact DID/CID path must pass through the same requested-
   response, matching-ID, ten-second client wait; this characterizes possible
   proof-of-life stall boundaries without attributing a cause to firmware.
+- Pi release `9ae1835` ran the expanded audit against the installed pinned
+  sources with Bluetooth inactive/blocked. All ten stationary command entries
+  passed and immutable evidence SHA-256 is
+  `105d76da6497bb3a526fc5c9c44e29ff5ad93d45235507b69a65603a129eda41`;
+  it records `movement_performed: false` and `firmware_behavior: unverified`.
 
 ## Remaining gate items
 
