@@ -1,0 +1,19 @@
+# Exact CPython 3.11 Linux/aarch64 chat-service wheel set.
+# Install offline with: pip install --require-hashes --no-index --find-links <wheelhouse> -r requirements-chat-pi.lock
+annotated-types==0.8.0 --hash=sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0
+alembic==1.16.5 --hash=sha256:60c92a1aadd930d0767194a3a5b8e2098fca14866f9a98e6f6072bfe1d702067
+anyio==4.14.2 --hash=sha256:4ae834a4cb8d6a9f0d0160eef05c18f72654d4790fae1da8050a106b4c9561a1
+click==8.4.2 --hash=sha256:2252088d7b7fe76fbfa50fae76a9657f3ffafafc85a34a799a97bc172c852a3f
+fastapi==0.116.1 --hash=sha256:c46ac7c312df840f0c9e220f7964bada936781bc4e2e6eb71f1c4d7553786565
+greenlet==3.5.5 --hash=sha256:8a268024ce2d7d2b04694bf1594058981a9fa663d1df4b762dee499211ed7c1c
+h11==0.16.0 --hash=sha256:9e54505b012527625f54dcc591e3e253276327e8a9c86f55bdb9012e9000e462
+idna==3.18 --hash=sha256:7f952cbe720b688055e3f87de14f5c3e5fdaa8bc3928985c4077ca689de849a2
+mako==1.4.1 --hash=sha256:6995caedadbe7b500f25ac245feb13979f93c342d1f6be621ea3f01e821cb1bf
+markupsafe==3.0.3 --hash=sha256:6b5420a1d9450023228968e7e6a9ce57f65d148ab56d2313fcd589eee96a7a50
+pydantic==2.13.4 --hash=sha256:45a282cde31d808236fd7ea9d919b128653c8b38b393d1c4ab335c62924d9aba
+pydantic-core==2.46.4 --hash=sha256:7bfb192b3f4b9e8a89b6277b6ce787564f62cfd272055f6e685726b111dc7826
+starlette==0.47.3 --hash=sha256:89c0778ca62a76b826101e7c709e70680a1699ca7da6b44d38eb0a7e61fe4b51
+sqlalchemy==2.0.43 --hash=sha256:4fb1a8c5438e0c5ea51afe9c6564f951525795cf432bed0c028c1cb081276685
+typing-extensions==4.16.0 --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8
+typing-inspection==0.4.4 --hash=sha256:65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147
+uvicorn==0.35.0 --hash=sha256:197535216b25ff9b785e29a0b79199f55222193d47f820816e7da751e9bc8d4a

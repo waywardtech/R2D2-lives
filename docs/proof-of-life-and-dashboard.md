@@ -42,12 +42,35 @@ astromech-console design based on the operator's layout sketch. It provides:
 - a static guarantee that the page exposes no drive or proof-of-life endpoint.
 
 The service worker caches only versioned static assets. It never caches
-`status.json`, emergency state, or authenticated API data. The first deployment
-is read-only and restricted by Apache to loopback/private-LAN addresses. It does
+`status.json`, emergency state, chat requests, or authenticated API data. The
+deployment is non-actuating and restricted by Apache to loopback/private-LAN
+addresses. It does
 not yet satisfy the full authenticated P2 operator-control requirement in
 R2-012: emergency stop, deadman manual controls, authentication, and a live
 reasoning service remain future gates. The dialogue fallback runs locally in the
 browser and cannot issue physical commands.
+
+The dashboard prefers a loopback FastAPI conversation service through Apache at
+`/R2D2/api/chat`. It retains at most 40 recent turn pairs per opaque browser
+session in an Alembic-migrated SQLAlchemy/SQLite database and remembers an
+explicitly supplied preferred name. Strict Pydantic request models reject
+unknown fields and messages outside 1-280 printable characters. The service has
+no hardware driver, BLE dependency, command tool, arbitrary URL, or shell
+surface; movement language receives a conversational refusal. If the service is
+unavailable, the browser visibly activates its earlier local reply table.
+
+The initial personality profile is grounded in Lucasfilm's official R2-D2
+Databank description: reliable, versatile, brave, helpful, and enduringly loyal,
+with the familiar prickly friendship with C-3PO. StarWars.com's official sound
+design history describes R2's voice as whistles and beeps carrying thought and
+emotion, while an official *Clone Wars* rewatch characterizes Artoo as mouthy.
+The UI therefore presents an electronic vocalization first and a readable Basic
+display translation, never audible English dialogue. The local persona is
+resourceful, courageous, loyal, dryly irreverent, and occasionally stubborn; it
+must not fabricate canon events or claim memories absent from bounded continuity.
+Sources: [`R2-D2 Databank`](https://www.starwars.com/databank/r2-d2),
+[`Iconic Star Wars Sound Effects`](https://www.starwars.com/news/5-iconic-star-wars-sound-effects-and-how-they-were-made-starwars-com), and
+[`The Clone Wars Rewatch: Secret Weapons`](https://www.starwars.com/news/the-clone-wars-rewatch-secret-weapons).
 
 Console text uses the freely licensed Clynese Hand face from the AurekFonts
 Archive. R2's English translation remains in a conventional condensed Latin

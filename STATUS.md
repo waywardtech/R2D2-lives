@@ -232,6 +232,16 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   passed and immutable evidence SHA-256 is
   `105d76da6497bb3a526fc5c9c44e29ff5ad93d45235507b69a65603a129eda41`;
   it records `movement_performed: false` and `firmware_behavior: unverified`.
+- A loopback-only FastAPI conversation service now backs dashboard chat through
+  Apache. Strict Pydantic boundaries, a 280-character cap, SQLAlchemy 2 plus an
+  Alembic migration, 40-turn-pair retention, opaque browser sessions, explicit-
+  name continuity, and a visible browser fallback are implemented. The service
+  exposes no BLE, driver, shell, arbitrary-URL, or physical-command surface.
+- R2's local dialogue profile is grounded in official StarWars.com sources: the
+  reliable, versatile, brave and loyal astromech communicates through emotional
+  electronic whistles/beeps, with readable Basic shown only as a display
+  translation. His dry, mouthy, resourceful and occasionally stubborn edge is
+  retained without inventing canon memories.
 
 ## Remaining gate items
 

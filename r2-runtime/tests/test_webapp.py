@@ -19,6 +19,9 @@ class WebAppTest(unittest.TestCase):
         self.assertIn('id="pi-state"', html)
         self.assertIn("CHAT DOES NOT COMMAND MOTORS", html)
         self.assertIn("fetch(`status.json", javascript)
+        self.assertIn('fetch("api/chat"', javascript)
+        self.assertIn('method: "POST"', javascript)
+        self.assertIn('window.localStorage.setItem("r2-chat-session"', javascript)
         for forbidden in ("/drive", "/move", "/heading", "/proof-of-life"):
             self.assertNotIn(forbidden, javascript)
 
@@ -28,6 +31,7 @@ class WebAppTest(unittest.TestCase):
         self.assertEqual(manifest["start_url"], "/R2D2/")
         self.assertEqual(manifest["scope"], "/R2D2/")
         self.assertIn('endsWith("/status.json")', worker)
+        self.assertIn('includes("/api/")', worker)
         self.assertNotIn('"status.json"', worker.split("const STATIC", 1)[1].split(";", 1)[0])
 
     def test_clynese_console_font_keeps_r2_english_translation_readable(self) -> None:
@@ -69,7 +73,7 @@ class WebAppTest(unittest.TestCase):
         for forbidden in ("/drive", "/move", "/heading", "/proof-of-life"):
             self.assertNotIn(forbidden, javascript)
 
-    def test_apache_surface_is_lan_only_read_only_and_hardened(self) -> None:
+    def test_apache_surface_is_lan_only_chat_scoped_and_hardened(self) -> None:
         config = (ROOT / "r2-runtime" / "deploy" / "apache" / "r2d2-dashboard.conf").read_text(
             encoding="utf-8"
         )
@@ -78,7 +82,9 @@ class WebAppTest(unittest.TestCase):
         self.assertIn("Require ip", config)
         self.assertIn("fc00::/7", config)
         self.assertIn("Content-Security-Policy", config)
-        self.assertNotIn("ProxyPass", config)
+        self.assertIn('ProxyPass "/R2D2/api/" "http://127.0.0.1:8765/"', config)
+        self.assertNotIn("/drive", config)
+        self.assertNotIn("/proof-of-life", config)
 
 
 if __name__ == "__main__":

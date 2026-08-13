@@ -7,6 +7,7 @@ const signalState = { mood: 0.28, input: 0.04, output: 0.03 };
 let outputDecayTimer = null;
 let microphoneStream = null;
 let microphoneFrame = null;
+let chatSessionId = window.localStorage.getItem("r2-chat-session");
 
 function pulseModules(moduleName) {
   const matrix = document.querySelector("#module-matrix");
@@ -88,7 +89,21 @@ function droidReply(text) {
   return ["beep-brrt · woo-deet", "I received that. Conversational reasoning is in local fallback mode, so no physical action was inferred."];
 }
 
-chatForm.addEventListener("submit", (event) => {
+async function requestConversation(message) {
+  const response = await fetch("api/chat", {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message, session_id: chatSessionId }),
+  });
+  if (!response.ok) throw new Error(`chat service returned ${response.status}`);
+  const reply = await response.json();
+  chatSessionId = reply.session_id;
+  window.localStorage.setItem("r2-chat-session", chatSessionId);
+  return [reply.binary, reply.translation];
+}
+
+chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const text = messageInput.value.trim();
   if (!text) return;
@@ -97,8 +112,13 @@ chatForm.addEventListener("submit", (event) => {
   else if (/warning|issue|problem|bad|danger/i.test(text)) setMood(0.88, "ALERT");
   else setMood(0.44, "CURIOUS");
   messageInput.value = "";
-  const [binary, translation] = droidReply(text);
-  window.setTimeout(() => addMessage("droid", binary, translation), 260);
+  try {
+    const [binary, translation] = await requestConversation(text);
+    addMessage("droid", binary, translation);
+  } catch (_error) {
+    const [binary, translation] = droidReply(text);
+    window.setTimeout(() => addMessage("droid", binary, `${translation} Local service unavailable; browser fallback active.`), 260);
+  }
 });
 
 function row(label, value) {

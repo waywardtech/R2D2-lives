@@ -2,9 +2,15 @@
 name = "r2-runtime"
 version = "0.1.0"
 requires-python = ">=3.11,<3.12"
-dependencies = ["sap-protocol==0.1.0"]
+dependencies = [
+    "alembic==1.16.5",
+    "fastapi==0.116.1",
+    "pydantic==2.13.4",
+    "sap-protocol==0.1.0",
+    "sqlalchemy==2.0.43",
+    "uvicorn==0.35.0",
+]
 
 [build-system]
 requires = ["setuptools==75.8.0"]
 build-backend = "setuptools.build_meta"
-

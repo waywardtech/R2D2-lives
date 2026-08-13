@@ -1,4 +1,4 @@
-const CACHE = "r2-link-v5";
+const CACHE = "r2-link-v6";
 const STATIC = ["./", "app.css", "app.js", "manifest.webmanifest", "fonts/Clynese_Hand.otf", "og.png"];
 
 self.addEventListener("install", (event) => {
@@ -13,7 +13,7 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
-  if (url.pathname.endsWith("/status.json")) return;
+  if (url.pathname.endsWith("/status.json") || url.pathname.includes("/api/")) return;
   if (event.request.method !== "GET") return;
   event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
 });
