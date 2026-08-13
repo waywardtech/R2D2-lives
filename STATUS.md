@@ -211,6 +211,11 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
 - R2 English translation lines are now twice the base size, heavy-weight, set in
   a futuristic Latin font stack, and prefixed by a same-size right-facing
   triangle. Responsive wrapping and a new PWA cache revision ship the change.
+- A deterministic static response-policy audit now verifies the pinned 0.12.1
+  raw-motor DID/CID, requested-response flag, enqueue path, matching-ID wait, and
+  ten-second timeout without importing the package or accessing BLE. It hashes
+  reviewed sources, fails closed on drift, and keeps firmware behavior explicitly
+  unverified pending the separately authorized bench trace.
 
 ## Remaining gate items
 

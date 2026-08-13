@@ -97,6 +97,16 @@ stationary bench trace determines the command/response behavior and an
 independent emergency-stop path is demonstrated. This is source inspection plus
 one failed charging-state HIL observation, not verified stop behavior.
 
+`scripts/audit_spherov2_response_policy.py` makes the client-side portion of
+that inspection deterministic. It parses, but never imports, the pinned package;
+hashes the three reviewed source files; verifies that raw-motor DID 22/CID 1 is
+sent through `_execute`; and verifies that protocol-v2 packet construction asks
+for a response before `_execute` waits up to ten seconds for the matching packet
+ID. The immutable JSON result deliberately reports firmware behavior as
+`unverified`, contains no package path or device identity, and performs no BLE
+access or movement. Source or version drift fails closed instead of producing a
+partial conclusion.
+
 ## Simulation
 
 Run `python scripts/tasks.py p1-sim` (or `make p1-sim`). Output includes seed
