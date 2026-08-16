@@ -31,9 +31,13 @@
       "supersedes": []
     },
     "drive.bounded_calibration": {
-      "claim": "No bounded locomotion calibration has been performed.",
-      "evidence": [],
-      "state": "untested",
+      "claim": "Two separately armed low-speed forward pulses queued through the reviewed nonblocking path, but the operator observed no displacement; transport delivery and motor response remain unconfirmed.",
+      "evidence": [
+        "evidence/hil/bounded-motion-f1a38b1-attempt-1.json",
+        "evidence/hil/bounded-motion-f1a38b1-attempt-2.json",
+        "evidence/hil/bounded-motion-f1a38b1-operator-observation.json"
+      ],
+      "state": "failed",
       "supersedes": []
     },
     "emergency_stop.physical": {

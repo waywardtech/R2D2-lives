@@ -1,0 +1,16 @@
+{
+  "device_identity_persisted": false,
+  "evidence_category": "hil_bounded_motion_calibration_pulse",
+  "evidence_sha256": "8bf139f4c6bf808da20e38a9d44305afe01b26da417d4318a038aefe951dc222",
+  "generated_at": "2026-08-16T18:54:49.231664Z",
+  "measured_distance_m": null,
+  "measurement_status": "operator_observation_required",
+  "raw_speed": 5,
+  "requested_window_s": 0.1,
+  "schema_version": "1.0",
+  "stop_dispatch": "queued_unacknowledged",
+  "terminal": "disconnected_safe_hold",
+  "watchdog_elapsed_s": 0.101051,
+  "watchdog_terminal": "completed",
+  "watchdog_timeout_s": 0.25
+}

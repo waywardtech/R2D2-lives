@@ -21,7 +21,7 @@ class FirmwareCapabilityProfileTest(unittest.TestCase):
         self.assertEqual(profile.capabilities["led.dome_logic_display"].state, "verified")
         self.assertEqual(profile.capabilities["head.position_read"].state, "untested")
         self.assertEqual(profile.capabilities["audio.quiet_preview"].state, "untested")
-        self.assertEqual(profile.capabilities["drive.bounded_calibration"].state, "untested")
+        self.assertEqual(profile.capabilities["drive.bounded_calibration"].state, "failed")
         self.assertNotIn("D2-", PROFILE.read_text(encoding="utf-8"))
         for capability in profile.capabilities.values():
             for evidence in (*capability.evidence, *capability.supersedes):
