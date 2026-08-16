@@ -1,0 +1,17 @@
+{
+  "device_identity_persisted": false,
+  "evidence_category": "hil_post_wake_motion_diagnostic",
+  "evidence_sha256": "6a289f220c7750df0104cb1513a4437e0c6ac127b5f3b78970cdcd664afd1894",
+  "generated_at": "2026-08-16T19:11:46.214570Z",
+  "measured_distance_m": null,
+  "measurement_status": "operator_observation_required",
+  "post_wake_settle_s": 3.0,
+  "raw_speed": 10,
+  "requested_window_s": 0.1,
+  "schema_version": "1.0",
+  "stop_dispatch": "queued_unacknowledged",
+  "terminal": "disconnected_safe_hold",
+  "watchdog_elapsed_s": 0.10114,
+  "watchdog_terminal": "completed",
+  "watchdog_timeout_s": 0.25
+}

@@ -1,0 +1,17 @@
+{
+  "attempts": [
+    "evidence/hil/post-wake-motion-606a9eb-attempt-1.json",
+    "evidence/hil/post-wake-motion-606a9eb-attempt-2.json"
+  ],
+  "final_stance": "two_leg",
+  "locomotion_observed": false,
+  "location_change_observed": false,
+  "observation_source": "operator",
+  "reported_date": "2026-08-16",
+  "schema_version": "1.0",
+  "stance_sequence_observed": [
+    "wake",
+    "three_leg",
+    "two_leg"
+  ]
+}
