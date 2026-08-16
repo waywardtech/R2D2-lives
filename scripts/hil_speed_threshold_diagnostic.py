@@ -61,6 +61,7 @@ def main() -> None:
         owner.connect_for_stationary_probe()
         time.sleep(POST_WAKE_SETTLE_S)
         watchdog = IndependentMotionWatchdog(driver.dispatch_emergency_stop)
+
         def pulse() -> None:
             owner.serialized(lambda: driver.dispatch_bounded_forward(RAW_SPEED))
             time.sleep(REQUESTED_WINDOW_S)
