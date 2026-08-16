@@ -24,3 +24,12 @@ The operator must measure and record the observed displacement, direction,
 normal final state, and any unexpected behavior after the pulse. A successful
 script result proves only local queueing and safe disconnect, not a calibrated
 speed, stopping distance, or Phase 1 movement gate.
+
+## Follow-up after no observed movement
+
+The two initial speed-5 pulses were issued immediately after `wake()` and did
+not produce observed displacement. `scripts/hil_post_wake_motion_diagnostic.py`
+is therefore a distinct, newly armed diagnostic: it waits three seconds for the
+wake/stance sequence, then sends one speed-10 pulse for 0.10 seconds under the
+same independent stop watchdog. It requires its own exact authorization and arm
+token; it is not a retry of the original calibration command.

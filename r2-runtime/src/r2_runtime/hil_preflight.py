@@ -49,6 +49,11 @@ class BoundedMotionCalibrationPreflight:
     identity: str
 
 
+@dataclass(frozen=True)
+class PostWakeMotionDiagnosticPreflight:
+    identity: str
+
+
 def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
@@ -161,3 +166,23 @@ def validate_bounded_motion_calibration_preflight(
     if environment.get("R2_BOUNDED_MOTION_ARM_TOKEN") != "AUTHORIZE_ONE_LOW_SPEED_PULSE":
         raise ValueError("calibration disabled: exact external arm token is required")
     return BoundedMotionCalibrationPreflight(identity)
+
+
+def validate_post_wake_motion_diagnostic_preflight(
+    args: argparse.Namespace, environment: Mapping[str, str]
+) -> PostWakeMotionDiagnosticPreflight:
+    """Refuse a new motion diagnostic after a previously failed pulse by default."""
+    if not args.authorize_post_wake_motion_diagnostic:
+        raise ValueError("diagnostic disabled: exact post-wake authorization is required")
+    required = STOP_BENCH_FLAGS + ("allow_wake_stance_cycle",)
+    missing = [name.replace("_", "-") for name in required if not getattr(args, name)]
+    if missing:
+        raise ValueError("diagnostic disabled: incomplete preflight: " + ", ".join(missing))
+    identity = environment.get("R2_DEVICE_IDENTITY", "")
+    if not identity:
+        raise ValueError(
+            "diagnostic disabled: R2_DEVICE_IDENTITY is required outside source control"
+        )
+    if environment.get("R2_POST_WAKE_DIAGNOSTIC_ARM_TOKEN") != "AUTHORIZE_ONE_POST_WAKE_PULSE":
+        raise ValueError("diagnostic disabled: exact external arm token is required")
+    return PostWakeMotionDiagnosticPreflight(identity)

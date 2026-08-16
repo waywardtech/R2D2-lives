@@ -4,6 +4,7 @@ import unittest
 from r2_runtime.hil_preflight import (
     validate_bounded_motion_calibration_preflight,
     validate_nonblocking_stop_bench_preflight,
+    validate_post_wake_motion_diagnostic_preflight,
     validate_proof_of_life_preflight,
     validate_stationary_encounter_preflight,
     validate_stationary_preflight,
@@ -101,6 +102,14 @@ def bounded_motion_arguments(**overrides: object) -> Namespace:
         "second_go_confirmed": False,
         "allow_wake_stance_cycle": False,
     }
+    values.update(overrides)
+    return Namespace(**values)
+
+
+def post_wake_motion_arguments(**overrides: object) -> Namespace:
+    values = bounded_motion_arguments().__dict__.copy()
+    values.pop("authorize_bounded_motion_calibration")
+    values["authorize_post_wake_motion_diagnostic"] = False
     values.update(overrides)
     return Namespace(**values)
 
@@ -248,6 +257,37 @@ class HilPreflightTest(unittest.TestCase):
                     "R2_DEVICE_IDENTITY": "private",
                     "R2_BOUNDED_MOTION_ARM_TOKEN": "AUTHORIZE_ONE_LOW_SPEED_PULSE",
                 },
+            )
+
+    def test_post_wake_diagnostic_requires_a_new_exact_authorization(self) -> None:
+        args = post_wake_motion_arguments(
+            **{
+                name: True
+                for name in (
+                    "authorize_post_wake_motion_diagnostic",
+                    "operator_present",
+                    "device_inspected",
+                    "temperature_ok",
+                    "keepout_clear",
+                    "emergency_stop_ready",
+                    "unplugged_from_charger",
+                    "physically_contained",
+                    "second_go_confirmed",
+                    "allow_wake_stance_cycle",
+                )
+            }
+        )
+        environment = {
+            "R2_DEVICE_IDENTITY": "private",
+            "R2_POST_WAKE_DIAGNOSTIC_ARM_TOKEN": "AUTHORIZE_ONE_POST_WAKE_PULSE",
+        }
+        self.assertEqual(
+            validate_post_wake_motion_diagnostic_preflight(args, environment).identity,
+            "private",
+        )
+        with self.assertRaisesRegex(ValueError, "exact post-wake authorization"):
+            validate_post_wake_motion_diagnostic_preflight(
+                post_wake_motion_arguments(), environment
             )
 
     def test_encounter_default_refuses_before_scanning(self) -> None:
