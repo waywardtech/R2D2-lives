@@ -44,6 +44,11 @@ class NonblockingStopBenchPreflight:
     identity: str
 
 
+@dataclass(frozen=True)
+class BoundedMotionCalibrationPreflight:
+    identity: str
+
+
 def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
@@ -136,3 +141,23 @@ def validate_nonblocking_stop_bench_preflight(
     if not identity:
         raise ValueError("bench disabled: R2_DEVICE_IDENTITY is required outside source control")
     return NonblockingStopBenchPreflight(identity)
+
+
+def validate_bounded_motion_calibration_preflight(
+    args: argparse.Namespace, environment: Mapping[str, str]
+) -> BoundedMotionCalibrationPreflight:
+    """Refuse the separately armed, supervised first-motion calibration by default."""
+    if not args.authorize_bounded_motion_calibration:
+        raise ValueError("calibration disabled: exact bounded-motion authorization is required")
+    required = STOP_BENCH_FLAGS + ("allow_wake_stance_cycle",)
+    missing = [name.replace("_", "-") for name in required if not getattr(args, name)]
+    if missing:
+        raise ValueError("calibration disabled: incomplete preflight: " + ", ".join(missing))
+    identity = environment.get("R2_DEVICE_IDENTITY", "")
+    if not identity:
+        raise ValueError(
+            "calibration disabled: R2_DEVICE_IDENTITY is required outside source control"
+        )
+    if environment.get("R2_BOUNDED_MOTION_ARM_TOKEN") != "AUTHORIZE_ONE_LOW_SPEED_PULSE":
+        raise ValueError("calibration disabled: exact external arm token is required")
+    return BoundedMotionCalibrationPreflight(identity)

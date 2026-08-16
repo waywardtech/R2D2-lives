@@ -1,0 +1,26 @@
+# R201 bounded-motion calibration pulse
+
+`scripts/hil_bounded_motion_calibration.py` is a single-use, separately armed
+hardware calibration aid. It is not part of the runtime command surface and it
+is never invoked by the web application, conversation system, or SAP.
+
+The runner sends exactly one queue-only raw-motor forward pulse at speed 5 for
+0.10 seconds. An independent watchdog queues raw-motor `OFF/0` on normal
+completion, worker failure, or a 0.25-second deadline. The command path does
+not wait for a firmware response. The final evidence therefore records requested
+bounds and a queued (unacknowledged) stop, not an inferred distance or braking
+claim.
+
+It refuses before creating a BLE backend unless all of the following are supplied:
+
+- exact motion-calibration authorization;
+- visible operator, inspection, 0–40 C envelope, clear one-metre keep-out, and
+  an immediately reachable emergency stop;
+- unplugged charger, physical containment, a second confirmation, and explicit
+  acknowledgement that the R201 wake sequence changes stance;
+- external device identity and exact, non-source-controlled arm token.
+
+The operator must measure and record the observed displacement, direction,
+normal final state, and any unexpected behavior after the pulse. A successful
+script result proves only local queueing and safe disconnect, not a calibrated
+speed, stopping distance, or Phase 1 movement gate.

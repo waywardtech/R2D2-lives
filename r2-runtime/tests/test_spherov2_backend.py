@@ -35,6 +35,7 @@ class FakeLeds(IntEnum):
 
 class FakeRawMotorModes(IntEnum):
     OFF = 0
+    FORWARD = 1
 
 
 class FakeAudio(IntEnum):
@@ -230,6 +231,19 @@ class Spherov2BackendTest(unittest.TestCase):
         self.assertFalse(
             any(isinstance(call, tuple) and call[0] == "execute" for call in toy.calls)
         )
+        backend.disconnect()
+
+    def test_bounded_forward_is_queued_without_execute_or_response_wait(self) -> None:
+        backend, toy, _, _ = self.make_backend()
+        backend.connect("D2-TEST")
+        backend.dispatch_bounded_forward_no_wait(5)
+        self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 1, 17)))
+        self.assertEqual(FakeDriveCommand.encoded_data, [1, 5, 1, 5])
+        self.assertFalse(
+            any(isinstance(call, tuple) and call[0] == "execute" for call in toy.calls)
+        )
+        with self.assertRaises(ValueError):
+            backend.dispatch_bounded_forward_no_wait(11)
         backend.disconnect()
 
     def test_default_policy_denies_stationary_actuation(self) -> None:

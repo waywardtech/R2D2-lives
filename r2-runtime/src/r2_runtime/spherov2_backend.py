@@ -249,10 +249,19 @@ class Spherov2LibraryBackend:
 
     def dispatch_stop_no_wait(self) -> None:
         """Queue raw-motor OFF/0 directly; this deliberately does not await a response."""
+        self._queue_raw_motors_no_wait("OFF", 0)
+
+    def dispatch_bounded_forward_no_wait(self, speed: int) -> None:
+        """Queue an explicitly bounded low-speed forward command without a response wait."""
+        if not 1 <= speed <= 10:
+            raise ValueError("bounded raw-motor speed must be in [1, 10]")
+        self._queue_raw_motors_no_wait("FORWARD", speed)
+
+    def _queue_raw_motors_no_wait(self, mode_name: str, speed: int) -> None:
         toy = self._require_toy()
         drive = self._module_loader("spherov2.commands.drive")
-        off = drive.RawMotorModes.OFF
-        packet = drive.Drive._encode(toy, 1, None, [off, 0, off, 0])
+        mode = getattr(drive.RawMotorModes, mode_name)
+        packet = drive.Drive._encode(toy, 1, None, [mode, speed, mode, speed])
         queue = getattr(toy, "_Toy__packet_queue", None)
         if queue is None or not hasattr(queue, "put"):
             raise RuntimeError("pinned toy transport queue is unavailable")

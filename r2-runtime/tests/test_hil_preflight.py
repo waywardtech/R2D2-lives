@@ -2,6 +2,7 @@ from argparse import Namespace
 import unittest
 
 from r2_runtime.hil_preflight import (
+    validate_bounded_motion_calibration_preflight,
     validate_nonblocking_stop_bench_preflight,
     validate_proof_of_life_preflight,
     validate_stationary_encounter_preflight,
@@ -82,6 +83,23 @@ def nonblocking_stop_arguments(**overrides: object) -> Namespace:
         "emergency_stop_ready": False,
         "unplugged_from_charger": False,
         "physically_contained": False,
+    }
+    values.update(overrides)
+    return Namespace(**values)
+
+
+def bounded_motion_arguments(**overrides: object) -> Namespace:
+    values = {
+        "authorize_bounded_motion_calibration": False,
+        "operator_present": False,
+        "device_inspected": False,
+        "temperature_ok": False,
+        "keepout_clear": False,
+        "emergency_stop_ready": False,
+        "unplugged_from_charger": False,
+        "physically_contained": False,
+        "second_go_confirmed": False,
+        "allow_wake_stance_cycle": False,
     }
     values.update(overrides)
     return Namespace(**values)
@@ -193,6 +211,44 @@ class HilPreflightTest(unittest.TestCase):
         args.unplugged_from_charger = False
         with self.assertRaisesRegex(ValueError, "unplugged-from-charger"):
             validate_nonblocking_stop_bench_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
+
+    def test_bounded_motion_requires_every_gate_and_external_arm(self) -> None:
+        args = bounded_motion_arguments(
+            **{
+                name: True
+                for name in (
+                    "authorize_bounded_motion_calibration",
+                    "operator_present",
+                    "device_inspected",
+                    "temperature_ok",
+                    "keepout_clear",
+                    "emergency_stop_ready",
+                    "unplugged_from_charger",
+                    "physically_contained",
+                    "second_go_confirmed",
+                    "allow_wake_stance_cycle",
+                )
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "external arm token"):
+            validate_bounded_motion_calibration_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
+        result = validate_bounded_motion_calibration_preflight(
+            args,
+            {
+                "R2_DEVICE_IDENTITY": "private",
+                "R2_BOUNDED_MOTION_ARM_TOKEN": "AUTHORIZE_ONE_LOW_SPEED_PULSE",
+            },
+        )
+        self.assertEqual(result.identity, "private")
+        args.allow_wake_stance_cycle = False
+        with self.assertRaisesRegex(ValueError, "allow-wake-stance-cycle"):
+            validate_bounded_motion_calibration_preflight(
+                args,
+                {
+                    "R2_DEVICE_IDENTITY": "private",
+                    "R2_BOUNDED_MOTION_ARM_TOKEN": "AUTHORIZE_ONE_LOW_SPEED_PULSE",
+                },
+            )
 
     def test_encounter_default_refuses_before_scanning(self) -> None:
         with self.assertRaisesRegex(ValueError, "exact stationary authorization"):

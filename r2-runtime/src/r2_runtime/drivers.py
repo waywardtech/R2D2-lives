@@ -24,6 +24,7 @@ class Spherov2Backend(Protocol):
     def disconnect(self) -> None: ...
     def stop(self) -> None: ...
     def dispatch_stop_no_wait(self) -> None: ...
+    def dispatch_bounded_forward_no_wait(self, speed: int) -> None: ...
     def identity(self) -> Mapping[str, str]: ...
     def battery(self) -> Mapping[str, object]: ...
     def exercise_stationary(self, capability: str) -> Mapping[str, object]: ...
@@ -49,6 +50,9 @@ class UnavailableSpherov2Backend:
         self._raise()
 
     def dispatch_stop_no_wait(self) -> None:
+        self._raise()
+
+    def dispatch_bounded_forward_no_wait(self, speed: int) -> None:
         self._raise()
 
     def identity(self) -> Mapping[str, str]:
@@ -135,6 +139,16 @@ class Spherov2R2Driver:
         self.stop_attempted_since_connect = True
         self.backend.dispatch_stop_no_wait()
         self.stopped = True
+
+    def dispatch_bounded_forward(self, speed: int) -> None:
+        if not self.connected:
+            raise RuntimeError("bounded forward dispatch requires a connected R2")
+        if not self.stopped:
+            raise RuntimeError("bounded forward dispatch requires stopped state")
+        if not 1 <= speed <= 10:
+            raise ValueError("bounded raw-motor speed must be in [1, 10]")
+        self.backend.dispatch_bounded_forward_no_wait(speed)
+        self.stopped = False
 
     def discover_nearby_droids(self) -> tuple[str, ...]:
         if self.connected:

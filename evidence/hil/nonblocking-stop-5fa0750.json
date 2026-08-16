@@ -1,0 +1,10 @@
+{
+  "device_identity_persisted": false,
+  "evidence_category": "hil_nonblocking_stop_dispatch",
+  "evidence_sha256": "6ca8248c498b862010f11379d8672207aa583b34e63057df02f6295aa6be6c14",
+  "generated_at": "2026-08-16T18:42:20.213424Z",
+  "movement_performed": false,
+  "schema_version": "1.0",
+  "stop_dispatch": "queued_unacknowledged",
+  "terminal": "disconnected_safe_hold"
+}

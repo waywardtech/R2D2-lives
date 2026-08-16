@@ -117,6 +117,22 @@ class CapabilityProbeTest(unittest.TestCase):
         self.assertNotIn("stop", backend.calls)
         self.assertEqual(backend.calls[-1], "disconnect")
 
+    def test_bounded_forward_requires_connected_safe_hold_and_keeps_speed_cap(self) -> None:
+        backend, driver, owner, _ = self.make_probe()
+        with self.assertRaisesRegex(RuntimeError, "connected R2"):
+            driver.dispatch_bounded_forward(5)
+        owner.connect_for_stationary_probe()
+        driver.dispatch_bounded_forward(5)
+        self.assertEqual(backend.calls[-1], "forward_no_wait:5")
+        self.assertFalse(driver.stopped)
+        with self.assertRaisesRegex(RuntimeError, "stopped state"):
+            driver.dispatch_bounded_forward(5)
+        driver.dispatch_emergency_stop()
+        self.assertTrue(driver.stopped)
+        with self.assertRaises(ValueError):
+            driver.dispatch_bounded_forward(11)
+        owner.disconnect("bounded_forward_test_complete")
+
     def test_probe_records_stop_timeout_and_returns_failure_evidence(self) -> None:
         class StopTimeoutBackend(SimSpherov2Backend):
             def stop(self) -> None:
