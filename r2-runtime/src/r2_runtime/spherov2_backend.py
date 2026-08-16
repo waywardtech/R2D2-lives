@@ -274,6 +274,24 @@ class Spherov2LibraryBackend:
             raise RuntimeError("pinned toy transport queue is unavailable")
         queue.put(packet.build())
 
+    def dispatch_r2_drive_forward_no_wait(self, speed: int) -> None:
+        """Queue the R2-specific paired generic-drive motors (Drive CID 11)."""
+        if not 1 <= speed <= 25:
+            raise ValueError("R2 drive speed must be in [1, 25]")
+        toy = self._require_toy()
+        drive = self._module_loader("spherov2.commands.drive")
+        queue = getattr(toy, "_Toy__packet_queue", None)
+        if queue is None or not hasattr(queue, "put"):
+            raise RuntimeError("pinned toy transport queue is unavailable")
+        for index in (
+            drive.GenericRawMotorIndexes.LEFT_DRIVE,
+            drive.GenericRawMotorIndexes.RIGHT_DRIVE,
+        ):
+            packet = drive.Drive._encode(
+                toy, 11, None, [index, drive.GenericRawMotorModes.FORWARD, 0, speed]
+            )
+            queue.put(packet.build())
+
     def _queue_raw_motors_no_wait(self, mode_name: str, speed: int) -> None:
         toy = self._require_toy()
         drive = self._module_loader("spherov2.commands.drive")

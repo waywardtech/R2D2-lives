@@ -42,6 +42,15 @@ class FakeDriveFlags(IntEnum):
     FORWARD = 0
 
 
+class FakeGenericRawMotorIndexes(IntEnum):
+    LEFT_DRIVE = 0
+    RIGHT_DRIVE = 1
+
+
+class FakeGenericRawMotorModes(IntEnum):
+    FORWARD = 1
+
+
 class FakeAudio(IntEnum):
     R2_HEY_1 = 2813
 
@@ -196,7 +205,11 @@ class Spherov2BackendTest(unittest.TestCase):
             "spherov2.toy.r2d2": SimpleNamespace(R2D2=r2_type),
             "spherov2.controls": SimpleNamespace(RawMotorModes=FakeRawMotorModes),
             "spherov2.commands.drive": SimpleNamespace(
-                Drive=FakeDriveCommand, RawMotorModes=FakeRawMotorModes, DriveFlags=FakeDriveFlags
+                Drive=FakeDriveCommand,
+                RawMotorModes=FakeRawMotorModes,
+                DriveFlags=FakeDriveFlags,
+                GenericRawMotorIndexes=FakeGenericRawMotorIndexes,
+                GenericRawMotorModes=FakeGenericRawMotorModes,
             ),
         }
         backend = Spherov2LibraryBackend(
@@ -256,6 +269,15 @@ class Spherov2BackendTest(unittest.TestCase):
         backend.dispatch_heading_forward_no_wait(25)
         self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 7, 17)))
         self.assertEqual(FakeDriveCommand.encoded_data, [25, 0, 0, 0])
+        backend.disconnect()
+
+    def test_r2_specific_drive_queues_both_drive_motors_without_response_wait(self) -> None:
+        backend, toy, _, _ = self.make_backend()
+        backend.connect("D2-TEST")
+        backend.dispatch_r2_drive_forward_no_wait(25)
+        self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 11, 17)))
+        self.assertEqual(FakeDriveCommand.encoded_data, [1, 1, 0, 25])
+        self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 11, 17)))
         backend.disconnect()
 
     def test_default_policy_denies_stationary_actuation(self) -> None:
