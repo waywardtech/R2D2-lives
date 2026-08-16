@@ -33,3 +33,22 @@ is therefore a distinct, newly armed diagnostic: it waits three seconds for the
 wake/stance sequence, then sends one speed-10 pulse for 0.10 seconds under the
 same independent stop watchdog. It requires its own exact authorization and arm
 token; it is not a retry of the original calibration command.
+
+## R2-specific secondary-processor diagnostic
+
+The next separately armed diagnostic remains limited to one low-speed,
+0.10-second forward request at speed 25 and the same 0.25-second independent
+watchdog. It differs from the earlier generic raw-motor and heading attempts in
+two documented R201 details:
+
+- it queues the R2 `THREE_LEGS` animatronic action before the motion request and
+  queues `TWO_LEGS` only after the watchdog has queued the stop;
+- it sends Drive DID 22 control packets to the R2 secondary processor, including
+  the paired R2 generic drive-motor CID 11 commands and the raw `OFF/0` stop.
+
+The runner is `scripts/hil_speed_threshold_diagnostic.py`. It never waits for a
+firmware response, it never retries, and it records only that its stop was
+queued. The operator must still observe and record displacement, final stance,
+LED/audio behavior, and the final stationary state. A completed script cannot
+by itself prove that a motor packet was accepted or that the Phase 1 locomotion
+gate passed.

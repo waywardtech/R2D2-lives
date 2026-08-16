@@ -263,10 +263,11 @@ class Spherov2LibraryBackend:
             raise ValueError("heading drive bounds are invalid")
         toy = self._require_toy()
         drive = self._module_loader("spherov2.commands.drive")
+        processors = self._module_loader("spherov2.controls.v2")
         packet = drive.Drive._encode(
             toy,
             7,
-            None,
+            processors.Processors.SECONDARY,
             [speed, heading_degrees >> 8, heading_degrees & 0xFF, drive.DriveFlags.FORWARD],
         )
         queue = getattr(toy, "_Toy__packet_queue", None)
@@ -280,6 +281,7 @@ class Spherov2LibraryBackend:
             raise ValueError("R2 drive speed must be in [1, 25]")
         toy = self._require_toy()
         drive = self._module_loader("spherov2.commands.drive")
+        processors = self._module_loader("spherov2.controls.v2")
         queue = getattr(toy, "_Toy__packet_queue", None)
         if queue is None or not hasattr(queue, "put"):
             raise RuntimeError("pinned toy transport queue is unavailable")
@@ -288,15 +290,39 @@ class Spherov2LibraryBackend:
             drive.GenericRawMotorIndexes.RIGHT_DRIVE,
         ):
             packet = drive.Drive._encode(
-                toy, 11, None, [index, drive.GenericRawMotorModes.FORWARD, 0, speed]
+                toy,
+                11,
+                processors.Processors.SECONDARY,
+                [index, drive.GenericRawMotorModes.FORWARD, 0, speed],
             )
             queue.put(packet.build())
+
+    def dispatch_three_legs_no_wait(self) -> None:
+        self._queue_leg_action_no_wait("THREE_LEGS")
+
+    def dispatch_two_legs_no_wait(self) -> None:
+        """Queue the R2 stance return after a bounded motion diagnostic."""
+        self._queue_leg_action_no_wait("TWO_LEGS")
+
+    def _queue_leg_action_no_wait(self, action_name: str) -> None:
+        toy = self._require_toy()
+        animatronic = self._module_loader("spherov2.commands.animatronic")
+        queue = getattr(toy, "_Toy__packet_queue", None)
+        if queue is None or not hasattr(queue, "put"):
+            raise RuntimeError("pinned toy transport queue is unavailable")
+        packet = animatronic.Animatronic._encode(
+            toy, 13, None, [getattr(animatronic.R2LegActions, action_name)]
+        )
+        queue.put(packet.build())
 
     def _queue_raw_motors_no_wait(self, mode_name: str, speed: int) -> None:
         toy = self._require_toy()
         drive = self._module_loader("spherov2.commands.drive")
+        processors = self._module_loader("spherov2.controls.v2")
         mode = getattr(drive.RawMotorModes, mode_name)
-        packet = drive.Drive._encode(toy, 1, None, [mode, speed, mode, speed])
+        packet = drive.Drive._encode(
+            toy, 1, processors.Processors.SECONDARY, [mode, speed, mode, speed]
+        )
         queue = getattr(toy, "_Toy__packet_queue", None)
         if queue is None or not hasattr(queue, "put"):
             raise RuntimeError("pinned toy transport queue is unavailable")

@@ -49,6 +49,12 @@ class SimSpherov2Backend:
         self.stopped = False
         self.calls.append(f"r2_drive_forward_no_wait:{speed}")
 
+    def dispatch_three_legs_no_wait(self) -> None:
+        self.calls.append("three_legs_no_wait")
+
+    def dispatch_two_legs_no_wait(self) -> None:
+        self.calls.append("two_legs_no_wait")
+
     def identity(self) -> Mapping[str, str]:
         self.calls.append("identity")
         return {"model": "R201-sim", "system": "sim-system-1", "firmware": "sim-fw-1"}

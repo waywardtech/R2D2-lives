@@ -27,6 +27,8 @@ class Spherov2Backend(Protocol):
     def dispatch_bounded_forward_no_wait(self, speed: int) -> None: ...
     def dispatch_heading_forward_no_wait(self, speed: int, heading_degrees: int = 0) -> None: ...
     def dispatch_r2_drive_forward_no_wait(self, speed: int) -> None: ...
+    def dispatch_three_legs_no_wait(self) -> None: ...
+    def dispatch_two_legs_no_wait(self) -> None: ...
     def identity(self) -> Mapping[str, str]: ...
     def battery(self) -> Mapping[str, object]: ...
     def exercise_stationary(self, capability: str) -> Mapping[str, object]: ...
@@ -61,6 +63,12 @@ class UnavailableSpherov2Backend:
         self._raise()
 
     def dispatch_r2_drive_forward_no_wait(self, speed: int) -> None:
+        self._raise()
+
+    def dispatch_three_legs_no_wait(self) -> None:
+        self._raise()
+
+    def dispatch_two_legs_no_wait(self) -> None:
         self._raise()
 
     def identity(self) -> Mapping[str, str]:
@@ -173,6 +181,16 @@ class Spherov2R2Driver:
             raise ValueError("R2 drive speed must be in [1, 25]")
         self.backend.dispatch_r2_drive_forward_no_wait(speed)
         self.stopped = False
+
+    def dispatch_three_legs(self) -> None:
+        if not self.connected or not self.stopped:
+            raise RuntimeError("three-leg dispatch requires connected safe-hold state")
+        self.backend.dispatch_three_legs_no_wait()
+
+    def dispatch_two_legs(self) -> None:
+        if not self.connected or not self.stopped:
+            raise RuntimeError("two-leg dispatch requires connected safe-hold state")
+        self.backend.dispatch_two_legs_no_wait()
 
     def discover_nearby_droids(self) -> tuple[str, ...]:
         if self.connected:

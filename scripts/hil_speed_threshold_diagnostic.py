@@ -59,6 +59,7 @@ def main() -> None:
     owner = BleOwner(driver)
     try:
         owner.connect_for_stationary_probe()
+        owner.serialized(driver.dispatch_three_legs)
         time.sleep(POST_WAKE_SETTLE_S)
         watchdog = IndependentMotionWatchdog(driver.dispatch_emergency_stop)
 
@@ -69,6 +70,8 @@ def main() -> None:
         result = watchdog.run(pulse, timeout_s=WATCHDOG_TIMEOUT_S)
         if result.terminal != "completed" or not result.stop_dispatched:
             raise RuntimeError("speed-threshold watchdog did not complete with an emergency stop")
+        time.sleep(0.25)
+        owner.serialized(driver.dispatch_two_legs)
         time.sleep(0.25)
         owner.disconnect("speed_threshold_diagnostic_complete")
     except Exception as error:
@@ -101,6 +104,7 @@ def main() -> None:
         "watchdog_terminal": result.terminal,
         "watchdog_elapsed_s": round(result.elapsed_s, 6),
         "stop_dispatch": "queued_unacknowledged",
+        "stance_sequence": "three_legs_then_two_legs",
         "measured_distance_m": None,
         "measurement_status": "operator_observation_required",
         "device_identity_persisted": False,

@@ -51,6 +51,11 @@ class FakeGenericRawMotorModes(IntEnum):
     FORWARD = 1
 
 
+class FakeR2LegActions(IntEnum):
+    THREE_LEGS = 1
+    TWO_LEGS = 2
+
+
 class FakeAudio(IntEnum):
     R2_HEY_1 = 2813
 
@@ -160,11 +165,21 @@ class FakePacket:
 
 class FakeDriveCommand:
     encoded_data: list[object] = []
+    encoded_proc: object = None
 
     @staticmethod
     def _encode(toy: object, cid: int, proc: object, data: list[object]) -> FakePacket:
         FakeDriveCommand.encoded_data = list(data)
+        FakeDriveCommand.encoded_proc = proc
         return FakePacket(flags=10, did=22, cid=cid, seq=17)
+
+
+class FakeAnimatronicCommand:
+    @staticmethod
+    def _encode(toy: object, cid: int, proc: object, data: list[object]) -> FakePacket:
+        FakeDriveCommand.encoded_data = list(data)
+        FakeDriveCommand.encoded_proc = proc
+        return FakePacket(flags=10, did=23, cid=cid, seq=17)
 
 
 class FakeExecutingToy(FakeToy):
@@ -201,6 +216,7 @@ class Spherov2BackendTest(unittest.TestCase):
         scanner = FakeScanner(toy)
         r2_type = type("R2D2", (), {})
         modules = {
+            "spherov2.controls.v2": SimpleNamespace(Processors=SimpleNamespace(SECONDARY=2)),
             "spherov2.scanner": scanner,
             "spherov2.toy.r2d2": SimpleNamespace(R2D2=r2_type),
             "spherov2.controls": SimpleNamespace(RawMotorModes=FakeRawMotorModes),
@@ -210,6 +226,9 @@ class Spherov2BackendTest(unittest.TestCase):
                 DriveFlags=FakeDriveFlags,
                 GenericRawMotorIndexes=FakeGenericRawMotorIndexes,
                 GenericRawMotorModes=FakeGenericRawMotorModes,
+            ),
+            "spherov2.commands.animatronic": SimpleNamespace(
+                Animatronic=FakeAnimatronicCommand, R2LegActions=FakeR2LegActions
             ),
         }
         backend = Spherov2LibraryBackend(
@@ -245,6 +264,7 @@ class Spherov2BackendTest(unittest.TestCase):
         backend.dispatch_stop_no_wait()
         self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 1, 17)))
         self.assertEqual(FakeDriveCommand.encoded_data, [0, 0, 0, 0])
+        self.assertEqual(FakeDriveCommand.encoded_proc, 2)
         self.assertFalse(
             any(isinstance(call, tuple) and call[0] == "execute" for call in toy.calls)
         )
@@ -256,6 +276,7 @@ class Spherov2BackendTest(unittest.TestCase):
         backend.dispatch_bounded_forward_no_wait(5)
         self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 1, 17)))
         self.assertEqual(FakeDriveCommand.encoded_data, [1, 5, 1, 5])
+        self.assertEqual(FakeDriveCommand.encoded_proc, 2)
         self.assertFalse(
             any(isinstance(call, tuple) and call[0] == "execute" for call in toy.calls)
         )
@@ -269,6 +290,7 @@ class Spherov2BackendTest(unittest.TestCase):
         backend.dispatch_heading_forward_no_wait(25)
         self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 7, 17)))
         self.assertEqual(FakeDriveCommand.encoded_data, [25, 0, 0, 0])
+        self.assertEqual(FakeDriveCommand.encoded_proc, 2)
         backend.disconnect()
 
     def test_r2_specific_drive_queues_both_drive_motors_without_response_wait(self) -> None:
@@ -277,7 +299,26 @@ class Spherov2BackendTest(unittest.TestCase):
         backend.dispatch_r2_drive_forward_no_wait(25)
         self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 11, 17)))
         self.assertEqual(FakeDriveCommand.encoded_data, [1, 1, 0, 25])
+        self.assertEqual(FakeDriveCommand.encoded_proc, 2)
         self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 11, 17)))
+        backend.disconnect()
+
+    def test_three_leg_preparation_is_queued_without_response_wait(self) -> None:
+        backend, toy, _, _ = self.make_backend()
+        backend.connect("D2-TEST")
+        backend.dispatch_three_legs_no_wait()
+        self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 23, 13, 17)))
+        self.assertEqual(FakeDriveCommand.encoded_data, [1])
+        self.assertIsNone(FakeDriveCommand.encoded_proc)
+        backend.disconnect()
+
+    def test_two_leg_return_is_queued_without_response_wait(self) -> None:
+        backend, toy, _, _ = self.make_backend()
+        backend.connect("D2-TEST")
+        backend.dispatch_two_legs_no_wait()
+        self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 23, 13, 17)))
+        self.assertEqual(FakeDriveCommand.encoded_data, [2])
+        self.assertIsNone(FakeDriveCommand.encoded_proc)
         backend.disconnect()
 
     def test_default_policy_denies_stationary_actuation(self) -> None:

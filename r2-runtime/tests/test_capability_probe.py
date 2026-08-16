@@ -141,6 +141,18 @@ class CapabilityProbeTest(unittest.TestCase):
         driver.dispatch_emergency_stop()
         owner.disconnect("heading_forward_test_complete")
 
+    def test_r2_drive_and_stance_use_the_separate_r2_adapter_calls(self) -> None:
+        backend, driver, owner, _ = self.make_probe()
+        owner.connect_for_stationary_probe()
+        driver.dispatch_three_legs()
+        self.assertEqual(backend.calls[-1], "three_legs_no_wait")
+        driver.dispatch_r2_drive_forward(25)
+        self.assertEqual(backend.calls[-1], "r2_drive_forward_no_wait:25")
+        driver.dispatch_emergency_stop()
+        driver.dispatch_two_legs()
+        self.assertEqual(backend.calls[-1], "two_legs_no_wait")
+        owner.disconnect("r2_drive_and_stance_test_complete")
+
     def test_probe_records_stop_timeout_and_returns_failure_evidence(self) -> None:
         class StopTimeoutBackend(SimSpherov2Backend):
             def stop(self) -> None:
