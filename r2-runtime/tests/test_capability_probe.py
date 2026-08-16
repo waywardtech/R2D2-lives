@@ -108,6 +108,15 @@ class CapabilityProbeTest(unittest.TestCase):
         self.assertTrue(owner.stopped)
         self.assertEqual(owner.state, ConnectionState.OFFLINE)
 
+    def test_nonblocking_emergency_stop_prevents_disconnect_stop_retry(self) -> None:
+        backend, driver, owner, _ = self.make_probe()
+        owner.connect_for_stationary_probe()
+        driver.dispatch_emergency_stop()
+        owner.disconnect("emergency_stop_complete")
+        self.assertEqual(backend.calls.count("stop_no_wait"), 1)
+        self.assertNotIn("stop", backend.calls)
+        self.assertEqual(backend.calls[-1], "disconnect")
+
     def test_probe_records_stop_timeout_and_returns_failure_evidence(self) -> None:
         class StopTimeoutBackend(SimSpherov2Backend):
             def stop(self) -> None:

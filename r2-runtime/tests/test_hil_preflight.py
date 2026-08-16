@@ -2,6 +2,7 @@ from argparse import Namespace
 import unittest
 
 from r2_runtime.hil_preflight import (
+    validate_nonblocking_stop_bench_preflight,
     validate_proof_of_life_preflight,
     validate_stationary_encounter_preflight,
     validate_stationary_preflight,
@@ -66,6 +67,21 @@ def proof_arguments(**overrides: object) -> Namespace:
         "emergency_stop_ready": False,
         "charging_safe_only": False,
         "second_go_confirmed": False,
+    }
+    values.update(overrides)
+    return Namespace(**values)
+
+
+def nonblocking_stop_arguments(**overrides: object) -> Namespace:
+    values = {
+        "authorize_nonblocking_stop_bench": False,
+        "operator_present": False,
+        "device_inspected": False,
+        "temperature_ok": False,
+        "keepout_clear": False,
+        "emergency_stop_ready": False,
+        "unplugged_from_charger": False,
+        "physically_contained": False,
     }
     values.update(overrides)
     return Namespace(**values)
@@ -155,6 +171,28 @@ class HilPreflightTest(unittest.TestCase):
                 broken[key] = "wrong"
                 with self.assertRaisesRegex(ValueError, "external arm token"):
                     validate_stop_bench_preflight(args, broken)
+
+    def test_nonblocking_stop_bench_requires_full_physical_preflight(self) -> None:
+        args = nonblocking_stop_arguments(
+            **{
+                name: True
+                for name in (
+                    "authorize_nonblocking_stop_bench",
+                    "operator_present",
+                    "device_inspected",
+                    "temperature_ok",
+                    "keepout_clear",
+                    "emergency_stop_ready",
+                    "unplugged_from_charger",
+                    "physically_contained",
+                )
+            }
+        )
+        result = validate_nonblocking_stop_bench_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
+        self.assertEqual(result.identity, "private")
+        args.unplugged_from_charger = False
+        with self.assertRaisesRegex(ValueError, "unplugged-from-charger"):
+            validate_nonblocking_stop_bench_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
 
     def test_encounter_default_refuses_before_scanning(self) -> None:
         with self.assertRaisesRegex(ValueError, "exact stationary authorization"):

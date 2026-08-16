@@ -247,6 +247,17 @@ class Spherov2LibraryBackend:
         toy = self._require_toy()
         self._stop_executor(toy, self._module_loader)
 
+    def dispatch_stop_no_wait(self) -> None:
+        """Queue raw-motor OFF/0 directly; this deliberately does not await a response."""
+        toy = self._require_toy()
+        drive = self._module_loader("spherov2.commands.drive")
+        off = drive.RawMotorModes.OFF
+        packet = drive.Drive._encode(toy, 1, None, [off, 0, off, 0])
+        queue = getattr(toy, "_Toy__packet_queue", None)
+        if queue is None or not hasattr(queue, "put"):
+            raise RuntimeError("pinned toy transport queue is unavailable")
+        queue.put(packet.build())
+
     def identity(self) -> Mapping[str, str]:
         toy = self._require_toy()
         # Deliberately omit address and get_mac_address().

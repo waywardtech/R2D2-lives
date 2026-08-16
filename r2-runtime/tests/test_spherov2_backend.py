@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from datetime import datetime, timezone
 from enum import IntEnum
+from queue import SimpleQueue
 from types import SimpleNamespace
 import unittest
 
@@ -74,6 +75,7 @@ class FakeToy:
         self.calls: list[object] = []
         self.drive_control = FakeDriveControl(self.calls)
         self.multi_led_control = FakeLedControl(self.calls)
+        self._Toy__packet_queue: SimpleQueue[bytes] = SimpleQueue()
 
     def __enter__(self) -> "FakeToy":
         self.calls.append("enter")
@@ -188,6 +190,9 @@ class Spherov2BackendTest(unittest.TestCase):
             "spherov2.scanner": scanner,
             "spherov2.toy.r2d2": SimpleNamespace(R2D2=r2_type),
             "spherov2.controls": SimpleNamespace(RawMotorModes=FakeRawMotorModes),
+            "spherov2.commands.drive": SimpleNamespace(
+                Drive=FakeDriveCommand, RawMotorModes=FakeRawMotorModes
+            ),
         }
         backend = Spherov2LibraryBackend(
             policy=policy,
@@ -214,6 +219,17 @@ class Spherov2BackendTest(unittest.TestCase):
         self.assertNotIn("private-address", str(identity))
         self.assertEqual(identity["firmware"], "1.2.3")
         self.assertEqual(identity["system"], "D2A")
+        backend.disconnect()
+
+    def test_emergency_stop_is_queued_without_execute_or_response_wait(self) -> None:
+        backend, toy, _, _ = self.make_backend()
+        backend.connect("D2-TEST")
+        backend.dispatch_stop_no_wait()
+        self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 1, 17)))
+        self.assertEqual(FakeDriveCommand.encoded_data, [0, 0, 0, 0])
+        self.assertFalse(
+            any(isinstance(call, tuple) and call[0] == "execute" for call in toy.calls)
+        )
         backend.disconnect()
 
     def test_default_policy_denies_stationary_actuation(self) -> None:

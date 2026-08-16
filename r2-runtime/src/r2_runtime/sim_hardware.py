@@ -33,6 +33,10 @@ class SimSpherov2Backend:
         self.stopped = True
         self.calls.append("stop")
 
+    def dispatch_stop_no_wait(self) -> None:
+        self.stopped = True
+        self.calls.append("stop_no_wait")
+
     def identity(self) -> Mapping[str, str]:
         self.calls.append("identity")
         return {"model": "R201-sim", "system": "sim-system-1", "firmware": "sim-fw-1"}

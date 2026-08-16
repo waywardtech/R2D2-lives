@@ -23,6 +23,7 @@ class Spherov2Backend(Protocol):
     def connect(self, configured_identity: str) -> None: ...
     def disconnect(self) -> None: ...
     def stop(self) -> None: ...
+    def dispatch_stop_no_wait(self) -> None: ...
     def identity(self) -> Mapping[str, str]: ...
     def battery(self) -> Mapping[str, object]: ...
     def exercise_stationary(self, capability: str) -> Mapping[str, object]: ...
@@ -45,6 +46,9 @@ class UnavailableSpherov2Backend:
         self._raise()
 
     def stop(self) -> None:
+        self._raise()
+
+    def dispatch_stop_no_wait(self) -> None:
         self._raise()
 
     def identity(self) -> Mapping[str, str]:
@@ -121,6 +125,15 @@ class Spherov2R2Driver:
         except Exception:
             self.stopped = False
             raise
+        self.stopped = True
+
+    def dispatch_emergency_stop(self) -> None:
+        """Queue one OFF/0 packet without sharing a response wait."""
+        if not self.connected:
+            self.stopped = True
+            return
+        self.stop_attempted_since_connect = True
+        self.backend.dispatch_stop_no_wait()
         self.stopped = True
 
     def discover_nearby_droids(self) -> tuple[str, ...]:

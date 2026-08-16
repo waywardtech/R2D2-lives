@@ -39,6 +39,11 @@ class ProofOfLifePreflight:
     identity: str
 
 
+@dataclass(frozen=True)
+class NonblockingStopBenchPreflight:
+    identity: str
+
+
 def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
@@ -116,3 +121,18 @@ def validate_proof_of_life_preflight(
     if environment.get("R2_PROOF_OF_LIFE_ARM_TOKEN") != "AUTHORIZE_STATIONARY_PROOF_OF_LIFE":
         raise ValueError("proof of life disabled: exact external arm token is required")
     return ProofOfLifePreflight(identity)
+
+
+def validate_nonblocking_stop_bench_preflight(
+    args: argparse.Namespace, environment: Mapping[str, str]
+) -> NonblockingStopBenchPreflight:
+    if not args.authorize_nonblocking_stop_bench:
+        raise ValueError("bench disabled: exact nonblocking-stop authorization is required")
+    required = PREFLIGHT_FLAGS + ("unplugged_from_charger", "physically_contained")
+    missing = [name.replace("_", "-") for name in required if not getattr(args, name)]
+    if missing:
+        raise ValueError("bench disabled: incomplete preflight: " + ", ".join(missing))
+    identity = environment.get("R2_DEVICE_IDENTITY", "")
+    if not identity:
+        raise ValueError("bench disabled: R2_DEVICE_IDENTITY is required outside source control")
+    return NonblockingStopBenchPreflight(identity)
