@@ -130,7 +130,7 @@ class CapabilityProbeTest(unittest.TestCase):
         driver.dispatch_emergency_stop()
         self.assertTrue(driver.stopped)
         with self.assertRaises(ValueError):
-            driver.dispatch_bounded_forward(11)
+            driver.dispatch_bounded_forward(26)
         owner.disconnect("bounded_forward_test_complete")
 
     def test_probe_records_stop_timeout_and_returns_failure_evidence(self) -> None:

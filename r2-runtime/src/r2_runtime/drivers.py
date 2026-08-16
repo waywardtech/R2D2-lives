@@ -145,8 +145,8 @@ class Spherov2R2Driver:
             raise RuntimeError("bounded forward dispatch requires a connected R2")
         if not self.stopped:
             raise RuntimeError("bounded forward dispatch requires stopped state")
-        if not 1 <= speed <= 10:
-            raise ValueError("bounded raw-motor speed must be in [1, 10]")
+        if not 1 <= speed <= 25:
+            raise ValueError("bounded raw-motor speed must be in [1, 25]")
         self.backend.dispatch_bounded_forward_no_wait(speed)
         self.stopped = False
 

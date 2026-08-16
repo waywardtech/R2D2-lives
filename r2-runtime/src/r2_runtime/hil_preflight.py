@@ -54,6 +54,11 @@ class PostWakeMotionDiagnosticPreflight:
     identity: str
 
 
+@dataclass(frozen=True)
+class SpeedThresholdDiagnosticPreflight:
+    identity: str
+
+
 def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
@@ -186,3 +191,22 @@ def validate_post_wake_motion_diagnostic_preflight(
     if environment.get("R2_POST_WAKE_DIAGNOSTIC_ARM_TOKEN") != "AUTHORIZE_ONE_POST_WAKE_PULSE":
         raise ValueError("diagnostic disabled: exact external arm token is required")
     return PostWakeMotionDiagnosticPreflight(identity)
+
+
+def validate_speed_threshold_diagnostic_preflight(
+    args: argparse.Namespace, environment: Mapping[str, str]
+) -> SpeedThresholdDiagnosticPreflight:
+    if not args.authorize_speed_threshold_diagnostic:
+        raise ValueError("diagnostic disabled: exact speed-threshold authorization is required")
+    required = STOP_BENCH_FLAGS + ("allow_wake_stance_cycle",)
+    missing = [name.replace("_", "-") for name in required if not getattr(args, name)]
+    if missing:
+        raise ValueError("diagnostic disabled: incomplete preflight: " + ", ".join(missing))
+    identity = environment.get("R2_DEVICE_IDENTITY", "")
+    if not identity:
+        raise ValueError(
+            "diagnostic disabled: R2_DEVICE_IDENTITY is required outside source control"
+        )
+    if environment.get("R2_SPEED_THRESHOLD_ARM_TOKEN") != "AUTHORIZE_ONE_SPEED_25_PULSE":
+        raise ValueError("diagnostic disabled: exact external arm token is required")
+    return SpeedThresholdDiagnosticPreflight(identity)

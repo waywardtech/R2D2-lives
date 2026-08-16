@@ -253,8 +253,8 @@ class Spherov2LibraryBackend:
 
     def dispatch_bounded_forward_no_wait(self, speed: int) -> None:
         """Queue an explicitly bounded low-speed forward command without a response wait."""
-        if not 1 <= speed <= 10:
-            raise ValueError("bounded raw-motor speed must be in [1, 10]")
+        if not 1 <= speed <= 25:
+            raise ValueError("bounded raw-motor speed must be in [1, 25]")
         self._queue_raw_motors_no_wait("FORWARD", speed)
 
     def _queue_raw_motors_no_wait(self, mode_name: str, speed: int) -> None:

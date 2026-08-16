@@ -243,7 +243,7 @@ class Spherov2BackendTest(unittest.TestCase):
             any(isinstance(call, tuple) and call[0] == "execute" for call in toy.calls)
         )
         with self.assertRaises(ValueError):
-            backend.dispatch_bounded_forward_no_wait(11)
+            backend.dispatch_bounded_forward_no_wait(26)
         backend.disconnect()
 
     def test_default_policy_denies_stationary_actuation(self) -> None:
