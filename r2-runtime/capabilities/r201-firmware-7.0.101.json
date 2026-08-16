@@ -31,7 +31,7 @@
       "supersedes": []
     },
     "drive.bounded_calibration": {
-      "claim": "Four separately armed forward pulses (two immediate post-wake at speed 5 and two after a three-second wake settle at speed 10) queued through the reviewed nonblocking path, but the operator observed no displacement; transport delivery and motor response remain unconfirmed.",
+      "claim": "Four forward pulses—two at speed 5 and two at speed 10 after a three-second wake settle—queued through the reviewed path. The operator observed no displacement; transport delivery and motor response remain unconfirmed.",
       "evidence": [
         "evidence/hil/bounded-motion-f1a38b1-attempt-1.json",
         "evidence/hil/bounded-motion-f1a38b1-attempt-2.json",
