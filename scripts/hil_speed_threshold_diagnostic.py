@@ -63,7 +63,7 @@ def main() -> None:
         watchdog = IndependentMotionWatchdog(driver.dispatch_emergency_stop)
 
         def pulse() -> None:
-            owner.serialized(lambda: driver.dispatch_bounded_forward(RAW_SPEED))
+            owner.serialized(lambda: driver.dispatch_heading_forward(RAW_SPEED))
             time.sleep(REQUESTED_WINDOW_S)
 
         result = watchdog.run(pulse, timeout_s=WATCHDOG_TIMEOUT_S)

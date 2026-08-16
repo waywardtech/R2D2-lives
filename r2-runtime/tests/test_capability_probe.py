@@ -133,6 +133,14 @@ class CapabilityProbeTest(unittest.TestCase):
             driver.dispatch_bounded_forward(26)
         owner.disconnect("bounded_forward_test_complete")
 
+    def test_heading_forward_uses_the_separate_heading_drive_adapter(self) -> None:
+        backend, driver, owner, _ = self.make_probe()
+        owner.connect_for_stationary_probe()
+        driver.dispatch_heading_forward(25)
+        self.assertEqual(backend.calls[-1], "heading_forward_no_wait:25:0")
+        driver.dispatch_emergency_stop()
+        owner.disconnect("heading_forward_test_complete")
+
     def test_probe_records_stop_timeout_and_returns_failure_evidence(self) -> None:
         class StopTimeoutBackend(SimSpherov2Backend):
             def stop(self) -> None:

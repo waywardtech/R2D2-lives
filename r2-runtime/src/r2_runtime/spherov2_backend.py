@@ -257,6 +257,23 @@ class Spherov2LibraryBackend:
             raise ValueError("bounded raw-motor speed must be in [1, 25]")
         self._queue_raw_motors_no_wait("FORWARD", speed)
 
+    def dispatch_heading_forward_no_wait(self, speed: int, heading_degrees: int = 0) -> None:
+        """Queue Drive CID 7 forward heading control without awaiting firmware response."""
+        if not 1 <= speed <= 25 or not 0 <= heading_degrees <= 359:
+            raise ValueError("heading drive bounds are invalid")
+        toy = self._require_toy()
+        drive = self._module_loader("spherov2.commands.drive")
+        packet = drive.Drive._encode(
+            toy,
+            7,
+            None,
+            [speed, heading_degrees >> 8, heading_degrees & 0xFF, drive.DriveFlags.FORWARD],
+        )
+        queue = getattr(toy, "_Toy__packet_queue", None)
+        if queue is None or not hasattr(queue, "put"):
+            raise RuntimeError("pinned toy transport queue is unavailable")
+        queue.put(packet.build())
+
     def _queue_raw_motors_no_wait(self, mode_name: str, speed: int) -> None:
         toy = self._require_toy()
         drive = self._module_loader("spherov2.commands.drive")
