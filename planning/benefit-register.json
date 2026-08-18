@@ -28,7 +28,7 @@
     {
       "id": "r201-stock-primary-bounded-calibration-20260818",
       "scope": "hardware_diagnostic",
-      "state": "proposed",
+      "state": "completed_benefit",
       "hypothesis": "The verified stock/default-primary heading path can produce one conservatively bounded forward segment that an operator can measure, establishing a calibration baseline without exceeding the Phase 1 0.25 m limit.",
       "baseline": {
         "summary": "The stock/default-primary heading diagnostic produced operator-observed locomotion, but the distance and stopping effectiveness remain unmeasured.",
@@ -41,11 +41,34 @@
         "collection": "A supervising operator measures the forward displacement from fixed start and finish marks, observes direction, final stance, and stationary state after the independent watchdog safe hold."
       },
       "decision_rule": "A measured segment within the 0.25 m bound establishes only a preliminary motion calibration datum; unexpected direction, excessive distance, or any abnormal behavior stops the branch and leaves physical-stop effectiveness unverified.",
+      "result": "On 8-inch carpet tiles, the repeated stock/default-primary speed-25, 0.10-second pulse produced a measured straight forward displacement of 3 inches (0.0762 m), within the 0.25 m limit; watchdog safe hold and normal two-leg return were observed.",
       "sources": [
         {"kind": "official", "url": "https://sdk.sphero.com/documentation/api-documents"},
         {"kind": "upstream", "url": "https://github.com/artificial-intelligence-class/spherov2.py"}
       ],
-      "next_action": "Review and stage a distinct, fixed-bounds calibration runner, then require fresh exact motion authorization and preflight before one HIL run."
+      "next_action": "Treat this as carpet-tile-only calibration. Measure physical stopping distance and response separately before asserting stop effectiveness or applying any value to another surface."
+    },
+    {
+      "id": "r201-carpet-tile-physical-stop-20260818",
+      "scope": "hardware_diagnostic",
+      "state": "proposed",
+      "hypothesis": "For the measured 0.0762 m carpet-tile calibration segment, the independent OFF/0 watchdog leaves R2 stationary within the marked 0.25 m containment boundary and produces a normal final stance.",
+      "baseline": {
+        "summary": "The current calibration proves only a queued, unacknowledged stop and a final stationary observation; it does not measure stopping distance or prove physical-stop effectiveness.",
+        "evidence": ["planning/benefit-register.json#r201-stock-primary-bounded-calibration-20260818"]
+      },
+      "measurement": {
+        "metric": "operator_measured_stop_overrun_m",
+        "unit": "m",
+        "threshold": "<= 0.1738",
+        "collection": "On 8-inch carpet tiles, the supervising operator measures the center-to-center final position relative to the 0.0762 m calibration mark and confirms that R2 is stationary in a 0.25 m contained lane after the independently queued OFF/0 watchdog."
+      },
+      "decision_rule": "A measured final position no farther than 0.25 m from the marked start and a normal stationary final state provide one surface-specific physical-stop observation; any overrun, abnormal behavior, or inability to measure closes the branch without a parameter retry.",
+      "sources": [
+        {"kind": "official", "url": "https://sdk.sphero.com/documentation/api-documents"},
+        {"kind": "upstream", "url": "https://github.com/artificial-intelligence-class/spherov2.py"}
+      ],
+      "next_action": "Use the existing fixed calibration runner once with a marked 0.25 m carpet-tile lane and collect the final center position; do not change speed, duration, or processor."
     },
     {
       "id": "r201-secondary-processor-drive-20260818",
