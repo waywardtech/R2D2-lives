@@ -259,15 +259,27 @@ class Spherov2LibraryBackend:
 
     def dispatch_heading_forward_no_wait(self, speed: int, heading_degrees: int = 0) -> None:
         """Queue Drive CID 7 forward heading control without awaiting firmware response."""
+        self._queue_heading_forward_no_wait(speed, heading_degrees, secondary=True)
+
+    def dispatch_stock_heading_forward_no_wait(self, speed: int, heading_degrees: int = 0) -> None:
+        """Queue the stock R2 Drive CID 7 binding with its default processor."""
+        self._queue_heading_forward_no_wait(speed, heading_degrees, secondary=False)
+
+    def _queue_heading_forward_no_wait(
+        self, speed: int, heading_degrees: int, *, secondary: bool
+    ) -> None:
         if not 1 <= speed <= 25 or not 0 <= heading_degrees <= 359:
             raise ValueError("heading drive bounds are invalid")
         toy = self._require_toy()
         drive = self._module_loader("spherov2.commands.drive")
-        processors = self._module_loader("spherov2.controls.v2")
+        processor = None
+        if secondary:
+            processors = self._module_loader("spherov2.controls.v2")
+            processor = processors.Processors.SECONDARY
         packet = drive.Drive._encode(
             toy,
             7,
-            processors.Processors.SECONDARY,
+            processor,
             [speed, heading_degrees >> 8, heading_degrees & 0xFF, drive.DriveFlags.FORWARD],
         )
         queue = getattr(toy, "_Toy__packet_queue", None)

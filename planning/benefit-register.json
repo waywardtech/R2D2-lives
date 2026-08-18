@@ -3,6 +3,28 @@
   "policy": "Build or deploy a new behavior only when its stated outcome has a measurable benefit over a recorded baseline.",
   "entries": [
     {
+      "id": "r201-stock-primary-heading-20260818",
+      "scope": "hardware_diagnostic",
+      "state": "proposed",
+      "hypothesis": "The upstream R2 default-processor heading control path may produce observed forward displacement, unlike the completed secondary-processor heading attempt.",
+      "baseline": {
+        "summary": "The secondary-processor/tripod path completed safely with no observed locomotion.",
+        "evidence": ["planning/benefit-register.json#r201-stock-control-path-parity-20260818"]
+      },
+      "measurement": {
+        "metric": "operator_observed_forward_displacement_m",
+        "unit": "m",
+        "threshold": "> 0",
+        "collection": "Supervising operator observes direction, displacement, and final stance after one bounded pulse."
+      },
+      "decision_rule": "A positive observed displacement establishes only a candidate drive path for further calibrated stop testing; no displacement closes this stock-heading variation without retry.",
+      "sources": [
+        {"kind": "upstream", "url": "https://github.com/artificial-intelligence-class/spherov2.py"},
+        {"kind": "official", "url": "https://sdk.sphero.com/documentation/api-documents"}
+      ],
+      "next_action": "Run once only after code verification, Pi staging, fresh preflight, and explicit arm token."
+    },
+    {
       "id": "r201-secondary-processor-drive-20260818",
       "scope": "hardware_diagnostic",
       "state": "completed_no_benefit",

@@ -293,6 +293,15 @@ class Spherov2BackendTest(unittest.TestCase):
         self.assertEqual(FakeDriveCommand.encoded_proc, 2)
         backend.disconnect()
 
+    def test_stock_heading_forward_preserves_the_default_processor(self) -> None:
+        backend, toy, _, _ = self.make_backend()
+        backend.connect("D2-TEST")
+        backend.dispatch_stock_heading_forward_no_wait(25)
+        self.assertEqual(toy._Toy__packet_queue.get_nowait(), bytes((10, 22, 7, 17)))
+        self.assertEqual(FakeDriveCommand.encoded_data, [25, 0, 0, 0])
+        self.assertIsNone(FakeDriveCommand.encoded_proc)
+        backend.disconnect()
+
     def test_r2_specific_drive_queues_both_drive_motors_without_response_wait(self) -> None:
         backend, toy, _, _ = self.make_backend()
         backend.connect("D2-TEST")

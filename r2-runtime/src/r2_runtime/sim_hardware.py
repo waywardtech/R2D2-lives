@@ -45,6 +45,10 @@ class SimSpherov2Backend:
         self.stopped = False
         self.calls.append(f"heading_forward_no_wait:{speed}:{heading_degrees}")
 
+    def dispatch_stock_heading_forward_no_wait(self, speed: int, heading_degrees: int = 0) -> None:
+        self.stopped = False
+        self.calls.append(f"stock_heading_forward_no_wait:{speed}:{heading_degrees}")
+
     def dispatch_r2_drive_forward_no_wait(self, speed: int) -> None:
         self.stopped = False
         self.calls.append(f"r2_drive_forward_no_wait:{speed}")

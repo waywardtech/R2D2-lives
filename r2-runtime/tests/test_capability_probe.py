@@ -141,6 +141,14 @@ class CapabilityProbeTest(unittest.TestCase):
         driver.dispatch_emergency_stop()
         owner.disconnect("heading_forward_test_complete")
 
+    def test_stock_heading_forward_uses_the_default_processor_adapter(self) -> None:
+        backend, driver, owner, _ = self.make_probe()
+        owner.connect_for_stationary_probe()
+        driver.dispatch_stock_heading_forward(25)
+        self.assertEqual(backend.calls[-1], "stock_heading_forward_no_wait:25:0")
+        driver.dispatch_emergency_stop()
+        owner.disconnect("stock_heading_forward_test_complete")
+
     def test_r2_drive_and_stance_use_the_separate_r2_adapter_calls(self) -> None:
         backend, driver, owner, _ = self.make_probe()
         owner.connect_for_stationary_probe()

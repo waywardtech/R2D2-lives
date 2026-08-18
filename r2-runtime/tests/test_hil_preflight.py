@@ -6,6 +6,7 @@ from r2_runtime.hil_preflight import (
     validate_nonblocking_stop_bench_preflight,
     validate_post_wake_motion_diagnostic_preflight,
     validate_proof_of_life_preflight,
+    validate_stock_heading_diagnostic_preflight,
     validate_stationary_encounter_preflight,
     validate_stationary_preflight,
     validate_stop_bench_preflight,
@@ -110,6 +111,14 @@ def post_wake_motion_arguments(**overrides: object) -> Namespace:
     values = bounded_motion_arguments().__dict__.copy()
     values.pop("authorize_bounded_motion_calibration")
     values["authorize_post_wake_motion_diagnostic"] = False
+    values.update(overrides)
+    return Namespace(**values)
+
+
+def stock_heading_arguments(**overrides: object) -> Namespace:
+    values = bounded_motion_arguments().__dict__.copy()
+    values.pop("authorize_bounded_motion_calibration")
+    values["authorize_stock_heading_diagnostic"] = False
     values.update(overrides)
     return Namespace(**values)
 
@@ -289,6 +298,29 @@ class HilPreflightTest(unittest.TestCase):
             validate_post_wake_motion_diagnostic_preflight(
                 post_wake_motion_arguments(), environment
             )
+
+    def test_stock_heading_diagnostic_requires_its_own_exact_authorization(self) -> None:
+        args = stock_heading_arguments(
+            authorize_stock_heading_diagnostic=True,
+            operator_present=True,
+            device_inspected=True,
+            temperature_ok=True,
+            keepout_clear=True,
+            emergency_stop_ready=True,
+            unplugged_from_charger=True,
+            physically_contained=True,
+            second_go_confirmed=True,
+            allow_wake_stance_cycle=True,
+        )
+        environment = {
+            "R2_DEVICE_IDENTITY": "private",
+            "R2_STOCK_HEADING_ARM_TOKEN": "AUTHORIZE_ONE_STOCK_HEADING_PULSE",
+        }
+        self.assertEqual(
+            validate_stock_heading_diagnostic_preflight(args, environment).identity, "private"
+        )
+        with self.assertRaisesRegex(ValueError, "exact external arm token"):
+            validate_stock_heading_diagnostic_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
 
     def test_encounter_default_refuses_before_scanning(self) -> None:
         with self.assertRaisesRegex(ValueError, "exact stationary authorization"):

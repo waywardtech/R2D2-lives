@@ -26,6 +26,9 @@ class Spherov2Backend(Protocol):
     def dispatch_stop_no_wait(self) -> None: ...
     def dispatch_bounded_forward_no_wait(self, speed: int) -> None: ...
     def dispatch_heading_forward_no_wait(self, speed: int, heading_degrees: int = 0) -> None: ...
+    def dispatch_stock_heading_forward_no_wait(
+        self, speed: int, heading_degrees: int = 0
+    ) -> None: ...
     def dispatch_r2_drive_forward_no_wait(self, speed: int) -> None: ...
     def dispatch_three_legs_no_wait(self) -> None: ...
     def dispatch_two_legs_no_wait(self) -> None: ...
@@ -60,6 +63,9 @@ class UnavailableSpherov2Backend:
         self._raise()
 
     def dispatch_heading_forward_no_wait(self, speed: int, heading_degrees: int = 0) -> None:
+        self._raise()
+
+    def dispatch_stock_heading_forward_no_wait(self, speed: int, heading_degrees: int = 0) -> None:
         self._raise()
 
     def dispatch_r2_drive_forward_no_wait(self, speed: int) -> None:
@@ -172,6 +178,14 @@ class Spherov2R2Driver:
         if not 1 <= speed <= 25:
             raise ValueError("heading-drive speed must be in [1, 25]")
         self.backend.dispatch_heading_forward_no_wait(speed)
+        self.stopped = False
+
+    def dispatch_stock_heading_forward(self, speed: int) -> None:
+        if not self.connected or not self.stopped:
+            raise RuntimeError("stock heading dispatch requires connected safe-hold state")
+        if not 1 <= speed <= 25:
+            raise ValueError("stock heading-drive speed must be in [1, 25]")
+        self.backend.dispatch_stock_heading_forward_no_wait(speed)
         self.stopped = False
 
     def dispatch_r2_drive_forward(self, speed: int) -> None:

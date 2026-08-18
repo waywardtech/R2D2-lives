@@ -59,6 +59,11 @@ class SpeedThresholdDiagnosticPreflight:
     identity: str
 
 
+@dataclass(frozen=True)
+class StockHeadingDiagnosticPreflight:
+    identity: str
+
+
 def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
@@ -210,3 +215,22 @@ def validate_speed_threshold_diagnostic_preflight(
     if environment.get("R2_SPEED_THRESHOLD_ARM_TOKEN") != "AUTHORIZE_ONE_SPEED_25_PULSE":
         raise ValueError("diagnostic disabled: exact external arm token is required")
     return SpeedThresholdDiagnosticPreflight(identity)
+
+
+def validate_stock_heading_diagnostic_preflight(
+    args: argparse.Namespace, environment: Mapping[str, str]
+) -> StockHeadingDiagnosticPreflight:
+    if not args.authorize_stock_heading_diagnostic:
+        raise ValueError("diagnostic disabled: exact stock-heading authorization is required")
+    required = STOP_BENCH_FLAGS + ("allow_wake_stance_cycle",)
+    missing = [name.replace("_", "-") for name in required if not getattr(args, name)]
+    if missing:
+        raise ValueError("diagnostic disabled: incomplete preflight: " + ", ".join(missing))
+    identity = environment.get("R2_DEVICE_IDENTITY", "")
+    if not identity:
+        raise ValueError(
+            "diagnostic disabled: R2_DEVICE_IDENTITY is required outside source control"
+        )
+    if environment.get("R2_STOCK_HEADING_ARM_TOKEN") != "AUTHORIZE_ONE_STOCK_HEADING_PULSE":
+        raise ValueError("diagnostic disabled: exact external arm token is required")
+    return StockHeadingDiagnosticPreflight(identity)
