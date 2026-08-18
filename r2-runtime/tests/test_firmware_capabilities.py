@@ -21,7 +21,9 @@ class FirmwareCapabilityProfileTest(unittest.TestCase):
         self.assertEqual(profile.capabilities["led.dome_logic_display"].state, "verified")
         self.assertEqual(profile.capabilities["head.position_read"].state, "untested")
         self.assertEqual(profile.capabilities["audio.quiet_preview"].state, "untested")
-        self.assertEqual(profile.capabilities["drive.bounded_calibration"].state, "failed")
+        self.assertEqual(profile.capabilities["drive.bounded_calibration"].state, "verified")
+        self.assertEqual(profile.capabilities["emergency_stop.physical"].state, "verified")
+        self.assertEqual(profile.capabilities["stop.physical_effectiveness"].state, "verified")
         self.assertNotIn("D2-", PROFILE.read_text(encoding="utf-8"))
         for capability in profile.capabilities.values():
             for evidence in (*capability.evidence, *capability.supersedes):
@@ -34,6 +36,7 @@ class FirmwareCapabilityProfileTest(unittest.TestCase):
     def test_gate_cannot_complete_with_untested_physical_controls(self) -> None:
         payload = json.loads(PROFILE.read_text(encoding="utf-8"))
         payload["gate_p1_complete"] = True
+        payload["capabilities"]["stop.physical_effectiveness"]["state"] = "untested"
         with tempfile.TemporaryDirectory() as raw_temp:
             path = Path(raw_temp) / "invalid.json"
             path.write_text(json.dumps(payload), encoding="utf-8")

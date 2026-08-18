@@ -31,22 +31,29 @@
       "supersedes": []
     },
     "drive.bounded_calibration": {
-      "claim": "Four forward pulses—two at speed 5 and two at speed 10 after a three-second wake settle—queued through the reviewed path. The operator observed no displacement; transport delivery and motor response remain unconfirmed.",
+      "claim": "On 8-inch carpet tiles, stock/default-primary heading pulses at speed 25 for 0.10 s produced observed forward locomotion; measured displacement was 0.0762 m in one run.",
       "evidence": [
+        "evidence/hil/stock-calibration-7faa5c2-20260818T164825Z.json",
+        "evidence/hil/stock-calibration-7faa5c2-repeat-20260818T165657Z.json",
+        "docs/r201-stock-primary-calibration.md"
+      ],
+      "state": "verified",
+      "supersedes": [
         "evidence/hil/bounded-motion-f1a38b1-attempt-1.json",
         "evidence/hil/bounded-motion-f1a38b1-attempt-2.json",
         "evidence/hil/bounded-motion-f1a38b1-operator-observation.json",
         "evidence/hil/post-wake-motion-606a9eb-attempt-1.json",
         "evidence/hil/post-wake-motion-606a9eb-attempt-2.json",
         "evidence/hil/post-wake-motion-606a9eb-operator-observation.json"
-      ],
-      "state": "failed",
-      "supersedes": []
+      ]
     },
     "emergency_stop.physical": {
-      "claim": "No moving emergency-stop effectiveness test has been performed.",
-      "evidence": [],
-      "state": "untested",
+      "claim": "One carpet-tile moving pulse ended stationary inside the marked 0.25 m lane after the independent OFF/0 watchdog; other surfaces remain unverified.",
+      "evidence": [
+        "evidence/hil/stock-calibration-7faa5c2-stop-lane-20260818T170129Z.json",
+        "docs/r201-stock-primary-calibration.md"
+      ],
+      "state": "verified",
       "supersedes": []
     },
     "head.position_read": {
@@ -79,9 +86,12 @@
       ]
     },
     "stop.physical_effectiveness": {
-      "claim": "Stopping time and distance have not been measured from locomotion.",
-      "evidence": [],
-      "state": "untested",
+      "claim": "On 8-inch carpet tiles, one watchdog-stopped run ended at 0.06985 m from start, inside the 0.25 m containment lane; braking distance is not separately measured.",
+      "evidence": [
+        "evidence/hil/stock-calibration-7faa5c2-stop-lane-20260818T170129Z.json",
+        "docs/r201-stock-primary-calibration.md"
+      ],
+      "state": "verified",
       "supersedes": []
     },
     "telemetry.stationary": {

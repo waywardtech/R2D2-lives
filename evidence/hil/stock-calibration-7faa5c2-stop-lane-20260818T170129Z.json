@@ -1,0 +1,21 @@
+{
+  "device_identity_persisted": false,
+  "evidence_category": "hil_stock_bounded_calibration",
+  "evidence_sha256": "11f7327c44ab5bae6ef819d187b3b4aeb8955fa08c85a1f5f0a4788ad383d25d",
+  "generated_at": "2026-08-18T17:01:40.563577Z",
+  "heading_processor": "default_primary",
+  "max_accepted_displacement_m": 0.25,
+  "measured_distance_m": null,
+  "measurement_status": "operator_measurement_required",
+  "post_wake_settle_s": 3.0,
+  "requested_window_s": 0.1,
+  "schema_version": "1.0",
+  "speed": 25,
+  "stance_sequence": "three_legs_then_two_legs",
+  "stop_dispatch": "queued_unacknowledged",
+  "surface": "carpet_tile_8_in",
+  "terminal": "disconnected_safe_hold",
+  "watchdog_elapsed_s": 0.102352,
+  "watchdog_terminal": "completed",
+  "watchdog_timeout_s": 0.25
+}

@@ -15,3 +15,11 @@ retain immediate emergency disconnect access. The operator records the measured
 forward displacement, direction, final stance, and abnormal behavior. A script
 completion proves queueing and safe disconnect only; it does not prove speed,
 stopping distance, or physical-stop effectiveness.
+
+## Observed carpet-tile results
+
+The first measured run traveled 3 inches (0.0762 m) center-to-center. The
+marked-lane run ended 2.75 inches (0.06985 m) from the center start mark,
+inside the 0.25 m lane after the independent OFF/0 watchdog. These are two
+operator observations on 8-inch carpet tiles only; they do not establish a
+calibrated speed, braking distance, or result for a different surface.
