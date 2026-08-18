@@ -53,6 +53,7 @@
       },
       "decision_rule": "Build a new diagnostic only if the comparison finds at least one reviewed, R2-applicable difference and a simulation test captures it; otherwise close the locomotion branch pending new external evidence.",
       "result": "The pinned upstream R2 binding retains proc=None for stock raw-motor and heading calls, while the completed diagnostic explicitly used Processors.SECONDARY; deterministic audit found two control-path differences without hardware access.",
+      "target_host_evidence_sha256": "d729f19b17578ec4f7046f3ae5081451a94f62b96b4aea172812a123cd68885a",
       "sources": [
         {
           "kind": "official",
