@@ -5,7 +5,7 @@
     {
       "id": "r201-stock-primary-heading-20260818",
       "scope": "hardware_diagnostic",
-      "state": "proposed",
+      "state": "completed_benefit",
       "hypothesis": "The upstream R2 default-processor heading control path may produce observed forward displacement, unlike the completed secondary-processor heading attempt.",
       "baseline": {
         "summary": "The secondary-processor/tripod path completed safely with no observed locomotion.",
@@ -18,11 +18,34 @@
         "collection": "Supervising operator observes direction, displacement, and final stance after one bounded pulse."
       },
       "decision_rule": "A positive observed displacement establishes only a candidate drive path for further calibrated stop testing; no displacement closes this stock-heading variation without retry.",
+      "result": "Two separately authorized default-primary heading pulses completed with the watchdog safe hold, and the supervising operator confirmed locomotion.",
       "sources": [
         {"kind": "upstream", "url": "https://github.com/artificial-intelligence-class/spherov2.py"},
         {"kind": "official", "url": "https://sdk.sphero.com/documentation/api-documents"}
       ],
-      "next_action": "Run once only after code verification, Pi staging, fresh preflight, and explicit arm token."
+      "next_action": "Measure one conservative, bounded calibration segment and its stopped final state before claiming distance, speed, or physical-stop effectiveness."
+    },
+    {
+      "id": "r201-stock-primary-bounded-calibration-20260818",
+      "scope": "hardware_diagnostic",
+      "state": "proposed",
+      "hypothesis": "The verified stock/default-primary heading path can produce one conservatively bounded forward segment that an operator can measure, establishing a calibration baseline without exceeding the Phase 1 0.25 m limit.",
+      "baseline": {
+        "summary": "The stock/default-primary heading diagnostic produced operator-observed locomotion, but the distance and stopping effectiveness remain unmeasured.",
+        "evidence": ["planning/benefit-register.json#r201-stock-primary-heading-20260818"]
+      },
+      "measurement": {
+        "metric": "operator_measured_forward_displacement_m",
+        "unit": "m",
+        "threshold": "> 0 and <= 0.25",
+        "collection": "A supervising operator measures the forward displacement from fixed start and finish marks, observes direction, final stance, and stationary state after the independent watchdog safe hold."
+      },
+      "decision_rule": "A measured segment within the 0.25 m bound establishes only a preliminary motion calibration datum; unexpected direction, excessive distance, or any abnormal behavior stops the branch and leaves physical-stop effectiveness unverified.",
+      "sources": [
+        {"kind": "official", "url": "https://sdk.sphero.com/documentation/api-documents"},
+        {"kind": "upstream", "url": "https://github.com/artificial-intelligence-class/spherov2.py"}
+      ],
+      "next_action": "Review and stage a distinct, fixed-bounds calibration runner, then require fresh exact motion authorization and preflight before one HIL run."
     },
     {
       "id": "r201-secondary-processor-drive-20260818",
