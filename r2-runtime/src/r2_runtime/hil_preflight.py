@@ -64,6 +64,11 @@ class StockHeadingDiagnosticPreflight:
     identity: str
 
 
+@dataclass(frozen=True)
+class StockBoundedCalibrationPreflight:
+    identity: str
+
+
 def validate_stationary_preflight(args: argparse.Namespace, environment: Mapping[str, str]) -> str:
     if not args.authorize_stationary_hil:
         raise ValueError("HIL disabled: explicit stationary authorization is required")
@@ -234,3 +239,26 @@ def validate_stock_heading_diagnostic_preflight(
     if environment.get("R2_STOCK_HEADING_ARM_TOKEN") != "AUTHORIZE_ONE_STOCK_HEADING_PULSE":
         raise ValueError("diagnostic disabled: exact external arm token is required")
     return StockHeadingDiagnosticPreflight(identity)
+
+
+def validate_stock_bounded_calibration_preflight(
+    args: argparse.Namespace, environment: Mapping[str, str]
+) -> StockBoundedCalibrationPreflight:
+    """Refuse the one-shot measured calibration until it is explicitly armed."""
+    if not args.authorize_stock_bounded_calibration:
+        raise ValueError("calibration disabled: exact stock-bounded authorization is required")
+    required = STOP_BENCH_FLAGS + ("allow_wake_stance_cycle",)
+    missing = [name.replace("_", "-") for name in required if not getattr(args, name)]
+    if missing:
+        raise ValueError("calibration disabled: incomplete preflight: " + ", ".join(missing))
+    identity = environment.get("R2_DEVICE_IDENTITY", "")
+    if not identity:
+        raise ValueError(
+            "calibration disabled: R2_DEVICE_IDENTITY is required outside source control"
+        )
+    if (
+        environment.get("R2_STOCK_BOUNDED_CALIBRATION_ARM_TOKEN")
+        != "AUTHORIZE_ONE_STOCK_CALIBRATION"
+    ):
+        raise ValueError("calibration disabled: exact external arm token is required")
+    return StockBoundedCalibrationPreflight(identity)

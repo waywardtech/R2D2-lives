@@ -7,6 +7,7 @@ from r2_runtime.hil_preflight import (
     validate_post_wake_motion_diagnostic_preflight,
     validate_proof_of_life_preflight,
     validate_stock_heading_diagnostic_preflight,
+    validate_stock_bounded_calibration_preflight,
     validate_stationary_encounter_preflight,
     validate_stationary_preflight,
     validate_stop_bench_preflight,
@@ -321,6 +322,30 @@ class HilPreflightTest(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "exact external arm token"):
             validate_stock_heading_diagnostic_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
+
+    def test_stock_bounded_calibration_requires_its_own_exact_authorization(self) -> None:
+        args = stock_heading_arguments(
+            authorize_stock_bounded_calibration=True,
+            operator_present=True,
+            device_inspected=True,
+            temperature_ok=True,
+            keepout_clear=True,
+            emergency_stop_ready=True,
+            unplugged_from_charger=True,
+            physically_contained=True,
+            second_go_confirmed=True,
+            allow_wake_stance_cycle=True,
+        )
+        args.authorize_stock_heading_diagnostic = False
+        environment = {
+            "R2_DEVICE_IDENTITY": "private",
+            "R2_STOCK_BOUNDED_CALIBRATION_ARM_TOKEN": "AUTHORIZE_ONE_STOCK_CALIBRATION",
+        }
+        self.assertEqual(
+            validate_stock_bounded_calibration_preflight(args, environment).identity, "private"
+        )
+        with self.assertRaisesRegex(ValueError, "exact external arm token"):
+            validate_stock_bounded_calibration_preflight(args, {"R2_DEVICE_IDENTITY": "private"})
 
     def test_encounter_default_refuses_before_scanning(self) -> None:
         with self.assertRaisesRegex(ValueError, "exact stationary authorization"):
