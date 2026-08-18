@@ -51,7 +51,7 @@
     {
       "id": "r201-carpet-tile-physical-stop-20260818",
       "scope": "hardware_diagnostic",
-      "state": "proposed",
+      "state": "completed_benefit",
       "hypothesis": "For the measured 0.0762 m carpet-tile calibration segment, the independent OFF/0 watchdog leaves R2 stationary within the marked 0.25 m containment boundary and produces a normal final stance.",
       "baseline": {
         "summary": "The current calibration proves only a queued, unacknowledged stop and a final stationary observation; it does not measure stopping distance or prove physical-stop effectiveness.",
@@ -64,11 +64,12 @@
         "collection": "On 8-inch carpet tiles, the supervising operator measures the center-to-center final position relative to the 0.0762 m calibration mark and confirms that R2 is stationary in a 0.25 m contained lane after the independently queued OFF/0 watchdog."
       },
       "decision_rule": "A measured final position no farther than 0.25 m from the marked start and a normal stationary final state provide one surface-specific physical-stop observation; any overrun, abnormal behavior, or inability to measure closes the branch without a parameter retry.",
+      "result": "On 8-inch carpet tiles, the marked-lane run ended 2.75 inches (0.06985 m) from the center start mark, inside the 0.25 m containment boundary. This is 0.00635 m shorter than the prior 3-inch calibration datum; the watchdog safe hold and normal final stance were observed.",
       "sources": [
         {"kind": "official", "url": "https://sdk.sphero.com/documentation/api-documents"},
         {"kind": "upstream", "url": "https://github.com/artificial-intelligence-class/spherov2.py"}
       ],
-      "next_action": "Use the existing fixed calibration runner once with a marked 0.25 m carpet-tile lane and collect the final center position; do not change speed, duration, or processor."
+      "next_action": "Record this as one carpet-tile-only physical-stop observation. Do not generalize it to another surface; next address the remaining actual-firmware capability report and untested telemetry controls."
     },
     {
       "id": "r201-secondary-processor-drive-20260818",
