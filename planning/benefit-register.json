@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "policy": "Build or deploy a new behavior only when its stated outcome has a measurable benefit over a recorded baseline.",
+  "entries": [
+    {
+      "id": "r201-secondary-processor-drive-20260818",
+      "scope": "hardware_diagnostic",
+      "state": "completed_no_benefit",
+      "hypothesis": "Selecting the R2 secondary processor and explicit tripod stance will produce observed forward wheel motion where earlier primary/default-path attempts did not.",
+      "baseline": {
+        "summary": "Four prior bounded forward pulses and one R2 generic-drive attempt produced no observed locomotion.",
+        "evidence": [
+          "r2-runtime/capabilities/r201-firmware-7.0.101.json",
+          "docs/r201-bounded-motion-calibration.md"
+        ]
+      },
+      "measurement": {
+        "metric": "operator_observed_forward_displacement_m",
+        "unit": "m",
+        "threshold": "> 0",
+        "collection": "Supervising operator observes direction and measured displacement after the single bounded pulse."
+      },
+      "result": "LEDs and the three-leg to two-leg stance cycle were observed; no locomotion was observed.",
+      "decision_rule": "No observed displacement means this path is not a validated wheel-control path and must not be retried unchanged.",
+      "sources": [
+        {
+          "kind": "official",
+          "url": "https://sdk.sphero.com/documentation/api-documents"
+        },
+        {
+          "kind": "upstream",
+          "url": "https://github.com/artificial-intelligence-class/spherov2.py"
+        }
+      ],
+      "next_action": "Compare the exact encoded stock high-level control path with the reviewed diagnostic packet path without accessing hardware."
+    },
+    {
+      "id": "r201-stock-control-path-parity-20260818",
+      "scope": "research_and_static_test",
+      "state": "completed_benefit",
+      "hypothesis": "A static, byte-level comparison can identify a control-path difference between the current diagnostic and the upstream recommended high-level R2 path, producing a distinct testable hypothesis before any new hardware action.",
+      "baseline": {
+        "summary": "Current secondary-processor diagnostic completes safely but produces no observed locomotion.",
+        "evidence": [
+          "planning/benefit-register.json#r201-secondary-processor-drive-20260818"
+        ]
+      },
+      "measurement": {
+        "metric": "distinct_control_path_differences_count",
+        "unit": "count",
+        "threshold": ">= 1",
+        "collection": "Deterministic static comparison of reviewed upstream/library source and locally encoded test fixtures; no BLE import, scan, connection, or write."
+      },
+      "decision_rule": "Build a new diagnostic only if the comparison finds at least one reviewed, R2-applicable difference and a simulation test captures it; otherwise close the locomotion branch pending new external evidence.",
+      "result": "The pinned upstream R2 binding retains proc=None for stock raw-motor and heading calls, while the completed diagnostic explicitly used Processors.SECONDARY; deterministic audit found two control-path differences without hardware access.",
+      "sources": [
+        {
+          "kind": "official",
+          "url": "https://sites.google.com/sphero.com/sphero-public-sdk/documentation/sdk-documents"
+        },
+        {
+          "kind": "upstream",
+          "url": "https://github.com/artificial-intelligence-class/spherov2.py"
+        },
+        {
+          "kind": "community",
+          "url": "https://github.com/ccb/sphero-r2d2/blob/main/spherov2/sphero_edu.py"
+        }
+      ],
+      "next_action": "Do not schedule another HIL run until a distinct, documented hypothesis explains why the stock primary/default control path would improve on its prior no-motion result."
+    }
+  ]
+}
