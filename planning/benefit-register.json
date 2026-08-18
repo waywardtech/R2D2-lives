@@ -72,6 +72,28 @@
       "next_action": "Record this as one carpet-tile-only physical-stop observation. Do not generalize it to another surface; next address the remaining actual-firmware capability report and untested telemetry controls."
     },
     {
+      "id": "r201-stationary-head-telemetry-20260818",
+      "scope": "hardware_diagnostic",
+      "state": "proposed",
+      "hypothesis": "A stationary post-connect head-position query can establish whether the R201 responds to a read-only head capability while also recording its advertised telemetry inventory, without drive or expressive commands.",
+      "baseline": {
+        "summary": "The former head-position query timed out before the wake/connect sequence was understood, and telemetry remains unverified on the actual firmware.",
+        "evidence": ["evidence/hil/stationary-capability-ec3785f-head-timeout.json"]
+      },
+      "measurement": {
+        "metric": "stationary_capability_results_count",
+        "unit": "count",
+        "threshold": ">= 1 observed or characterized failure",
+        "collection": "One separately authorized stationary probe records the sanitized head-query result, advertised telemetry stream names, connection lifecycle, and final safe-hold state; no drive, heading, leg, LED, audio, or animation option is enabled."
+      },
+      "decision_rule": "A read result or a sanitized, stable failure phase advances the capability report; no movement command is permitted and the run is not retried unchanged.",
+      "sources": [
+        {"kind": "official", "url": "https://sdk.sphero.com/documentation/api-documents"},
+        {"kind": "upstream", "url": "https://github.com/artificial-intelligence-class/spherov2.py"}
+      ],
+      "next_action": "Run the existing stationary probe once with head read authorized and all LED/audio options omitted; import its sanitized evidence and update only the capabilities it actually characterizes."
+    },
+    {
       "id": "r201-secondary-processor-drive-20260818",
       "scope": "hardware_diagnostic",
       "state": "completed_no_benefit",
