@@ -74,7 +74,7 @@
     {
       "id": "r201-stationary-head-telemetry-20260818",
       "scope": "hardware_diagnostic",
-      "state": "proposed",
+      "state": "completed_benefit",
       "hypothesis": "A stationary post-connect head-position query can establish whether the R201 responds to a read-only head capability while also recording its advertised telemetry inventory, without drive or expressive commands.",
       "baseline": {
         "summary": "The former head-position query timed out before the wake/connect sequence was understood, and telemetry remains unverified on the actual firmware.",
@@ -87,11 +87,12 @@
         "collection": "One separately authorized stationary probe records the sanitized head-query result, advertised telemetry stream names, connection lifecycle, and final safe-hold state; no drive, heading, leg, LED, audio, or animation option is enabled."
       },
       "decision_rule": "A read result or a sanitized, stable failure phase advances the capability report; no movement command is permitted and the run is not retried unchanged.",
+      "result": "The read-only head query timed out at the stable head.safe_range phase. The driver ended disconnected/offline and stopped, with movement_performed false; this unchanged probe path is closed.",
       "sources": [
         {"kind": "official", "url": "https://sdk.sphero.com/documentation/api-documents"},
         {"kind": "upstream", "url": "https://github.com/artificial-intelligence-class/spherov2.py"}
       ],
-      "next_action": "Run the existing stationary probe once with head read authorized and all LED/audio options omitted; import its sanitized evidence and update only the capabilities it actually characterizes."
+      "next_action": "Import the sanitized failure record and preserve head.position_read as untested/failed-to-characterize. Investigate a distinct non-blocking packet trace only if it offers a measurable distinction from the completed synchronous query."
     },
     {
       "id": "r201-secondary-processor-drive-20260818",
