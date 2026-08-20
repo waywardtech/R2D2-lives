@@ -124,6 +124,7 @@ class StationaryProbePolicy:
     allow_led_preview: bool = False
     led_preview_dwell_s: float = 1.5
     allow_head_read: bool = False
+    allow_session_initialized_head_read: bool = False
     allow_audio_preview: bool = False
     audio_id: int | None = None
     audio_volume: int = 8
@@ -379,6 +380,26 @@ class Spherov2LibraryBackend:
                     "head-position query was not explicitly authorized"
                 )
             return {"result": "read_only", "head_position": float(toy.get_head_position())}
+        if capability == "head.session_initialized_read":
+            if not self.policy.allow_session_initialized_head_read:
+                raise HardwareActionNotAuthorized(
+                    "session-initialized head read was not explicitly authorized"
+                )
+            if not self.policy.allow_wake_on_connect:
+                raise HardwareActionNotAuthorized(
+                    "session-initialized head read requires explicit wake authorization"
+                )
+            utilities = self._module_loader("spherov2.utils").ToyUtil
+            utilities.set_robot_state_on_start(toy)
+            utilities.enable_sensors(
+                toy, ["attitude", "accelerometer", "gyroscope", "locator", "velocity"]
+            )
+            return {
+                "result": "read_only",
+                "head_position": float(toy.get_head_position()),
+                "session_initialized": True,
+                "streams": ("accelerometer", "attitude", "gyroscope", "locator", "velocity"),
+            }
         if capability == "audio.quiet_preview":
             if not self.policy.allow_audio_preview:
                 raise HardwareActionNotAuthorized("audio preview was not explicitly authorized")

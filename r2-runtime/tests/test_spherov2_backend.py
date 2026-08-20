@@ -151,6 +151,16 @@ class FakeToy:
         raise AssertionError("inspection must not configure collision detection")
 
 
+class FakeToyUtil:
+    @staticmethod
+    def set_robot_state_on_start(toy: FakeToy) -> None:
+        toy.calls.append("session_neutral")
+
+    @staticmethod
+    def enable_sensors(toy: FakeToy, sensors: list[str]) -> None:
+        toy.calls.append(("session_sensors", tuple(sensors)))
+
+
 class FakePacket:
     def __init__(self, *, flags: int, did: int, cid: int, seq: int, err: object = None) -> None:
         self.flags = flags
@@ -230,6 +240,7 @@ class Spherov2BackendTest(unittest.TestCase):
             "spherov2.commands.animatronic": SimpleNamespace(
                 Animatronic=FakeAnimatronicCommand, R2LegActions=FakeR2LegActions
             ),
+            "spherov2.utils": SimpleNamespace(ToyUtil=FakeToyUtil),
         }
         backend = Spherov2LibraryBackend(
             policy=policy,
@@ -334,7 +345,12 @@ class Spherov2BackendTest(unittest.TestCase):
         backend, toy, _, _ = self.make_backend()
         backend.connect("D2-TEST")
         before = list(toy.calls)
-        for capability in ("led.low_brightness", "head.safe_range", "audio.quiet_preview"):
+        for capability in (
+            "led.low_brightness",
+            "head.safe_range",
+            "head.session_initialized_read",
+            "audio.quiet_preview",
+        ):
             with (
                 self.subTest(capability=capability),
                 self.assertRaises(HardwareActionNotAuthorized),
@@ -373,6 +389,36 @@ class Spherov2BackendTest(unittest.TestCase):
         self.assertEqual(
             toy.calls[-4:],
             [("audio_volume", 8), ("audio_play", 1704, 0), "audio_stop", ("audio_volume", 40)],
+        )
+        backend.disconnect()
+
+    def test_session_initialized_head_read_requires_wake_and_uses_documented_setup(self) -> None:
+        backend, toy, _, _ = self.make_backend(
+            StationaryProbePolicy(allow_session_initialized_head_read=True)
+        )
+        backend.connect("D2-TEST")
+        with self.assertRaises(HardwareActionNotAuthorized):
+            backend.exercise_stationary("head.session_initialized_read")
+        backend.disconnect()
+
+        backend, toy, _, _ = self.make_backend(
+            StationaryProbePolicy(
+                allow_wake_on_connect=True, allow_session_initialized_head_read=True
+            )
+        )
+        backend.connect("D2-TEST")
+        result = backend.exercise_stationary("head.session_initialized_read")
+        self.assertEqual(result["head_position"], 0.0)
+        self.assertEqual(
+            toy.calls[2:],
+            [
+                "session_neutral",
+                (
+                    "session_sensors",
+                    ("attitude", "accelerometer", "gyroscope", "locator", "velocity"),
+                ),
+                "head_read",
+            ],
         )
         backend.disconnect()
 
