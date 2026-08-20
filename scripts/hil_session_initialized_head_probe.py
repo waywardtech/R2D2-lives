@@ -31,6 +31,8 @@ def main() -> None:
     ):
         parser.add_argument(f"--{flag}", action="store_true")
     parser.add_argument("--allow-wake-on-connect", action="store_true")
+    parser.add_argument("--allow-audio-preview", action="store_true")
+    parser.add_argument("--audio-id", type=int)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     try:
