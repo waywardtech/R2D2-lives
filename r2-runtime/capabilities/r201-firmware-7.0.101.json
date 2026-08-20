@@ -97,8 +97,11 @@
       "supersedes": []
     },
     "telemetry.stationary": {
-      "claim": "Session initialization enabled accelerometer, attitude, gyroscope, locator, and velocity streams on the R201; sample delivery remains a separate measurement.",
-      "evidence": ["evidence/hil/session-head-b25bec4-20260820T210421Z.json"],
+      "claim": "Session initialization enabled accelerometer, attitude, gyroscope, locator, and velocity streams, and a bounded one-second passive collection received one real sample.",
+      "evidence": [
+        "evidence/hil/session-head-b25bec4-20260820T210421Z.json",
+        "evidence/hil/passive-telemetry-d04a1ee-20260820T211150Z.json"
+      ],
       "state": "verified",
       "supersedes": []
     },
