@@ -44,7 +44,8 @@ def main() -> None:
             allow_wake_on_connect=args.allow_wake_on_connect,
             allow_audio_preview=args.allow_audio_preview,
             audio_id=args.audio_id,
-            audio_volume=64,
+            audio_volume=255,
+            audio_preview_dwell_s=3.5,
             session_initialize_before_audio_preview=True,
         )
     )

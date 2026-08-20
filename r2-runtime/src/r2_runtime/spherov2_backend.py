@@ -132,6 +132,7 @@ class StationaryProbePolicy:
     session_initialize_before_audio_preview: bool = False
     audio_id: int | None = None
     audio_volume: int = 8
+    audio_preview_dwell_s: float = 2.5
     allow_stationary_expressions: bool = False
     allowed_audio_names: frozenset[str] = frozenset()
 
@@ -140,6 +141,8 @@ class StationaryProbePolicy:
             raise ValueError("LED preview dwell must be in [0.1, 2.0] seconds")
         if not 0 <= self.audio_volume <= 255:
             raise ValueError("audio preview volume must be in [0, 255]")
+        if not 0.5 <= self.audio_preview_dwell_s <= 5.0:
+            raise ValueError("audio preview dwell must be in [0.5, 5.0] seconds")
         if not 0.1 <= self.telemetry_sample_window_s <= 2.0:
             raise ValueError("telemetry sample window must be in [0.1, 2.0] seconds")
         if self.allow_audio_preview and self.audio_id is None:
@@ -428,6 +431,8 @@ class Spherov2LibraryBackend:
                 toy.set_audio_volume(self.policy.audio_volume)
                 phase = "audio_play"
                 toy.play_audio_file(self.policy.audio_id, 0)
+                phase = "audio_playback_dwell"
+                self._sleeper(self.policy.audio_preview_dwell_s)
             except Exception as error:
                 primary_error = error
             cleanup_error: Exception | None = None
@@ -453,6 +458,7 @@ class Spherov2LibraryBackend:
                 "result": "exercised",
                 "audio_id": self.policy.audio_id,
                 "volume": self.policy.audio_volume,
+                "playback_dwell_s": self.policy.audio_preview_dwell_s,
                 "restored": True,
             }
         if capability == "telemetry.stationary":

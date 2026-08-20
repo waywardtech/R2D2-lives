@@ -394,6 +394,31 @@ class Spherov2BackendTest(unittest.TestCase):
         self.assertEqual(toy.calls[:2], ["enter", "wake"])
         backend.disconnect()
 
+    def test_audio_preview_waits_before_safe_audio_cleanup(self) -> None:
+        policy = StationaryProbePolicy(
+            allow_audio_preview=True,
+            audio_id=1704,
+            audio_preview_dwell_s=3.5,
+        )
+        backend, toy, _, _ = self.make_backend(policy)
+        dwells: list[float] = []
+        backend._sleeper = dwells.append
+        backend.connect("D2-TEST")
+        result = backend.exercise_stationary("audio.quiet_preview")
+        self.assertEqual(dwells, [3.5])
+        self.assertEqual(result["playback_dwell_s"], 3.5)
+        self.assertEqual(
+            toy.calls[-5:],
+            [
+                "audio_get_volume",
+                ("audio_volume", 8),
+                ("audio_play", 1704, 0),
+                "audio_stop",
+                ("audio_volume", 40),
+            ],
+        )
+        backend.disconnect()
+
     def test_authorized_previews_restore_led_and_audio_state(self) -> None:
         policy = StationaryProbePolicy(
             allow_led_preview=True,
@@ -403,6 +428,7 @@ class Spherov2BackendTest(unittest.TestCase):
             audio_volume=8,
         )
         backend, toy, _, _ = self.make_backend(policy)
+        backend._sleeper = lambda _: None
         backend.connect("D2-TEST")
         backend.exercise_stationary("led.low_brightness")
         backend.exercise_stationary("head.safe_range")
