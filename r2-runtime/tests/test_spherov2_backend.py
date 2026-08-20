@@ -82,6 +82,28 @@ class FakeDriveControl:
         self.calls.append(("raw_motors", left_mode, left_speed, right_mode, right_speed))
 
 
+class FakeSensorControl:
+    def __init__(self, calls: list[object]) -> None:
+        self.calls = calls
+        self.listener: object | None = None
+
+    def add_sensor_data_listener(self, listener: object) -> None:
+        self.listener = listener
+        self.calls.append("listener_add")
+
+    def remove_sensor_data_listener(self, listener: object) -> None:
+        self.calls.append("listener_remove")
+        self.listener = None
+
+    def enable(self, *names: str) -> None:
+        self.calls.append(("sensors_enable", names))
+        if callable(self.listener):
+            self.listener({"attitude": {"yaw": 0.0}})
+
+    def disable_all(self) -> None:
+        self.calls.append("sensors_disable")
+
+
 class FakeToy:
     name = "D2-TEST"
     address = "private-address-must-not-escape"
@@ -94,6 +116,7 @@ class FakeToy:
         self.calls: list[object] = []
         self.drive_control = FakeDriveControl(self.calls)
         self.multi_led_control = FakeLedControl(self.calls)
+        self.sensor_control = FakeSensorControl(self.calls)
         self._Toy__packet_queue: SimpleQueue[bytes] = SimpleQueue()
 
     def __enter__(self) -> "FakeToy":
@@ -399,6 +422,30 @@ class Spherov2BackendTest(unittest.TestCase):
         backend.connect("D2-TEST")
         with self.assertRaises(HardwareActionNotAuthorized):
             backend.exercise_stationary("head.session_initialized_read")
+        backend.disconnect()
+
+    def test_passive_telemetry_sampling_is_bounded_and_always_restored(self) -> None:
+        backend, toy, _, _ = self.make_backend(
+            StationaryProbePolicy(
+                allow_passive_telemetry_sample=True, telemetry_sample_window_s=0.1
+            )
+        )
+        backend.connect("D2-TEST")
+        result = backend.exercise_stationary("telemetry.passive_sample")
+        self.assertEqual(result["result"], "sampled")
+        self.assertEqual(result["sample_count"], 1)
+        self.assertEqual(
+            toy.calls[-4:],
+            [
+                "listener_add",
+                (
+                    "sensors_enable",
+                    ("attitude", "accelerometer", "gyroscope", "locator", "velocity"),
+                ),
+                "sensors_disable",
+                "listener_remove",
+            ],
+        )
         backend.disconnect()
 
         backend, toy, _, _ = self.make_backend(

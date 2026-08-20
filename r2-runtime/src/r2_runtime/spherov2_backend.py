@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from importlib import import_module, metadata
+from threading import Event
 import time
 from types import ModuleType
 from typing import Any, Callable, Mapping, Protocol
@@ -125,6 +126,8 @@ class StationaryProbePolicy:
     led_preview_dwell_s: float = 1.5
     allow_head_read: bool = False
     allow_session_initialized_head_read: bool = False
+    allow_passive_telemetry_sample: bool = False
+    telemetry_sample_window_s: float = 1.0
     allow_audio_preview: bool = False
     audio_id: int | None = None
     audio_volume: int = 8
@@ -136,6 +139,8 @@ class StationaryProbePolicy:
             raise ValueError("LED preview dwell must be in [0.1, 2.0] seconds")
         if not 0 <= self.audio_volume <= 16:
             raise ValueError("quiet audio preview volume must be in [0, 16]")
+        if not 0.1 <= self.telemetry_sample_window_s <= 2.0:
+            raise ValueError("telemetry sample window must be in [0.1, 2.0] seconds")
         if self.allow_audio_preview and self.audio_id is None:
             raise ValueError("authorized audio preview requires an explicit verified audio ID")
 
@@ -443,6 +448,36 @@ class Spherov2LibraryBackend:
             return {
                 "result": "advertised_only",
                 "streams": tuple(sorted((*toy.sensors.keys(), *toy.extended_sensors.keys()))),
+            }
+        if capability == "telemetry.passive_sample":
+            if not self.policy.allow_passive_telemetry_sample:
+                raise HardwareActionNotAuthorized(
+                    "passive telemetry sampling was not explicitly authorized"
+                )
+            control = getattr(toy, "sensor_control", None)
+            if control is None:
+                raise RuntimeError("R201 sensor-control surface is unavailable")
+            samples: list[object] = []
+            received = Event()
+
+            def listener(sample: object) -> None:
+                if len(samples) < 8:
+                    samples.append(sample)
+                received.set()
+
+            control.add_sensor_data_listener(listener)
+            try:
+                control.enable("attitude", "accelerometer", "gyroscope", "locator", "velocity")
+                received.wait(self.policy.telemetry_sample_window_s)
+            finally:
+                try:
+                    control.disable_all()
+                finally:
+                    control.remove_sensor_data_listener(listener)
+            return {
+                "result": "sampled" if samples else "no_sample",
+                "sample_count": len(samples),
+                "window_s": self.policy.telemetry_sample_window_s,
             }
         if capability == "collision.configuration":
             return {
