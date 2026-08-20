@@ -138,8 +138,8 @@ class StationaryProbePolicy:
     def __post_init__(self) -> None:
         if not 0.1 <= self.led_preview_dwell_s <= 2.0:
             raise ValueError("LED preview dwell must be in [0.1, 2.0] seconds")
-        if not 0 <= self.audio_volume <= 16:
-            raise ValueError("quiet audio preview volume must be in [0, 16]")
+        if not 0 <= self.audio_volume <= 255:
+            raise ValueError("audio preview volume must be in [0, 255]")
         if not 0.1 <= self.telemetry_sample_window_s <= 2.0:
             raise ValueError("telemetry sample window must be in [0.1, 2.0] seconds")
         if self.allow_audio_preview and self.audio_id is None:
