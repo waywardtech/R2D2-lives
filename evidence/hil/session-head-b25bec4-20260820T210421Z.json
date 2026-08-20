@@ -1,0 +1,21 @@
+{
+  "device_identity_persisted": false,
+  "evidence_category": "hil_session_initialized_head_probe",
+  "generated_at": "2026-08-20T21:04:32.547547Z",
+  "head_query": {
+    "head_position": 1.4146270751953125,
+    "result": "read_only",
+    "session_initialized": true,
+    "streams": [
+      "accelerometer",
+      "attitude",
+      "gyroscope",
+      "locator",
+      "velocity"
+    ]
+  },
+  "movement_performed": false,
+  "schema_version": "1.0",
+  "session_setup": "wake_neutral_sensor_streams",
+  "terminal": "disconnected_safe_hold"
+}

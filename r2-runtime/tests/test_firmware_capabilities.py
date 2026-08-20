@@ -19,7 +19,12 @@ class FirmwareCapabilityProfileTest(unittest.TestCase):
         self.assertFalse(profile.gate_p1_complete)
         self.assertEqual(profile.capabilities["wake.stance_cycle"].state, "verified")
         self.assertEqual(profile.capabilities["led.dome_logic_display"].state, "verified")
-        self.assertEqual(profile.capabilities["head.position_read"].state, "untested")
+        head = profile.capabilities["head.position_read"]
+        self.assertEqual(head.state, "verified")
+        self.assertEqual(
+            head.evidence,
+            ("evidence/hil/session-head-b25bec4-20260820T210421Z.json",),
+        )
         self.assertEqual(profile.capabilities["audio.quiet_preview"].state, "untested")
         self.assertEqual(profile.capabilities["drive.bounded_calibration"].state, "verified")
         self.assertEqual(profile.capabilities["emergency_stop.physical"].state, "verified")

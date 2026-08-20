@@ -57,11 +57,13 @@
       "supersedes": []
     },
     "head.position_read": {
-      "claim": "Untested after the required wake sequence; the pre-wake read timed out.",
-      "evidence": [],
-      "state": "untested",
+      "claim": "After documented wake, neutral-state, and passive-stream setup, the R201 returned a read-only head position and disconnected safe-held.",
+      "evidence": [
+        "evidence/hil/session-head-b25bec4-20260820T210421Z.json"
+      ],
+      "state": "verified",
       "supersedes": [
-        "evidence/hil/stationary-capability-ec3785f-head-timeout.json"
+        "evidence/hil/cycle-1-stop-timeout.json"
       ]
     },
     "led.dome_logic_display": {
@@ -95,9 +97,9 @@
       "supersedes": []
     },
     "telemetry.stationary": {
-      "claim": "Sensor streams are advertised by the adapter but have not been exercised on this firmware.",
-      "evidence": [],
-      "state": "unverified",
+      "claim": "Session initialization enabled accelerometer, attitude, gyroscope, locator, and velocity streams on the R201; sample delivery remains a separate measurement.",
+      "evidence": ["evidence/hil/session-head-b25bec4-20260820T210421Z.json"],
+      "state": "verified",
       "supersedes": []
     },
     "wake.stance_cycle": {
@@ -113,7 +115,7 @@
   "device_ref": "sha256:275886bae470849ca3796342f2b473846da043d693e4f39445c7390d59d35807",
   "firmware": "7.0.101",
   "gate_p1_complete": false,
-  "generated_at": "2026-08-13T17:44:16.214456Z",
+  "generated_at": "2026-08-20T20:49:03.988938Z",
   "library_baseline": "0.12.1",
   "model": "R2-D2 R201",
   "schema_version": "1.0"
