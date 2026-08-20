@@ -129,6 +129,7 @@ class StationaryProbePolicy:
     allow_passive_telemetry_sample: bool = False
     telemetry_sample_window_s: float = 1.0
     allow_audio_preview: bool = False
+    session_initialize_before_audio_preview: bool = False
     audio_id: int | None = None
     audio_volume: int = 8
     allow_stationary_expressions: bool = False
@@ -412,6 +413,16 @@ class Spherov2LibraryBackend:
             previous: int | None = None
             primary_error: Exception | None = None
             try:
+                if self.policy.session_initialize_before_audio_preview:
+                    if not self.policy.allow_wake_on_connect:
+                        raise HardwareActionNotAuthorized(
+                            "session-initialized audio preview requires explicit wake authorization"
+                        )
+                    utilities = self._module_loader("spherov2.utils").ToyUtil
+                    utilities.set_robot_state_on_start(toy)
+                    utilities.enable_sensors(
+                        toy, ["attitude", "accelerometer", "gyroscope", "locator", "velocity"]
+                    )
                 previous = int(toy.get_audio_volume())
                 phase = "audio_volume_set"
                 toy.set_audio_volume(self.policy.audio_volume)
