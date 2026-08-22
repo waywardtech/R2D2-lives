@@ -48,7 +48,8 @@ def main() -> None:
         raise SystemExit(str(exc)) from exc
     seed = args.seed if args.seed is not None else secrets.randbits(32)
     policy = StationaryProbePolicy(
-        allow_head_read=True,
+        allow_wake_on_connect=True,
+        allow_session_initialized_head_read=True,
         allow_stationary_expressions=True,
         allowed_audio_names=allowed_audio_names(),
     )

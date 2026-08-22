@@ -90,7 +90,9 @@ def run_proof_of_life(
             raise PermissionError(f"battery state {battery_state!r} blocks proof of life")
         phase = "head_position_query"
         droid_status["head"] = dict(
-            owner.serialized(lambda: driver.backend.exercise_stationary("head.safe_range"))
+            owner.serialized(
+                lambda: driver.backend.exercise_stationary("head.session_initialized_read")
+            )
         )
         mark("head_checked")
         mark("expression_started")

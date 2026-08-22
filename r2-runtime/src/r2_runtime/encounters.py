@@ -41,8 +41,8 @@ class StationaryExpressionPlan:
     head_positions_deg: tuple[float, ...]
     logic_display_brightness: int = 8
     logic_display_pattern: tuple[int, ...] = (0, 8, 0, 8, 0)
-    audio_volume: int = 8
-    audio_dwell_s: float = 1.25
+    audio_volume: int = 255
+    audio_dwell_s: float = 3.5
     light_dwell_s: float = 0.12
 
     def __post_init__(self) -> None:
@@ -60,10 +60,10 @@ class StationaryExpressionPlan:
             raise ValueError("stationary expression must finish with logic displays off")
         if any(not 0 <= level <= 8 for level in self.logic_display_pattern):
             raise ValueError("logic-display pattern levels must be in [0, 8]")
-        if not 0 <= self.audio_volume <= 8:
-            raise ValueError("stationary expression volume must be in [0, 8]")
-        if not 0.1 <= self.audio_dwell_s <= 2.0:
-            raise ValueError("audio dwell must be in [0.1, 2.0] seconds")
+        if not 0 <= self.audio_volume <= 255:
+            raise ValueError("stationary expression volume must be in [0, 255]")
+        if not 0.5 <= self.audio_dwell_s <= 5.0:
+            raise ValueError("audio dwell must be in [0.5, 5.0] seconds")
         if not 0.05 <= self.light_dwell_s <= 0.5:
             raise ValueError("light dwell must be in [0.05, 0.5] seconds")
 

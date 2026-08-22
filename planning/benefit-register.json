@@ -161,6 +161,38 @@
         }
       ],
       "next_action": "Do not schedule another HIL run until a distinct, documented hypothesis explains why the stock primary/default control path would improve on its prior no-motion result."
+    },
+    {
+      "id": "r201-proof-of-life-session-audio-20260822",
+      "scope": "hardware_diagnostic",
+      "state": "active",
+      "hypothesis": "Replacing the closed direct head query and obsolete low-volume/short-dwell expression settings with the already verified session-initialized head path and 255-volume, 3.5-second audio envelope will complete one observed stationary proof-of-life expression.",
+      "baseline": {
+        "summary": "The previous proof-of-life HIL failed before expression_started; direct head read was subsequently characterized as unsuitable, while the separate session-initialized head and audio preview paths are verified.",
+        "evidence": [
+          "evidence/hil/proof-of-life-attempt-1-failure.json",
+          "evidence/hil/session-head-b25bec4-20260820T210421Z.json",
+          "evidence/hil/session-audio-c93d04d-20260820T213520Z.json"
+        ]
+      },
+      "measurement": {
+        "metric": "operator_observed_completed_stationary_expression_count",
+        "unit": "count",
+        "threshold": ">= 1",
+        "collection": "One separately authorized, watchdog-bounded run records durable stages and immutable evidence; the supervising operator confirms audible sound, bounded dome movement, LEDs, final stationary state, and no locomotion."
+      },
+      "decision_rule": "A completed report plus matching operator observation establishes only this exact stationary proof-of-life composition; any failure or unexpected motion closes the run without an automatic retry.",
+      "sources": [
+        {
+          "kind": "official",
+          "url": "https://sdk.sphero.com/documentation/api-documents"
+        },
+        {
+          "kind": "upstream",
+          "url": "https://github.com/artificial-intelligence-class/spherov2.py"
+        }
+      ],
+      "next_action": "Stage the tested change and conduct one explicitly authorized no-drive proof-of-life HIL under the existing external watchdog."
     }
   ]
 }

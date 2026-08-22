@@ -71,7 +71,8 @@ class DroidEncounterChatTest(unittest.TestCase):
         self.assertEqual(first.logic_display_pattern[-1], 0)
         self.assertIn(-abs(first.head_positions_deg[1]), first.head_positions_deg)
         self.assertEqual(first.head_positions_deg[-1], 0.0)
-        self.assertLessEqual(first.audio_volume, 8)
+        self.assertEqual(first.audio_volume, 255)
+        self.assertEqual(first.audio_dwell_s, 3.5)
 
 
 if __name__ == "__main__":

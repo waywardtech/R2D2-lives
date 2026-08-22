@@ -75,7 +75,7 @@ class ProofOfLifeTest(unittest.TestCase):
     def test_head_query_failure_has_stable_phase_and_disconnects(self) -> None:
         class HeadFailureBackend(SimSpherov2Backend):
             def exercise_stationary(self, capability: str) -> dict[str, object]:
-                if capability == "head.safe_range":
+                if capability == "head.session_initialized_read":
                     raise EOFError
                 return dict(super().exercise_stationary(capability))
 
@@ -96,7 +96,7 @@ class ProofOfLifeTest(unittest.TestCase):
     def test_disconnect_failure_does_not_replace_primary_failure(self) -> None:
         class PrimaryAndCleanupFailureBackend(SimSpherov2Backend):
             def exercise_stationary(self, capability: str) -> dict[str, object]:
-                if capability == "head.safe_range":
+                if capability == "head.session_initialized_read":
                     raise TimeoutError
                 return dict(super().exercise_stationary(capability))
 
