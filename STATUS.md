@@ -1,13 +1,13 @@
 # Project status
 
-Last updated: 2026-08-12
-Current phase: Phase 1
+Last updated: 2026-08-22
+Current phase: Phase 2
 Gate state: IN PROGRESS
 
 ## Current objective
 
-Deploy and verify the stationary proof-of-life report and read-only iPhone
-dashboard while keeping locomotion and every physical operation separately gated.
+Build the deterministic control core in simulation while preserving the completed
+Phase 1 hardware capability evidence and its separately gated HIL boundaries.
 
 ## Requirement/evidence status
 
@@ -21,17 +21,19 @@ dashboard while keeping locomotion and every physical operation separately gated
 | ARCH-004 / agent selection | pass | BSM scaffold tests | Generic SimMobileAgent only |
 | TEST-001, TEST-003 | pass | simulation fault tests | No hardware path; final safe state asserted |
 | Gate P0 | pass | `python scripts/tasks.py test`, `sim-smoke`, `docs-check` | Automated/contract/simulation evidence complete |
-| R2-001 / single BLE owner | in_progress | `r2_runtime.ble_owner.BleOwner` | Simulation verified; real process/HIL pending |
-| R2-002, R2-003 / capability probe | in_progress | `evidence/hil/cycle-1-stop-timeout.json` | Firmware observed; stop and optional actions incomplete |
-| R2-004 / reconnect no-resume | pass | `test_link_loss_and_reconnect_do_not_resume` | Simulation evidence |
-| R2-008 / bounded expressions | in_progress | proof-of-life simulation and failed HIL report | HIL failed before expression start; no primitive issued |
-| R2-012 / Safari PWA | in_progress | `https://raspberrypi.local/R2D2/` | Read-only portrait dashboard live; auth/control gates pending |
+| R2-001 / single BLE owner | pass | `docs/r2-connectivity-diagnosis-2026-08-13.md` | Five fresh HIL cycles and a 30-minute stationary session completed through the serialized owner |
+| R2-002, R2-003 / capability probe | pass | `r2-runtime/capabilities/r201-firmware-7.0.101.json` | Phase 1 profile closed: BLE, battery, wake, LED, session head/telemetry, audio, and bounded carpet motion have evidence; collision remains explicitly unverified |
+| R2-004 / reconnect no-resume | pass | connectivity diagnosis plus fault tests | HIL sessions ended disconnected/stopped; injected reconnect never resumes motion |
+| R2-008 / bounded expressions | pass | `evidence/hil/proof-of-life-43e8261-20260822T163324Z.json` | Operator-confirmed stationary proof of life completed: wake cycle, dome reset/sweep, LEDs, audible vocalization, restoration, no locomotion |
+| R2-012 / Safari PWA | in_progress | `https://raspberrypi.local/R2D2/`, `https://raspberrypi.local/BLE/` | Portrait dashboards live; auth/control gates pending |
 | R2-014 / distinct health | pass | live dashboard status plus collector tests | Target-host Pi/R2 status and issue highlighting verified |
-| Gate P1 / five cycles | incomplete | five simulation cycles | Five real HIL cycles required |
-| Gate P1 / 30-minute session | incomplete | 1,800-second virtual soak | Real stationary HIL session required |
-| Gate P1 / bounded movement | incomplete | none | Explicit motion authorization and preflight required |
+| R2-014 / BLE diagnostics | pass | `https://raspberrypi.local/BLE/` | Live SSE scan/detail/on-demand intelligence, Sphero highlighting, strict product links, and separate TSV logs verified |
+| Gate P1 / five cycles | pass | `docs/r2-connectivity-diagnosis-2026-08-13.md` | Five consecutive fresh real connect/probe/disconnect cycles passed |
+| Gate P1 / 30-minute session | pass | `docs/r2-connectivity-diagnosis-2026-08-13.md` | Thirty samples over 30 minutes completed with clean disconnect |
+| Gate P1 / bounded movement | pass | `docs/r201-stock-primary-calibration.md` | Carpet-tile run traveled 0.0762 m; independent stop lane ended at 0.06985 m, within 0.25 m |
 
-Evidence category: automated, contract, simulation, HIL failure. No passing HIL cycle.
+Evidence category: automated, contract, simulation, target-host, passing and
+failed HIL, and operator-observed surface-specific calibration.
 
 ## Completed this phase
 
@@ -278,13 +280,24 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   tests. The served HTML, JavaScript, and cache v7 were verified over HTTPS; a
   live issue query returned `mode: local` and `physical_action: false`.
   Bluetooth remained inactive and soft-blocked, with no droid access.
+- Immutable Pi release `5ef2465-ble-v2d-20260813` serves the expanded
+  iPhone-first passive BLE survey at `/BLE/`. An eight-second HTTPS/SSE scan
+  streamed 24 advertisers as discovered, enriched their rows in place, and
+  identified one R2-D2-family and one BB-series Sphero. Every table column sorts
+  both directions and accepts a regular-expression filter. Details survive
+  service restarts from the active TSV. Explicitly requesting the R2-D2 report
+  streamed observations, live Bluetooth SIG standards data, identity inference,
+  four bounded searches, product-link validation, imagery, and completion; the
+  separate intelligence TSV was fsynced before each stage. Generic Sphero and
+  Amazon storefront pages were correctly rejected as product links, so the UI
+  used its labeled speculative silhouette. `btmgmt con` reported zero BLE
+  connections. BlueZ `NotReady` output now fails visibly instead of completing
+  as an empty scan, and an older TSV schema was retained in a timestamped archive.
 
 ## Remaining gate items
 
-- After explicit stationary-HIL authorization and preflight: run five real
-  connect/probe/disconnect cycles and a 30-minute stationary session.
-- After separate explicit motion authorization: run the <=0.25 m calibration
-  and emergency-stop subtest. Failure must end the sequence without retry.
+- Phase 2 deterministic control acceptance: lease/watchdog timing, command
+  lifecycle, bounded manual PWA, and simulated service-soak evidence.
 
 ## Decisions and assumptions
 
@@ -310,6 +323,15 @@ Evidence category: automated, contract, simulation, HIL failure. No passing HIL 
   inspection cannot distinguish a charging-state behavior from an unsupported
   response assumption. Treating packet transmission as stop confirmation is
   prohibited until a separately authorized bench trace resolves the ambiguity.
+- Basic BLE connectivity is now resolved. The pinned adapter failed to stop its
+  non-daemon event-loop thread when disconnect raised `EOFError`, and cleanup
+  could overwrite a primary command timeout. Release `18d52e9` guarantees
+  bounded worker cleanup and preserves first-failure precedence. One diagnostic,
+  five consecutive fresh cycles, and a 30-minute/30-sample stationary session
+  all passed on R2 with clean disconnects and no movement.
+- The direct post-wake head query remains closed after its characterized failure;
+  the session-initialized read path, bounded audio preview, telemetry sample, and
+  stationary proof-of-life composition are verified separately.
 
 ## Last verification
 
@@ -322,7 +344,7 @@ python scripts/tasks.py sim-smoke -> pass; seed 20260811, duplicate suppressed, 
 python scripts/tasks.py docs-check -> pass
 python scripts/verify_repository_hygiene.py -> pass; tracked secrets/device identities and dependency notices
 python scripts/tasks.py p1-sim -> pass; five simulated cycles, virtual 1800 s soak, no movement, safe_hold
-python scripts/tasks.py test -> pass; 120 primary suite tests plus isolated standalone repetitions
+python scripts/tasks.py test -> pass; 173 R2, 2 BSM, 13 integration, and 8 contract tests plus isolated standalone repetitions
 python scripts/tasks.py encounter-sim -> pass; BB-8 classified, 3 bounded reactions, no movement, offline
 python scripts/tasks.py proof-of-life-sim -> pass; seeded sound, LED flashes, bounded dome sweep, offline
 python scripts/tasks.py stop-trace-sim -> pass; 5 deterministic non-BLE classifier outcomes
@@ -347,23 +369,22 @@ Pi static response-policy audit -> pass; client wait policy verified, firmware b
 Pi conversation service -> pass; HTTPS local chat, migration, continuity, movement refusal, no physical action
 Pi safe model-adapter rollout -> pass; release e0c54fe, local mode, no credential, Bluetooth inactive/blocked
 Pi stop-response trace simulation -> pass; release 6613c70, 5 outcomes, Bluetooth inactive/blocked
+Pi BLE web scanner -> pass; release 5ef2465-ble-20260813, HTTPS page/health/5 s scan, 25 devices, 2 Sphero, 25 TSV rows, zero connections
 stationary proof-of-life attempt 1 -> failed before expression start; watchdog cleanup, no retry
 proof-of-life attempt 1 operator observation -> no expression or locomotion observed; stationary, silent, LEDs off
+R2 connectivity diagnosis -> pass; 5/5 fresh cycles and 30-minute stationary session, clean disconnect, no movement
+stationary proof-of-life 43e8261 -> pass; session head, LED/dome/audio sequence observed; safe-held/offline, no locomotion
 ```
 
 ## Hardware state
 
-- Real R2 movement authorized for next run: no
-- One stationary proof-of-life expression authorized for next run: no; authorization consumed
-- Last known droid state: operator-confirmed stationary and silent with all LEDs off; controller powered off with no BLE connection or HIL process
-- Capability profile: partial; firmware/identity/battery/advertised telemetry observed
-- Hardware evidence category: target-host import, HIL discovery, and failed stationary probe
+- Real R2 movement authorized for next run: no (automation never grants this; the current operator authorization and preflight are evaluated at each HIL launch)
+- Stationary proof-of-life authorization: controlled by the current operator preflight; never automatically repeated
+- Last known droid state: operator-confirmed final two-leg stance with LEDs off after the successful stationary proof-of-life run
+- Capability profile: Phase 1 complete; collision behavior remains unverified
+- Hardware evidence category: target-host, HIL, and operator observation
 
 ## Exact next task
 
-The response-policy diagnosis has reached its hardware boundary: static source
-audit and the complete deterministic trace-classifier matrix pass. The next
-question--whether firmware 7.0.101 acknowledges the one OFF/0 raw-motor packet--
-requires the separately authorized physical stop-response bench, exact preflight,
-and a demonstrated immediate shutdown method. Do not run it while charging or
-reuse earlier proof-of-life authorization. Locomotion remains unauthorized.
+Implement and verify the next smallest Phase 2 deterministic-control acceptance
+criterion in simulation. Keep real hardware tests separately armed and bounded.
