@@ -165,7 +165,7 @@
     {
       "id": "r201-proof-of-life-session-audio-20260822",
       "scope": "hardware_diagnostic",
-      "state": "active",
+      "state": "completed_benefit",
       "hypothesis": "Replacing the closed direct head query and obsolete low-volume/short-dwell expression settings with the already verified session-initialized head path and 255-volume, 3.5-second audio envelope will complete one observed stationary proof-of-life expression.",
       "baseline": {
         "summary": "The previous proof-of-life HIL failed before expression_started; direct head read was subsequently characterized as unsuitable, while the separate session-initialized head and audio preview paths are verified.",
@@ -192,7 +192,8 @@
           "url": "https://github.com/artificial-intelligence-class/spherov2.py"
         }
       ],
-      "next_action": "Stage the tested change and conduct one explicitly authorized no-drive proof-of-life HIL under the existing external watchdog."
+      "result": "The watchdog-bounded run completed all durable stages. The supervising operator observed the two-leg to three-leg to two-leg wake cycle, dome reset then left/right/center sweep, LED flashes, an audible greeting-like vocalization, a short stationary pause, and final LEDs off; no locomotion was observed.",
+      "next_action": "Record the immutable HIL report and operator observation as the completed stationary proof-of-life evidence; keep all future expressions separately authorized."
     }
   ]
 }

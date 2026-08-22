@@ -1,0 +1,13 @@
+{
+  "attempt": "proof-of-life-43e8261",
+  "audio_observed": true,
+  "dome_reset_observed": true,
+  "dome_sweep_observed": ["left", "right", "center"],
+  "final_led_state": "off",
+  "generated_at": "2026-08-22T16:35:00Z",
+  "led_flashes_observed": true,
+  "locomotion_observed": false,
+  "observation_source": "operator",
+  "schema_version": "1.0",
+  "stance_sequence_observed": ["two_leg", "three_leg", "two_leg"]
+}

@@ -199,3 +199,13 @@ LED activity occurred; the base, legs, heading, and location did not change; and
 R2 ended stationary, silent, with all LEDs off. The attempt remains a failed HIL
 cycle because the intended expression was not performed and disconnect
 completion was not journaled.
+
+## Verified proof-of-life run
+
+Release `43e8261` used the verified session-initialized head path and the
+verified 255-volume, 3.5-second audio envelope. Its watchdog-bounded HIL report
+completed every durable lifecycle stage and ended offline/safe-held with no
+locomotion. The supervising operator observed the two-leg to three-leg to
+two-leg wake cycle, dome reset and left/right/center sweep, LED flashes, an
+audible greeting-like sound, and final LEDs off. This verifies only the reviewed
+stationary proof-of-life composition.

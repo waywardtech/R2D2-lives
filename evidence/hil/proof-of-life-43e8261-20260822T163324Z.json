@@ -1,0 +1,122 @@
+{
+  "evidence_category": "stationary-proof-of-life",
+  "final_state": "offline",
+  "movement_performed": false,
+  "plan": {
+    "audio_dwell_s": 3.5,
+    "audio_name": "R2_POSITIVE_8",
+    "audio_volume": 255,
+    "head_positions_deg": [
+      0.0,
+      -20.0,
+      20.0,
+      0.0
+    ],
+    "light_dwell_s": 0.12,
+    "logic_display_brightness": 8,
+    "logic_display_pattern": [
+      0,
+      8,
+      0,
+      8,
+      0
+    ],
+    "semantic": "excitement"
+  },
+  "schema_version": "1.0",
+  "seed": 1003024618,
+  "status": {
+    "clock": {
+      "clock_id": "raspberrypi-monotonic-boot",
+      "sync_source": "ntp",
+      "synchronized": true,
+      "uncertainty_ms": null
+    },
+    "droid": {
+      "battery": {
+        "provenance": "r201_firmware_query",
+        "state": "ok",
+        "voltage_v": 3.94
+      },
+      "connection": "offline",
+      "expression": {
+        "audio_name": "R2_POSITIVE_8",
+        "audio_stopped": true,
+        "head_restored": true,
+        "logic_displays_off": true,
+        "semantic": "excitement",
+        "status": "completed"
+      },
+      "head": {
+        "head_position": -3.285400390625,
+        "result": "read_only",
+        "session_initialized": true,
+        "streams": [
+          "accelerometer",
+          "attitude",
+          "gyroscope",
+          "locator",
+          "velocity"
+        ]
+      },
+      "identity": {
+        "board_revision": "3",
+        "bootloader": "4.1.18",
+        "firmware": "7.0.101",
+        "model": "R2-D2 R201",
+        "processor": "bytearray(b'Nordic')",
+        "system": "bytearray(b'ROW')"
+      },
+      "movement_performed": false,
+      "safe_hold": true
+    },
+    "issues": [],
+    "measured_at": "2026-08-22T16:33:24.865356Z",
+    "monotonic_ns": 493901355551567,
+    "overall": "nominal",
+    "pi": {
+      "ambient_temperature_c": null,
+      "ambient_temperature_status": "sensor_not_configured",
+      "audio_cards": "0 [vc4hdmi0       ]: vc4-hdmi - vc4-hdmi-0\n                      vc4-hdmi-0\n 1 [vc4hdmi1       ]: vc4-hdmi - vc4-hdmi-1\n                      vc4-hdmi-1\n 2 [Headphones     ]: bcm2835_headpho - bcm2835 Headphones\n                      bcm2835 Headphones",
+      "collector_process": {
+        "pid": 480856,
+        "state": "running"
+      },
+      "cpu_count": 4,
+      "cpu_temperature_c": 37.485,
+      "disk": {
+        "free_bytes": 48602820608,
+        "total_bytes": 125258715136,
+        "used_percent": 56.1
+      },
+      "hostname": "raspberrypi",
+      "kernel": "6.18.39+rpt-rpi-v8",
+      "load": {
+        "fifteen_min": 0.00830078125,
+        "five_min": 0.04345703125,
+        "one_min": 0.13623046875
+      },
+      "machine": "aarch64",
+      "memory": {
+        "available_bytes": 3613609984,
+        "total_bytes": 3980189696,
+        "used_percent": 9.2
+      },
+      "network_interfaces": {
+        "eth0": "down",
+        "lo": "unknown",
+        "wlan0": "up"
+      },
+      "os": "Debian GNU/Linux 13 (trixie)",
+      "python": "3.11.2",
+      "services": {
+        "apache2": "active",
+        "bluetooth": "active",
+        "r2_dashboard_status": "unknown"
+      },
+      "throttling": "throttled=0x0",
+      "uptime_s": 493901.14
+    },
+    "schema_version": "1.0"
+  }
+}
