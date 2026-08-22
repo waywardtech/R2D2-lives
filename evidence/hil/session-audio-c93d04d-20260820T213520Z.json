@@ -1,0 +1,15 @@
+{
+  "audio": {
+    "audio_id": 2813,
+    "playback_dwell_s": 3.5,
+    "restored": true,
+    "result": "exercised",
+    "volume": 255
+  },
+  "device_identity_persisted": false,
+  "evidence_category": "hil_session_audio_preview",
+  "generated_at": "2026-08-20T21:35:35.521093Z",
+  "movement_performed": false,
+  "schema_version": "1.0",
+  "terminal": "disconnected_safe_hold"
+}

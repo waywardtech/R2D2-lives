@@ -1,9 +1,12 @@
 {
   "capabilities": {
     "audio.quiet_preview": {
-      "claim": "Untested after the required wake sequence; the pre-wake volume query returned an empty payload before playback.",
-      "evidence": [],
-      "state": "untested",
+      "claim": "After the documented wake and session setup, onboard audio ID 2813 was physically heard at volume 255 during a bounded 3.5-second preview; the command then stopped, restored the prior volume, and disconnected safe-held without locomotion.",
+      "evidence": [
+        "evidence/hil/session-audio-c93d04d-20260820T213520Z.json",
+        "evidence/hil/session-audio-c93d04d-operator-observation.json"
+      ],
+      "state": "verified",
       "supersedes": [
         "evidence/hil/stationary-audio-ec3785f-volume-response.json"
       ]
@@ -118,7 +121,7 @@
   "device_ref": "sha256:275886bae470849ca3796342f2b473846da043d693e4f39445c7390d59d35807",
   "firmware": "7.0.101",
   "gate_p1_complete": false,
-  "generated_at": "2026-08-20T20:49:03.988938Z",
+  "generated_at": "2026-08-22T16:29:29.634Z",
   "library_baseline": "0.12.1",
   "model": "R2-D2 R201",
   "schema_version": "1.0"

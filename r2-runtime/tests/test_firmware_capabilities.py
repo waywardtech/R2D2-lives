@@ -25,7 +25,15 @@ class FirmwareCapabilityProfileTest(unittest.TestCase):
             head.evidence,
             ("evidence/hil/session-head-b25bec4-20260820T210421Z.json",),
         )
-        self.assertEqual(profile.capabilities["audio.quiet_preview"].state, "untested")
+        audio = profile.capabilities["audio.quiet_preview"]
+        self.assertEqual(audio.state, "verified")
+        self.assertEqual(
+            audio.evidence,
+            (
+                "evidence/hil/session-audio-c93d04d-20260820T213520Z.json",
+                "evidence/hil/session-audio-c93d04d-operator-observation.json",
+            ),
+        )
         self.assertEqual(profile.capabilities["drive.bounded_calibration"].state, "verified")
         self.assertEqual(profile.capabilities["emergency_stop.physical"].state, "verified")
         self.assertEqual(profile.capabilities["stop.physical_effectiveness"].state, "verified")

@@ -116,3 +116,19 @@ path on the tested hardware, but also proves `wake()` is physical stance
 actuation on this R201 rather than a link-only initialization step. It must stay
 default-off and requires explicit authorization for bounded stance movement;
 passive connection, status, and telemetry paths must not invoke it.
+
+## Verified onboard audio
+
+The earlier audio failure was not treated as a reason to retry the same packet.
+Comparison with the stock Sphero-Edu R2 path showed that audio playback is
+asynchronous. The preview implementation had issued its cleanup stop immediately
+after playback began, giving the droid no bounded time to emit the sound. Release
+`c93d04d` adds a policy-bounded playback dwell before cleanup and accepts the
+vendor's full one-byte volume range.
+
+One authorized no-drive HIL run used documented R2 audio ID `2813` at volume
+`255`, held playback for `3.5` seconds, then stopped audio, restored the previous
+volume, safe-held, and disconnected. The run persisted no device identity and
+reported no locomotion. The supervising operator confirmed that R2 produced an
+audible sound. This verifies `audio.quiet_preview` for firmware `7.0.101` only;
+it does not authorize unattended playback, drive, or additional audio IDs.
