@@ -16,7 +16,7 @@ PROFILE = ROOT / "r2-runtime" / "capabilities" / "r201-firmware-7.0.101.json"
 class FirmwareCapabilityProfileTest(unittest.TestCase):
     def test_actual_profile_is_private_identity_free_and_evidence_backed(self) -> None:
         profile = load_capability_profile(PROFILE)
-        self.assertFalse(profile.gate_p1_complete)
+        self.assertTrue(profile.gate_p1_complete)
         self.assertEqual(profile.capabilities["wake.stance_cycle"].state, "verified")
         self.assertEqual(profile.capabilities["led.dome_logic_display"].state, "verified")
         head = profile.capabilities["head.position_read"]

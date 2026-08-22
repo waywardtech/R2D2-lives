@@ -120,7 +120,7 @@
   },
   "device_ref": "sha256:275886bae470849ca3796342f2b473846da043d693e4f39445c7390d59d35807",
   "firmware": "7.0.101",
-  "gate_p1_complete": false,
+  "gate_p1_complete": true,
   "generated_at": "2026-08-22T16:29:29.634Z",
   "library_baseline": "0.12.1",
   "model": "R2-D2 R201",
