@@ -1,5 +1,12 @@
 # R2 Runtime + Bat-Space Modeler workspace
 
+> **Work in progress.** An active build of a safe control runtime for a Sphero
+> R2-D2 (R201) droid, alongside the spatial-modeling work beside it. It is
+> published so the work is visible, not because any part of it is finished.
+> `STATUS.md` carries the current phase and gate state; interfaces change
+> without notice, and real hardware movement stays behind the explicit
+> authorization and safety gates described in `AGENTS.md`.
+
 This incubation workspace contains two independently deployable products joined
 only through the versioned Spatial Agent Protocol (SAP):
 
