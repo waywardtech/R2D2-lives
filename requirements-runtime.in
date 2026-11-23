@@ -1,0 +1,12 @@
+# Third-party runtime dependencies of r2-runtime, mirrored from
+# r2-runtime/pyproject.toml (sap-protocol is the local protocol/ package).
+# Regenerate requirements-runtime.lock with:
+#   pip-compile --generate-hashes --allow-unsafe --strip-extras --no-emit-index-url -o requirements-runtime.lock requirements-runtime.in
+# Keep shared pins (e.g. typing-extensions) identical to the dev toolchain lock.
+-c requirements-dev.lock
+
+alembic==1.16.5
+fastapi==0.116.1
+pydantic==2.13.4
+sqlalchemy==2.0.43
+uvicorn==0.35.0
