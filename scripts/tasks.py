@@ -37,7 +37,7 @@ def _run(command: list[str], *, paths: tuple[Path, ...] = PROJECT_SOURCES) -> No
 def bootstrap() -> None:
     if sys.version_info[:2] != (3, 11):
         raise SystemExit("Phase 0 requires Python 3.11")
-    print("Python 3.11 available; Phase 0 has no third-party runtime dependencies.")
+    print("Python 3.11 available; runtime dependencies pinned in requirements-runtime.lock.")
 
 
 def quality() -> None:
@@ -107,6 +107,7 @@ def docs_check() -> None:
     required = [
         ROOT / "AGENTS.md",
         ROOT / "requirements-dev.lock",
+        ROOT / "requirements-runtime.lock",
         ROOT / "STATUS.md",
         ROOT / "CHANGELOG.md",
         ROOT / "docs" / "phase-0-operator.md",

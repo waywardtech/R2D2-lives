@@ -11,12 +11,17 @@ present.
 ## Commands
 
 Create a Python 3.11 virtual environment and install the exact, hash-verified
-quality tools before running the complete suite:
+quality tools and r2-runtime's third-party runtime dependencies before running
+the complete suite:
 
 ```text
 python -m venv .venv
 python -m pip install --require-hashes -r requirements-dev.lock
+python -m pip install --require-hashes -r requirements-runtime.lock
 ```
+
+`requirements-runtime.lock` is generated from `requirements-runtime.in` with the
+`pip-compile` command recorded at the top of that file.
 
 Activate the environment, then on systems with GNU Make use `make bootstrap`,
 `make quality`, `make check`, `make contract`, `make sim-smoke`, `make test`, and
